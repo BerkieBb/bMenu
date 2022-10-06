@@ -32,9 +32,24 @@ local vehicleClassNames = {
     [22] = 'Open Wheel',
     [69] = 'Misc'
 }
+local vehicleDoorBoneNames = {
+    [0] = 'door_dside_f',
+    [1] = 'door_pside_f',
+    [2] = 'door_dside_r',
+    [3] = 'door_pside_r',
+    [4] = 'bonnet',
+    [5] = 'boot'
+}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
-local replacePreviousVehicle = false -- Replace the previous vehicle you were in when spawning a new vehicle
+local replacePreviousVehicle = true -- Replace the previous vehicle you were in when spawning a new vehicle
+local vehicleGodMode = false
+local vehicleInvincible = false
+local vehicleEngineDamage = false
+local vehicleVisualDamage = false
+local vehicleStrongWheels = false
+local vehicleRampDamage = false
+local vehicleAutoRepair = false
 
 local function firstToUpper(str)
     return str:gsub("^%l", string.upper)
@@ -268,6 +283,10 @@ local function spawnVehicleOnPlayer(model)
 end
 
 local function createVehiclesForSpawner(vehs, id)
+    table.sort(vehs, function(a, b)
+        return a.name < b.name
+    end)
+
     for i = 1, #vehs do
         local data = vehs[i]
         local label = GetLabelText(GetDisplayNameFromVehicleModel(data.model))
@@ -361,6 +380,73 @@ lib.registerMenu({
 end)
 
 lib.registerMenu({
+    id = 'berkie_menu_vehicle_options',
+    title = 'Vehicle Options',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        if args == 'berkie_menu_vehicle_options_god_mode_enable' then
+            vehicleGodMode = scrollIndex == 1
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'berkie_menu_vehicle_options_god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false}, 1)
+        end
+    end,
+    options = {
+        {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'berkie_menu_vehicle_options_god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false},
+        {label = 'God Mode Options', description = 'Enable or disable specific damage types', args = 'berkie_menu_vehicle_options_god_mode_menu'}
+    }
+}, function(_, scrollIndex, args)
+    if scrollIndex then return end
+    lib.showMenu(args)
+end)
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_god_mode_menu',
+    title = 'Vehicle God Mode Options',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        local val = scrollIndex == 1 and vehicleGodMode
+        if args == 'invincible' then
+            if val == vehicleInvincible then return end
+            vehicleInvincible = val
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = 'invincible', values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false}, 1)
+        elseif args == 'engine_damage' then
+            if val == vehicleEngineDamage then return end
+            vehicleEngineDamage = val
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = 'engine_damage', values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false}, 2)
+        elseif args == 'visual_damage' then
+            if val == vehicleVisualDamage then return end
+            vehicleVisualDamage = val
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = 'visual_damage', values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false}, 3)
+        elseif args == 'strong_wheels' then
+            if val == vehicleStrongWheels then return end
+            vehicleStrongWheels = val
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = 'strong_wheels', values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false}, 4)
+        elseif args == 'ramp_damage' then
+            if val == vehicleRampDamage then return end
+            vehicleRampDamage = val
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = 'ramp_damage', values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false}, 5)
+        elseif args == 'auto_repair' then
+            if val == vehicleAutoRepair then return end
+            vehicleAutoRepair = val
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = 'auto_repair', values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}, 6)
+        end
+    end,
+    options = {
+        {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = 'invincible', values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false},
+        {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = 'engine_damage', values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false},
+        {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = 'visual_damage', values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false},
+        {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = 'strong_wheels', values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false},
+        {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = 'ramp_damage', values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false},
+        {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = 'auto_repair', values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}
+    }
+})
+
+lib.registerMenu({
     id = 'berkie_menu_vehicle_spawner',
     title = 'Vehicle Spawner',
     position = 'top-right',
@@ -381,8 +467,8 @@ lib.registerMenu({
         {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'berkie_menu_vehicle_spawner_inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
         {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'berkie_menu_vehicle_spawner_replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
     }
-}, function(_, _, args)
-    if args == 'berkie_menu_vehicle_spawner_inside_vehicle' or args == 'berkie_menu_vehicle_spawner_replace_vehicle' then return end
+}, function(_, scrollIndex, args)
+    if scrollIndex then return end
 
     if args == 'berkie_menu_vehicle_spawner_by_model' then
         local vehicle = lib.inputDialog('test', {'Vehicle Model Name'})
@@ -450,4 +536,133 @@ CreateThread(function()
             className = vehicleClassName
         }
     end
+
+    while true do
+        local sleep = 200
+        if cache.vehicle then
+            sleep = 0
+            if vehicleGodMode then
+                local veh = cache.vehicle
+
+                SetVehicleReceivesRampDamage(veh, not vehicleRampDamage)
+
+                if vehicleVisualDamage then
+                    RemoveDecalsFromVehicle(veh)
+                end
+
+                if vehicleAutoRepair then
+                    SetVehicleFixed(veh)
+                end
+
+                SetVehicleCanBeVisiblyDamaged(veh, not vehicleVisualDamage)
+                SetVehicleEngineCanDegrade(veh, not vehicleEngineDamage)
+
+                if vehicleEngineDamage and GetVehicleEngineHealth(veh) < 1000.0 then
+                    SetVehicleEngineHealth(veh, 1000.0)
+                end
+
+                SetVehicleWheelsCanBreak(veh, not vehicleStrongWheels)
+                SetVehicleHasStrongAxles(veh, vehicleStrongWheels)
+
+                local memoryAddress = Citizen.InvokeNative(`GET_ENTITY_ADDRESS`, veh)
+                if not memoryAddress then
+                    goto skipAddresses
+                end
+
+                memoryAddress += 392
+
+                local setter = vehicleInvincible and SetBit or ClearBit
+
+                ---@diagnostic disable
+                setter(memoryAddress, 4) -- IsBulletProof
+                setter(memoryAddress, 5) -- IsFireProof
+                setter(memoryAddress, 6) -- IsCollisionProof
+                setter(memoryAddress, 7) -- IsMeleeProof
+                setter(memoryAddress, 11) -- IsExplosionProof
+                ---@diagnostic enable
+
+                SetEntityInvincible(vehicle, vehicleInvincible)
+
+                for i = 0, 5 do
+                    if GetEntityBoneIndexByName(veh, vehicleDoorBoneNames[i]) ~= -1 then
+                        SetVehicleDoorCanBreak(veh, i, not vehicleInvincible)
+                    end
+                end
+
+                :: skipAddresses ::
+            end
+        else
+
+        end
+        Wait(sleep)
+    end
 end)
+
+--[[
+    vehicle options menu:
+
+Vehicle God Mode (yes or no)
+God Mode options:
+  invincible (yes or no)
+  engine damage (yes or no)
+  visual damage (yes or no)
+  strong wheels (yes or no)
+  ramp damage (yes or no)
+  auto repair (yes or no)
+repair vehicle (option)
+keep vehicle clean (yes or no)
+wash vehicle (option)
+set dirt level (0-15)
+mod menu:
+  generate options
+colors:
+  primary color:
+  secondary color:
+  chrome (option)
+  enveff scale (nog kijken)
+  generaten:
+neon kits:
+  front light (yes or no)
+  rear light (yes or no)
+  left light (yes or no)
+  right light (yes or no)
+  color (selection)
+liveries:
+  generate, don't show if no liveries
+extras:
+  generate, don't show if no extras
+toggle engine on/off (option)
+set license plate text (input)
+license plate type (selection)
+vehicle doors:
+  generate
+  open all doors (option)
+  close all doors (option)
+  remove door (selection)
+  delete removed doors (yes or no)
+vehicle windows:
+  roll down and roll up (option)
+bike seatbelt (yes or no)
+speed limiter (selection to input)
+enable torque multiplier (yes or no)
+set engine torque multiplier (selection)
+enable power multiplier (yes or no)
+set engine power multiplier (selection)
+disable plane turbulence (yes or no)
+flip vehicle (option)
+toggle vehicle alarm (option)
+cycle through vehicle seats (option)
+vehicle lights (selection)
+fix / destroy tires (selection)
+freeze vehicle (yes or no)
+set vehicle visibility (yes or no)
+engine always on (yes or no)
+infinite fuel (yes or no)
+show vehicle health (yes or no)
+default radio station (yes or no)
+disable siren (yes or no)
+no bike helmet (yes or no)
+flash highbeams on honk (yes or no)
+delete vehicle:
+  confirm or go back
+]]
