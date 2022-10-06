@@ -5,6 +5,7 @@ local playerBlips = {}
 local itemsOnYourself = { -- Put the last part of the argument of the option that you want to be able to use on yourself in here
     '_kill',
 }
+local vehicles = {}
 local vehicleClassNames = {
     [0] = 'Compacts',
     [1] = 'Sedans',
@@ -28,12 +29,15 @@ local vehicleClassNames = {
     [19] = 'Military',
     [20] = 'Commercial',
     [21] = 'Trains',
-    [22] = 'Open Wheel'
+    [22] = 'Open Wheel',
+    [69] = 'Misc'
 }
-local vehicleClassNumbers  = {}
+local showEffects = true -- Show effects when going in and out of noclip or when teleporting
+local spawnInVehicle = true -- Teleport into the vehicle you're spawning
+local replacePreviousVehicle = false -- Replace the previous vehicle you were in when spawning a new vehicle
 
-for k, v in pairs(vehicleClassNames) do
-    vehicleClassNumbers[v] = k
+local function firstToUpper(str)
+    return str:gsub("^%l", string.upper)
 end
 
 local function arrayIncludes(value, array, useFormat)
@@ -45,6 +49,16 @@ local function arrayIncludes(value, array, useFormat)
     end
 
     return false
+end
+
+local function getVehiclesFromClassName(className)
+    local result = {}
+    for _, v in pairs(vehicles) do
+        if v.className == className then
+            result[#result+1] = v
+        end
+    end
+    return result
 end
 
 local function closeMenu(isFullMenuClose, keyPressed, previousMenu)
@@ -164,23 +178,147 @@ local function createPlayerMenu()
     end
 end
 
+local function spawnVehicleOnPlayer(model)
+    if not IsModelAVehicle(model) then return end
+
+    local speed = 0.0
+    local rpm = 0.0
+
+    if IsPedInAnyVehicle(cache.ped, false) and spawnInVehicle then
+        local oldVeh = GetVehiclePedIsIn(cache.ped, false)
+        speed = GetEntitySpeedVector(oldVeh, true).y
+        rpm = GetVehicleCurrentRpm(oldVeh)
+    end
+
+    lib.requestModel(model)
+
+    local otherCoords = spawnInVehicle and GetEntityCoords(cache.ped, true) or GetOffsetFromEntityInWorldCoords(cache.ped, 0.0, 8.0, 0.0)
+    local coords = vec4(otherCoords.x, otherCoords.y, otherCoords.z + 1, GetEntityHeading(cache.ped) + (spawnInVehicle and 0 or 90))
+
+    local previousVehicle = GetVehiclePedIsIn(cache.ped, true)
+
+    if previousVehicle ~= 0 then
+        if IsVehiclePreviouslyOwnedByPlayer(previousVehicle) and ((GetVehicleNumberOfPassengers(previousVehicle) and IsVehicleSeatFree(previousVehicle, -1)) or GetPedInVehicleSeat(previousVehicle, -1) == cache.ped) then
+            if replacePreviousVehicle then
+                SetVehicleHasBeenOwnedByPlayer(previousVehicle, false)
+                SetEntityAsMissionEntity(previousVehicle, false, true)
+                DeleteEntity(previousVehicle)
+            else
+                SetEntityAsMissionEntity(previousVehicle, false, false)
+            end
+            previousVehicle = 0
+        end
+    end
+
+    if IsPedInAnyVehicle(cache.ped, false) and replacePreviousVehicle then
+        local tempVeh = GetVehiclePedIsIn(cache.ped, false)
+        SetVehicleHasBeenOwnedByPlayer(tempVeh, false)
+        SetEntityAsMissionEntity(cache.ped, true, true)
+
+        if previousVehicle ~= 0 and previousVehicle == tempVeh then
+            previousVehicle = 0
+        end
+
+        SetEntityAsMissionEntity(tempVeh, false, true)
+        DeleteEntity(tempVeh)
+        tempVeh = 0
+    end
+
+    if previousVehicle ~= 0 then
+        SetVehicleHasBeenOwnedByPlayer(previousVehicle, false)
+    end
+
+    if IsPedInAnyVehicle(cache.ped, false) then
+        local _, dimensionMax = GetModelDimensions(model)
+        local offset = GetOffsetFromEntityInWorldCoords(GetVehiclePedIsIn(cache.ped, false), 0, dimensionMax.y, 0.0) - vec3(0, 6, 0)
+        coords = vec4(offset.x, offset.y, offset.z, coords.w)
+    end
+
+    local vehicle = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, true, false)
+    SetVehicleNeedsToBeHotwired(vehicle, false)
+    SetVehicleHasBeenOwnedByPlayer(vehicle, true)
+    SetEntityAsMissionEntity(vehicle, true, false)
+    SetVehicleIsStolen(vehicle, false)
+    SetVehicleIsWanted(vehicle, false)
+
+    if spawnInVehicle then
+        SetVehicleEngineOn(vehicle, true, true, true)
+
+        SetPedIntoVehicle(cache.ped, vehicle, -1)
+
+        if GetVehicleClass(vehicle) == 15 and GetEntityHeightAboveGround(vehicle) > 10 then
+            SetHeliBladesFullSpeed(vehicle)
+        else
+            SetVehicleOnGroundProperly(vehicle)
+        end
+    end
+
+    if not IsThisModelATrain(model) then -- I don't know why, but it's to be careful, so never remove this
+        SetVehicleForwardSpeed(vehicle, speed)
+    end
+
+    SetVehicleCurrentRpm(vehicle, rpm)
+
+    SetVehicleRadioEnabled(vehicle, true)
+    SetVehRadioStation(vehicle, "OFF")
+
+    SetModelAsNoLongerNeeded(model)
+
+    return vehicle
+end
+
+local function createVehiclesForSpawner(vehs, id)
+    for i = 1, #vehs do
+        local data = vehs[i]
+        local label = GetLabelText(GetDisplayNameFromVehicleModel(data.model))
+        label = label ~= "NULL" and label or GetDisplayNameFromVehicleModel(data.model)
+        label = label ~= "CARNOTFOUND" and label or data.modelName
+        lib.setMenuOptions(id, {label = firstToUpper(label:lower()), args = data.model, close = false}, i)
+    end
+end
+
+local function createVehicleSpawnerMenu()
+    local id = 'berkie_menu_vehicle_spawner'
+    local i = 4
+    for _, v in pairs(vehicleClassNames) do
+        local formattedId = ('%s_%s'):format(id, v)
+        local vehs = getVehiclesFromClassName(v)
+
+        if table.type(vehs) == 'empty' then goto skipLoop end
+
+        lib.registerMenu({
+            id = formattedId,
+            title = v,
+            position = 'top-right',
+            onClose = function(keyPressed)
+                closeMenu(false, keyPressed, id)
+            end,
+            options = {}
+        }, function(_, _, args)
+            spawnVehicleOnPlayer(args)
+        end)
+
+        lib.setMenuOptions(id, {label = v, args = formattedId}, i)
+
+        createVehiclesForSpawner(vehs, formattedId)
+        i += 1
+
+        :: skipLoop ::
+    end
+end
+
 lib.registerMenu({
     id = 'berkie_menu_main',
     title = 'Berkie Menu',
     position = 'top-right',
-    onSideScroll = function(_, scrollIndex, args)
-        if args then return end
-        ShowEffects = scrollIndex == 1
-        lib.setMenuOptions('berkie_menu_main', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = ShowEffects and 1 or 2}, 6)
-    end,
     onClose = function()
         closeMenu(true)
     end,
     options = {
-        {label = 'Online Players', icon = 'user-group', description = 'Show all online players', args = 'berkie_menu_online_players'},
-        {label = 'Players Options', icon = 'user-gear', description = 'Show all player related options', args = 'berkie_menu_player_options'},
-        {label = 'Vehicle Options', icon = 'car', description = 'Show all vehicle related options', args = 'berkie_menu_vehicle_options'},
-        {label = 'Recording Options', icon = 'video', description = 'Show all recording related options', args = 'berkie_menu_recording_options'},
+        {label = 'Online Players', icon = 'user-group', args = 'berkie_menu_online_players'},
+        {label = 'Player Related Options', icon = 'user-gear', args = 'berkie_menu_player_related_options'},
+        {label = 'Vehicle Related Options', icon = 'car', args = 'berkie_menu_vehicle_related_options'},
+        {label = 'Recording Options', icon = 'video', args = 'berkie_menu_recording_options'},
         {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = 'berkie_menu_miscellaneous_options'}
     }
 }, function(_, _, args)
@@ -204,22 +342,80 @@ lib.registerMenu({
 end)
 
 lib.registerMenu({
+    id = 'berkie_menu_vehicle_related_options',
+    title = 'Vehicle Related Options',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_main')
+    end,
+    options = {
+        {label = 'Options', icon = 'wrench', description = 'Common vehicle options including tuning and styling', args = 'berkie_menu_vehicle_options'},
+        {label = 'Spawner', icon = 'car', description = 'Spawn any vehicle that is registered in the game, including addon vehicles', args = 'berkie_menu_vehicle_spawner'},
+        {label = 'Personal Vehicle', icon = 'user-gear', description = 'Control your personal vehicle or change it', args = 'berkie_menu_vehicle_personal'}
+    }
+}, function(_, _, args)
+    if args == 'berkie_menu_vehicle_spawner' then
+        createVehicleSpawnerMenu()
+    end
+    lib.showMenu(args)
+end)
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_spawner',
+    title = 'Vehicle Spawner',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        if args == 'berkie_menu_vehicle_spawner_inside_vehicle' then
+            spawnInVehicle = scrollIndex == 1
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'berkie_menu_vehicle_spawner_inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false}, 2)
+        elseif args == 'berkie_menu_vehicle_spawner_replace_vehicle' then
+            replacePreviousVehicle = scrollIndex == 1
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'berkie_menu_vehicle_spawner_replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}, 3)
+        end
+    end,
+    options = {
+        {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = 'berkie_menu_vehicle_spawner_by_model'},
+        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'berkie_menu_vehicle_spawner_inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
+        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'berkie_menu_vehicle_spawner_replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
+    }
+}, function(_, _, args)
+    if args == 'berkie_menu_vehicle_spawner_inside_vehicle' or args == 'berkie_menu_vehicle_spawner_replace_vehicle' then return end
+
+    if args == 'berkie_menu_vehicle_spawner_by_model' then
+        local vehicle = lib.inputDialog('test', {'Vehicle Model Name'})
+        if vehicle and table.type(vehicle) ~= 'empty' then
+            local model = joaat(vehicle[1])
+            if IsModelInCdimage(model) then
+                spawnVehicleOnPlayer(model)
+            end
+        end
+        Wait(500)
+        args = 'berkie_menu_vehicle_spawner'
+    end
+
+    lib.showMenu(args)
+end)
+
+lib.registerMenu({
     id = 'berkie_menu_miscellaneous_options',
     title = 'Miscellaneous Options',
     position = 'top-right',
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_main')
     end,
+    onSideScroll = function(_, scrollIndex, args)
+        if args then return end
+        showEffects = scrollIndex == 1
+        lib.setMenuOptions('berkie_menu_miscellaneous_options', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}, 1)
+    end,
     options = {
-        {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = ShowEffects and 1 or 2, close = false}
+        {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}
     }
-}, function(_, scrollIndex, args)
-    if not args then
-        ShowEffects = scrollIndex == 1
-        lib.setMenuOptions('berkie_menu_miscellaneous_options', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = ShowEffects and 1 or 2, close = false}, 1)
-        return
-    end
-
+}, function(_, _, args)
+    if not args then return end
     lib.showMenu(args)
 end)
 
@@ -234,8 +430,6 @@ RegisterCommand('berkiemenu', function()
 end, type(MenuPermission) == 'string')
 RegisterKeyMapping('berkiemenu', 'Open Menu', 'KEYBOARD', 'M')
 
-exports('getCurrentMenuId', lib.getOpenMenu)
-
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() or not menuOpen then return end
 
@@ -248,9 +442,12 @@ CreateThread(function()
         local modelName = vehicleModels[i]
         local model = joaat(modelName)
         local vehicleClass = GetVehicleClassFromName(model)
-        local vehicleClassName = vehicleClassNames[vehicleClass]
-        if not vehicleClassName then
-            vehicleClassName = 'Unknown'
-        end
+        local vehicleClassName = vehicleClassNames[vehicleClass] or vehicleClassNames[69]
+        vehicles[model] = {
+            name = modelName,
+            model = model,
+            class = vehicleClassName ~= vehicleClassNames[69] and vehicleClass or 69,
+            className = vehicleClassName
+        }
     end
 end)
