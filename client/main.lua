@@ -50,6 +50,8 @@ local vehicleVisualDamage = false
 local vehicleStrongWheels = false
 local vehicleRampDamage = false
 local vehicleAutoRepair = false
+local vehicleNeverDirty = false
+local vehicleDirtLevelSetter = 0
 
 local function firstToUpper(str)
     return str:gsub("^%l", string.upper)
@@ -84,6 +86,18 @@ local function closeMenu(isFullMenuClose, keyPressed, previousMenu)
     end
 
     lib.showMenu(previousMenu)
+end
+
+local function isInVehicle(checkDriver)
+    if not cache.vehicle then
+        return false, 'You need to be in a vehicle to perform this action'
+    end
+
+    if checkDriver and GetPedInVehicleSeat(cache.vehicle, -1) ~= cache.ped then
+        return false, 'You need to be the driver of the vehicle to perform this action'
+    end
+
+    return true
 end
 
 local function createPlayerMenu()
@@ -388,17 +402,56 @@ lib.registerMenu({
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local val = scrollIndex == 1
         if args == 'god_mode_enable' then
-            vehicleGodMode = scrollIndex == 1
+            if val == vehicleGodMode then return end
+            vehicleGodMode = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false}, 1)
+        elseif args == 'keep_vehicle_clean' then
+            if val == vehicleNeverDirty then return end
+            vehicleNeverDirty = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false}, 4)
         end
     end,
     options = {
         {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false},
-        {label = 'God Mode Options', description = 'Enable or disable specific damage types', args = 'berkie_menu_vehicle_options_god_mode_menu'}
+        {label = 'God Mode Options', description = 'Enable or disable specific damage types', args = 'berkie_menu_vehicle_options_god_mode_menu'},
+        {label = 'Repair Vehicle', description = 'Repair any damage present on your vehicle', args = 'repair_vehicle', close = false},
+        {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false},
+        {label = 'Wash Vehicle', description = 'Clean your vehicle', args = 'wash_vehicle', close = false},
+        {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false}
     }
 }, function(_, scrollIndex, args)
-    if scrollIndex then return end
+    if scrollIndex and args ~= 'set_dirt_level' then return end
+
+    if args == 'repair_vehicle' then
+        local inVeh, reason = isInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+            return
+        end
+        SetVehicleFixed(cache.vehicle)
+        return
+    elseif args == 'wash_vehicle' then
+        local inVeh, reason = isInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+            return
+        end
+        SetVehicleDirtLevel(cache.vehicle, 0)
+        return
+    elseif args == 'set_dirt_level' then
+        vehicleDirtLevelSetter = scrollIndex - 1
+        SetVehicleDirtLevel(cache.vehicle, vehicleDirtLevelSetter)
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false}, 6)
+        return
+    end
 
     lib.showMenu(args)
 end)
@@ -543,7 +596,7 @@ CreateThread(function()
 
     while true do
         local sleep = 200
-        if cache.vehicle then
+        if isInVehicle(false) then
             sleep = 0
             if vehicleGodMode then
                 local veh = cache.vehicle
@@ -573,17 +626,21 @@ CreateThread(function()
                     goto skipAddresses
                 end
 
-                memoryAddress += 392
+                do
+                    memoryAddress += 392
 
-                local setter = vehicleInvincible and SetBit or ClearBit
+                    local setter = vehicleInvincible and SetBit or ClearBit
 
-                ---@diagnostic disable
-                setter(memoryAddress, 4) -- IsBulletProof
-                setter(memoryAddress, 5) -- IsFireProof
-                setter(memoryAddress, 6) -- IsCollisionProof
-                setter(memoryAddress, 7) -- IsMeleeProof
-                setter(memoryAddress, 11) -- IsExplosionProof
-                ---@diagnostic enable
+                    ---@diagnostic disable
+                    setter(memoryAddress, 4) -- IsBulletProof
+                    setter(memoryAddress, 5) -- IsFireProof
+                    setter(memoryAddress, 6) -- IsCollisionProof
+                    setter(memoryAddress, 7) -- IsMeleeProof
+                    setter(memoryAddress, 11) -- IsExplosionProof
+                    ---@diagnostic enable
+                end
+
+                :: skipAddresses ::
 
                 SetEntityInvincible(vehicle, vehicleInvincible)
 
@@ -593,7 +650,9 @@ CreateThread(function()
                     end
                 end
 
-                :: skipAddresses ::
+                if vehicleNeverDirty and GetVehicleDirtLevel(veh) > 0 then
+                    SetVehicleDirtLevel(veh, 0)
+                end
             end
         else
 
