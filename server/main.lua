@@ -18,14 +18,14 @@ end)
 lib.callback.register('berkie_menu:server:playerListAction', function(source, action, playerSource, canActOnSelf, message)
     if source == playerSource and not canActOnSelf then return false, 'You can\'t act on yourself' end
 
-    local messageArg = string.find(action, '_message')
-    local teleportVehicleArg = string.find(action, '_teleport_vehicle')
-    local teleportArg = not teleportVehicleArg and string.find(action, 'teleport')
-    local summonArg = string.find(action, '_summon')
-    local spectateArg = string.find(action, '_spectate')
-    local waypointArg = string.find(action, '_waypoint')
-    local blipArg = string.find(action, '_blip')
-    local killArg = string.find(action, '_kill')
+    local messageArg = action == 'message'
+    local teleportVehicleArg = action == 'teleport_vehicle'
+    local teleportArg = action == 'teleport'
+    local summonArg = action == 'summon'
+    local spectateArg = action == 'spectate'
+    local waypointArg = action == 'waypoint'
+    local blipArg = action == 'blip'
+    local killArg = action == 'kill'
     local playerName = GetPlayerName(playerSource)
     local playerPed = GetPlayerPed(playerSource)
     local ped = GetPlayerPed(source)

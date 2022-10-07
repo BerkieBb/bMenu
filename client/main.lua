@@ -92,14 +92,14 @@ local function createPlayerMenu()
     for i = 1, #onlinePlayers do
         local data = onlinePlayers[i]
         local formattedId = ('%s_%s'):format(id, i)
-        local messageArg = ('%s_message'):format(formattedId)
-        local teleportArg = ('%s_teleport'):format(formattedId)
-        local teleportVehicleArg = ('%s_teleport_vehicle'):format(formattedId)
-        local summonArg = ('%s_summon'):format(formattedId)
-        local spectateArg = ('%s_spectate'):format(formattedId)
-        local waypointArg = ('%s_waypoint'):format(formattedId)
-        local blipArg = ('%s_blip'):format(formattedId)
-        local killArg = ('%s_kill'):format(formattedId)
+        local messageArg = 'message'
+        local teleportArg = 'teleport'
+        local teleportVehicleArg = 'teleport_vehicle'
+        local summonArg = 'summon'
+        local spectateArg = 'spectate'
+        local waypointArg = 'waypoint'
+        local blipArg = 'blip'
+        local killArg = 'kill'
         lib.registerMenu({
             id = formattedId,
             title = data.name,
@@ -121,7 +121,7 @@ local function createPlayerMenu()
             local canActOnSelf = arrayIncludes(args, itemsOnYourself, true)
             if data.source == serverId and not canActOnSelf then
                 lib.notify({
-                    description = 'You can\'t act on yourself',
+                    description = 'You can\'t do this on yourself',
                     type = 'error'
                 })
                 return
@@ -376,6 +376,7 @@ lib.registerMenu({
     if args == 'berkie_menu_vehicle_spawner' then
         createVehicleSpawnerMenu()
     end
+
     lib.showMenu(args)
 end)
 
@@ -387,17 +388,18 @@ lib.registerMenu({
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'berkie_menu_vehicle_options_god_mode_enable' then
+        if args == 'god_mode_enable' then
             vehicleGodMode = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'berkie_menu_vehicle_options_god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false}, 1)
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false}, 1)
         end
     end,
     options = {
-        {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'berkie_menu_vehicle_options_god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false},
+        {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false},
         {label = 'God Mode Options', description = 'Enable or disable specific damage types', args = 'berkie_menu_vehicle_options_god_mode_menu'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
+
     lib.showMenu(args)
 end)
 
@@ -454,23 +456,23 @@ lib.registerMenu({
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'berkie_menu_vehicle_spawner_inside_vehicle' then
+        if args == 'inside_vehicle' then
             spawnInVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'berkie_menu_vehicle_spawner_inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false}, 2)
-        elseif args == 'berkie_menu_vehicle_spawner_replace_vehicle' then
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false}, 2)
+        elseif args == 'replace_vehicle' then
             replacePreviousVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'berkie_menu_vehicle_spawner_replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}, 3)
         end
     end,
     options = {
-        {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = 'berkie_menu_vehicle_spawner_by_model'},
-        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'berkie_menu_vehicle_spawner_inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
-        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'berkie_menu_vehicle_spawner_replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
+        {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = 'spawn_by_model'},
+        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
+        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
 
-    if args == 'berkie_menu_vehicle_spawner_by_model' then
+    if args == 'spawn_by_model' then
         local vehicle = lib.inputDialog('test', {'Vehicle Model Name'})
         if vehicle and table.type(vehicle) ~= 'empty' then
             local model = joaat(vehicle[1])
@@ -493,15 +495,17 @@ lib.registerMenu({
         closeMenu(false, keyPressed, 'berkie_menu_main')
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args then return end
-        showEffects = scrollIndex == 1
-        lib.setMenuOptions('berkie_menu_miscellaneous_options', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}, 1)
+        if args == 'show_effects' then
+            showEffects = scrollIndex == 1
+            lib.setMenuOptions('berkie_menu_miscellaneous_options', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}, 1)
+        end
     end,
     options = {
-        {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}
+        {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', args = 'show_effects', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}
     }
-}, function(_, _, args)
-    if not args then return end
+}, function(_, scrollIndex, args)
+    if scrollIndex then return end
+
     lib.showMenu(args)
 end)
 
@@ -600,15 +604,6 @@ end)
 
 --[[
     vehicle options menu:
-
-Vehicle God Mode (yes or no)
-God Mode options:
-  invincible (yes or no)
-  engine damage (yes or no)
-  visual damage (yes or no)
-  strong wheels (yes or no)
-  ramp damage (yes or no)
-  auto repair (yes or no)
 repair vehicle (option)
 keep vehicle clean (yes or no)
 wash vehicle (option)
