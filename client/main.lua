@@ -40,6 +40,105 @@ local vehicleDoorBoneNames = {
     [4] = 'bonnet',
     [5] = 'boot'
 }
+local vehicleModTypes = {
+    [0] = {nil, 'Spoilers'},
+    [1] = {nil, 'Front Bumper'},
+    [2] = {nil, 'Rear Bumper'},
+    [3] = {nil, 'Side Skirt'},
+    [4] = {nil, 'Exhaust'},
+    [5] = {nil, 'Chassis'},
+    [6] = {nil, 'Grille'},
+    [7] = {nil, 'Hood'},
+    [8] = {nil, 'Fender'},
+    [9] = {nil, 'Right Fender'},
+    [10] = {nil, 'Roof'},
+    [11] = {'CMOD_MOD_ENG', 'Engine'},
+    [12] = {'CMOD_MOD_BRA', 'Brakes'},
+    [13] = {'CMOD_MOD_TRN', 'Transmission'},
+    [14] = {'CMOD_MOD_HRN', 'Horns'},
+    [15] = {'CMOD_MOD_SUS', 'Suspension'},
+    [16] = {'CMOD_MOD_ARM', 'Armor'},
+    [18] = {nil, 'Turbo'},
+    [22] = {nil, 'Headlights'},
+    [23] = {'CMOD_WHE0_0', 'Front Wheel'},
+    [24] = {'CMOD_WHE0_1', 'Rear Wheel'},
+    [25] = {'CMM_MOD_S0', 'Plate Holder'},
+    [26] = {'CMM_MOD_S1', 'Vanity Plates'},
+    [27] = {'CMM_MOD_S2', 'Trim Design'},
+    [28] = {'CMM_MOD_S3', 'Ornaments'},
+    [29] = {'CMM_MOD_S4', 'Dashboard'},
+    [30] = {'CMM_MOD_S5', 'Dial Design'},
+    [31] = {'CMM_MOD_S6', 'Door Speakers'},
+    [32] = {'CMM_MOD_S7', 'Seats'},
+    [33] = {'CMM_MOD_S8', 'Steering Wheels'},
+    [34] = {'CMM_MOD_S9', 'Column Shifter Levers'},
+    [35] = {'CMM_MOD_S10', 'Plaques'},
+    [36] = {'CMM_MOD_S11', 'Speakers'},
+    [37] = {'CMM_MOD_S12', 'Trunk'},
+    [38] = {'CMM_MOD_S13', 'Hydraulics'},
+    [39] = {'CMM_MOD_S14', 'Engine Block'},
+    [40] = {'CMM_MOD_S15', 'Air Filter'},
+    [41] = {'CMM_MOD_S16', 'Struts'},
+    [42] = {'CMM_MOD_S17', 'Arch Cover'},
+    [43] = {'CMM_MOD_S18', 'Aerials'},
+    [44] = {'CMM_MOD_S19', 'Trim'},
+    [45] = {'CMM_MOD_S20', 'Tank'},
+    [46] = {'CMM_MOD_S21', 'Windows'},
+    [47] = {'CMM_MOD_S22', 'Mod 47'},
+    [48] = {'CMM_MOD_S23', 'Livery'}
+}
+local vehicleHornNames = {
+    [-1] = {'CMOD_HRN_0', 'Stock Horn'},
+    [0] = {'CMOD_HRN_TRK','Truck Horn'},
+    [1] = {'CMOD_HRN_COP', 'Cop Horn'},
+    [2] = {'CMOD_HRN_CLO', 'Clown Horn'},
+    [3] = {'CMOD_HRN_MUS1', 'Musical Horn 1'},
+    [4] = {'CMOD_HRN_MUS2', 'Musical Horn 2'},
+    [5] = {'CMOD_HRN_MUS3', 'Musical Horn 3'},
+    [6] = {'CMOD_HRN_MUS4', 'Musical Horn 4'},
+    [7] = {'CMOD_HRN_MUS5', 'Musical Horn 5'},
+    [8] = {'CMOD_HRN_SAD', 'Sad Trombone'},
+    [9] = {'HORN_CLAS1', 'Classical Horn 1'},
+    [10] = {'HORN_CLAS2', 'Classical Horn 2'},
+    [11] = {'HORN_CLAS3', 'Classical Horn 3'},
+    [12] = {'HORN_CLAS4', 'Classical Horn 4'},
+    [13] = {'HORN_CLAS5', 'Classical Horn 5'},
+    [14] = {'HORN_CLAS6', 'Classical Horn 6'},
+    [15] = {'HORN_CLAS7', 'Classical Horn 7'},
+    [16] = {'HORN_CNOTE_C0', 'Scale Do'},
+    [17] = {'HORN_CNOTE_D0', 'Scale Re'},
+    [18] = {'HORN_CNOTE_E0', 'Scale Mi'},
+    [19] = {'HORN_CNOTE_F0', 'Scale Fa'},
+    [20] = {'HORN_CNOTE_G0', 'Scale Sol'},
+    [21] = {'HORN_CNOTE_A0', 'Scale La'},
+    [22] = {'HORN_CNOTE_B0', 'Scale Ti'},
+    [23] = {'HORN_CNOTE_C1', 'Scale Do (High)'},
+    [24] = {'HORN_HIPS1', 'Jazz Horn 1'},
+    [25] = {'HORN_HIPS2', 'Jazz Horn 2'},
+    [26] = {'HORN_HIPS3', 'Jazz Horn 3'},
+    [27] = {'HORN_HIPS4', 'Jazz Horn Loop'},
+    [28] = {'HORN_INDI_1', 'Star Spangled Banner 1'},
+    [29] = {'HORN_INDI_2', 'Star Spangled Banner 2'},
+    [30] = {'HORN_INDI_3', 'Star Spangled Banner 3'},
+    [31] = {'HORN_INDI_4', 'Star Spangled Banner 4'},
+    [32] = {'HORN_LUXE2', 'Classical Horn Loop 1'},
+    [33] = {'HORN_LUXE1', 'Classical Horn 8'},
+    [34] = {'HORN_LUXE3', 'Classical Horn Loop 2'},
+    [35] = {'HORN_LUXE2', 'Classical Horn Loop 1'},
+    [36] = {'HORN_LUXE1', 'Classical Horn 8'},
+    [37] = {'HORN_LUXE3', 'Classical Horn Loop 2'},
+    [38] = {'HORN_HWEEN1', 'Halloween Loop 1'},
+    [39] = {'HORN_HWEEN1', 'Halloween Loop 1'},
+    [40] = {'HORN_HWEEN2', 'Halloween Loop 2'},
+    [41] = {'HORN_HWEEN2', 'Halloween Loop 2'},
+    [42] = {'HORN_LOWRDER1', 'San Andreas Loop'},
+    [43] = {'HORN_LOWRDER1', 'San Andreas Loop'},
+    [44] = {'HORN_LOWRDER2', 'Liberty City Loop'},
+    [45] = {'HORN_LOWRDER2', 'Liberty City Loop'},
+    [46] = {'HORN_XM15_1', 'Festive Loop 1'},
+    [47] = {'HORN_XM15_2', 'Festive Loop 2'},
+    [48] = {'HORN_XM15_3', 'Festive Loop 3'}
+}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
 local replacePreviousVehicle = true -- Replace the previous vehicle you were in when spawning a new vehicle
@@ -54,7 +153,13 @@ local vehicleNeverDirty = false
 local vehicleDirtLevelSetter = 0
 
 local function firstToUpper(str)
-    return str:gsub("^%l", string.upper)
+    return str:gsub('^%l', string.upper)
+end
+
+local function toProperCase(str)
+    return string.gsub(str, "(%a)([%w_']*)", function(first, rest)
+        return first:upper()..rest:lower()
+    end)
 end
 
 local function arrayIncludes(value, array, useFormat)
@@ -76,6 +181,139 @@ local function getVehiclesFromClassName(className)
         end
     end
     return result
+end
+
+local function getAllPossibleMods()
+    local result = {}
+    for k in pairs(vehicleModTypes) do
+        local amount = GetNumVehicleMods(cache.vehicle, k)
+        if amount > 0 then
+            result[k] = amount
+        end
+    end
+    return result
+end
+
+local function getModLocalizedType(mod)
+    local alt
+    local alt2
+    local vehModel = GetEntityModel(cache.vehicle)
+
+    if mod == 23 then
+        if not IsThisModelABike(vehModel) and IsThisModelABicycle(vehModel) then
+            alt = 'CMOD_MOD_WHEM'
+            alt2 = 'Wheels'
+        end
+    elseif mod == 27 then
+        if vehModel == `sultanrs` then
+            alt = 'CMM_MOD_S2b'
+        end
+    elseif mod == 40 then
+        if vehModel == `sultanrs` then
+            alt = 'CMM_MOD_S15b'
+        end
+    elseif mod == 41 then
+        if vehModel == `sultanrs` or vehModel == `banshee2` then
+            alt = 'CMM_MOD_S16b'
+        end
+    elseif mod == 42 then
+        if vehModel == `sultanrs` then
+            alt = 'CMM_MOD_S17b'
+        end
+    elseif mod == 43 then
+        if vehModel == `sultanrs` then
+            alt = 'CMM_MOD_S18b'
+        end
+    elseif mod == 44 then
+        if vehModel == `sultanrs` then
+            alt = 'CMM_MOD_S19b'
+        elseif vehModel == `btype3` then
+            alt = 'CMM_MOD_S19c'
+        elseif vehModel == `virgo2` then
+            alt = 'CMM_MOD_S19d'
+        end
+    elseif mod == 45 then
+        if vehModel == `slamvan3` then
+            alt = 'CMM_MOD_S27'
+        end
+    elseif mod == 46 then
+        if vehModel == `btype3` then
+            alt = 'CMM_MOD_S21b'
+        end
+    elseif mod == 47 then
+        if vehModel == `slamvan3` then
+            alt = 'SLVAN3_RDOOR'
+        end
+    end
+
+    local name = alt or vehicleModTypes[mod]?[1] or GetModSlotName(cache.vehicle, mod)
+
+    return DoesTextLabelExist(name) and GetLabelText(name) or alt2 or vehicleModTypes[mod]?[2]
+end
+
+local function getModLocalizedName(modType, mod)
+    local modCount = GetNumVehicleMods(cache.vehicle, modType)
+    if mod < -1 or mod >= modCount then return end
+
+    local vehModel = GetEntityModel(cache.vehicle)
+
+    if modType == 14 then
+        local horn = vehicleHornNames[mod]
+        if horn then
+            if DoesTextLabelExist(horn[1]) then
+                return GetLabelText(horn[1])
+            end
+            return horn[2]
+        end
+        return
+    elseif modType == 23 or modType == 24 then
+        if mod == -1 then
+            if not IsThisModelABike(vehModel) and IsThisModelABicycle(vehModel) then
+                return DoesTextLabelExist("CMOD_WHE_0") and GetLabelText("CMOD_WHE_0") or nil
+            else
+                return DoesTextLabelExist("CMOD_WHE_B_0") and GetLabelText("CMOD_WHE_B_0") or nil
+            end
+        end
+
+        if mod >= modCount / 2 then
+            local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
+            return ('%s %s'):format((DoesTextLabelExist("CHROME") and GetLabelText("CHROME") or ""), (DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or ""))
+        else
+            local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
+            return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
+        end
+    elseif modType == 16 then
+        local modLabel = ('CMOD_ARM_%s'):format(mod + 1)
+        return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
+    elseif modType == 12 then
+        local modLabel = ('CMOD_BRA_%s'):format(mod + 1)
+        return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
+    elseif modType == 11 then
+        if mod == -1 then
+            -- Engine doesn't list anything in LSC for no parts, but there is a setting with no part. so just use armours none
+            return DoesTextLabelExist('CMOD_ARM_0') and GetLabelText('CMOD_ARM_0') or nil
+        end
+        local modLabel = ('CMOD_ENG_%s'):format(mod + 2)
+        return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
+    elseif modType == 15 then
+        local modLabel = ('CMOD_SUS_%s'):format(mod + 1)
+        return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
+    elseif modType == 13 then
+        local modLabel = ('CMOD_GBX_%s'):format(mod + 1)
+        return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
+    end
+
+    if mod > -1 then
+        local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
+        return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or ('%s %s'):format(getModLocalizedType(modType), mod + 1)
+    else
+        if modType == 41 then
+            if vehModel == `banshee` or vehModel == `banshee2` or vehModel == `sultanrs` then
+                return DoesTextLabelExist('CMOD_COL5_41') and GetLabelText('CMOD_COL5_41') or nil
+            end
+        end
+        return DoesTextLabelExist('CMOD_DEF_0') and GetLabelText('CMOD_DEF_0') or nil
+    end
 end
 
 local function closeMenu(isFullMenuClose, keyPressed, previousMenu)
@@ -289,11 +527,42 @@ local function spawnVehicleOnPlayer(model)
     SetVehicleCurrentRpm(vehicle, rpm)
 
     SetVehicleRadioEnabled(vehicle, true)
-    SetVehRadioStation(vehicle, "OFF")
+    SetVehRadioStation(vehicle, 'OFF')
 
     SetModelAsNoLongerNeeded(model)
 
     return vehicle
+end
+
+local function createModMenu()
+    if not HasThisAdditionalTextLoaded("mod_mnu", 10) then
+        ClearAdditionalText(10, true)
+        RequestAdditionalText("mod_mnu", 10)
+        while not HasThisAdditionalTextLoaded("mod_mnu", 10) do
+            Wait(100)
+        end
+    end
+
+    local id = 'berkie_menu_vehicle_options_mod_menu'
+    SetVehicleModKit(cache.vehicle, 0)
+    local mods = getAllPossibleMods()
+    local i = 1
+    for k, v in pairs(mods) do
+        local values = {}
+        local args = {}
+        local localizedName = getModLocalizedType(k)
+        local defaultIndex = GetVehicleMod(cache.vehicle, k) + 2
+        values[1] = ('Stock %s'):format(localizedName)
+        args[1] = {-1, k}
+        for i2 = 2, v do
+            local actualIndex = i2 - 2
+            local localizedModName = getModLocalizedName(k, actualIndex)
+            values[i2] = localizedModName and toProperCase(localizedModName) or ('%s %s'):format(localizedName, actualIndex)
+            args[i2] = {actualIndex, k}
+        end
+        lib.setMenuOptions(id, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}, i)
+        i += 1
+    end
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -304,8 +573,8 @@ local function createVehiclesForSpawner(vehs, id)
     for i = 1, #vehs do
         local data = vehs[i]
         local label = GetLabelText(GetDisplayNameFromVehicleModel(data.model))
-        label = label ~= "NULL" and label or GetDisplayNameFromVehicleModel(data.model)
-        label = label ~= "CARNOTFOUND" and label or data.modelName
+        label = label ~= 'NULL' and label or GetDisplayNameFromVehicleModel(data.model)
+        label = label ~= 'CARNOTFOUND' and label or data.modelName
         lib.setMenuOptions(id, {label = firstToUpper(label:lower()), args = data.model, close = false}, i)
     end
 end
@@ -313,7 +582,18 @@ end
 local function createVehicleSpawnerMenu()
     local id = 'berkie_menu_vehicle_spawner'
     local i = 4
+    local sorted = {}
+
     for _, v in pairs(vehicleClassNames) do
+        sorted[#sorted+1] = v
+    end
+
+    table.sort(sorted, function(a, b)
+        return a < b
+    end)
+
+    for i2 = 1, #sorted do
+        local v = sorted[i2]
         local formattedId = ('%s_%s'):format(id, v)
         local vehs = getVehiclesFromClassName(v)
 
@@ -419,31 +699,25 @@ lib.registerMenu({
         {label = 'Repair Vehicle', description = 'Repair any damage present on your vehicle', args = 'repair_vehicle', close = false},
         {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false},
         {label = 'Wash Vehicle', description = 'Clean your vehicle', args = 'wash_vehicle', close = false},
-        {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false}
+        {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false},
+        {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = 'berkie_menu_vehicle_options_mod_menu'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex and args ~= 'set_dirt_level' then return end
 
+    local inVeh, reason = isInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+        return
+    end
+
     if args == 'repair_vehicle' then
-        local inVeh, reason = isInVehicle(true)
-        if not inVeh then
-            lib.notify({
-                description = reason,
-                type = 'error'
-            })
-            return
-        end
         SetVehicleFixed(cache.vehicle)
         return
     elseif args == 'wash_vehicle' then
-        local inVeh, reason = isInVehicle(true)
-        if not inVeh then
-            lib.notify({
-                description = reason,
-                type = 'error'
-            })
-            return
-        end
         SetVehicleDirtLevel(cache.vehicle, 0)
         return
     elseif args == 'set_dirt_level' then
@@ -451,6 +725,8 @@ lib.registerMenu({
         SetVehicleDirtLevel(cache.vehicle, vehicleDirtLevelSetter)
         lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false}, 6)
         return
+    elseif args == 'berkie_menu_vehicle_options_mod_menu' then
+        createModMenu()
     end
 
     lib.showMenu(args)
@@ -499,6 +775,23 @@ lib.registerMenu({
         {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = 'ramp_damage', values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false},
         {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = 'auto_repair', values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}
     }
+})
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_mod_menu',
+    title = 'Mod Menu',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        SetVehicleModKit(cache.vehicle, 0)
+        if type(args) == 'table' then
+            local curArg = args[scrollIndex]
+            SetVehicleMod(cache.vehicle, curArg[2], curArg[1], GetVehicleModVariation(cache.vehicle, 23))
+        end
+    end,
+    options = {}
 })
 
 lib.registerMenu({
@@ -663,12 +956,6 @@ end)
 
 --[[
     vehicle options menu:
-repair vehicle (option)
-keep vehicle clean (yes or no)
-wash vehicle (option)
-set dirt level (0-15)
-mod menu:
-  generate options
 colors:
   primary color:
   secondary color:
