@@ -5,6 +5,7 @@ local playerBlips = {}
 local itemsOnYourself = { -- Put the last part of the argument of the option that you want to be able to use on yourself in here
     '_kill',
 }
+local menuIndexes = {}
 local vehicles = {}
 local vehicleClassNames = {
     [0] = 'Compacts',
@@ -139,6 +140,23 @@ local vehicleHornNames = {
     [47] = {'HORN_XM15_2', 'Festive Loop 2'},
     [48] = {'HORN_XM15_3', 'Festive Loop 3'}
 }
+local vehicleWheelTypes = {
+    [0] = 'Sports',
+    [1] = 'Muscle',
+    [2] = 'Lowrider',
+    [3] = 'SUV',
+    [4] = 'Offroad',
+    [5] = 'Tuner',
+    [6] = 'Bike Wheels',
+    [7] = 'High End',
+    [8] = 'Benny\'s Original',
+    [9] = 'Benny\' Bespoke',
+    [10] = 'Open Wheel',
+    [11] = 'Street',
+    [12] = 'Track'
+}
+local vehicleFrontWheelIndex = 0
+local vehicleFrontWheelTable = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
 local replacePreviousVehicle = true -- Replace the previous vehicle you were in when spawning a new vehicle
@@ -157,7 +175,7 @@ local function firstToUpper(str)
 end
 
 local function toProperCase(str)
-    return string.gsub(str, "(%a)([%w_']*)", function(first, rest)
+    return string.gsub(str, '(%a)([%w_\']*)', function(first, rest)
         return first:upper()..rest:lower()
     end)
 end
@@ -269,15 +287,15 @@ local function getModLocalizedName(modType, mod)
     elseif modType == 23 or modType == 24 then
         if mod == -1 then
             if not IsThisModelABike(vehModel) and IsThisModelABicycle(vehModel) then
-                return DoesTextLabelExist("CMOD_WHE_0") and GetLabelText("CMOD_WHE_0") or nil
+                return DoesTextLabelExist('CMOD_WHE_0') and GetLabelText('CMOD_WHE_0') or nil
             else
-                return DoesTextLabelExist("CMOD_WHE_B_0") and GetLabelText("CMOD_WHE_B_0") or nil
+                return DoesTextLabelExist('CMOD_WHE_B_0') and GetLabelText('CMOD_WHE_B_0') or nil
             end
         end
 
         if mod >= modCount / 2 then
             local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
-            return ('%s %s'):format((DoesTextLabelExist("CHROME") and GetLabelText("CHROME") or ""), (DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or ""))
+            return ('%s %s'):format((DoesTextLabelExist('CHROME') and GetLabelText('CHROME') or ''), (DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or ''))
         else
             local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
             return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
@@ -323,7 +341,7 @@ local function closeMenu(isFullMenuClose, keyPressed, previousMenu)
         return
     end
 
-    lib.showMenu(previousMenu)
+    lib.showMenu(previousMenu, menuIndexes[previousMenu])
 end
 
 local function isInVehicle(checkDriver)
@@ -359,6 +377,9 @@ local function createPlayerMenu()
             onClose = function(keyPressed)
                 closeMenu(false, keyPressed, id)
             end,
+            onSelected = function(selected)
+                menuIndexes[formattedId] = selected
+            end,
             options = {
                 {label = 'Send Message', icon = 'comment-dots', description = 'Send a message to this player, note that staff can see these', args = messageArg, close = true},
                 {label = 'Teleport To Player', icon = 'hat-wizard', description = 'Teleport to the player', args = teleportArg, close = false},
@@ -383,7 +404,7 @@ local function createPlayerMenu()
 
             if args == messageArg and (not message or not message[1] or message[1] == '') then
                 Wait(500)
-                lib.showMenu(formattedId)
+                lib.showMenu(formattedId, menuIndexes[formattedId])
                 return
             end
 
@@ -438,7 +459,7 @@ local function createPlayerMenu()
             if args ~= messageArg then return end
 
             Wait(500)
-            lib.showMenu(formattedId)
+            lib.showMenu(formattedId, menuIndexes[formattedId])
         end)
 
         lib.setMenuOptions(id, {label = ('[%s] %s'):format(data.source, data.name), args = formattedId}, i)
@@ -535,13 +556,15 @@ local function spawnVehicleOnPlayer(model)
 end
 
 local function createModMenu()
-    if not HasThisAdditionalTextLoaded("mod_mnu", 10) then
+    if not HasThisAdditionalTextLoaded('mod_mnu', 10) then
         ClearAdditionalText(10, true)
-        RequestAdditionalText("mod_mnu", 10)
-        while not HasThisAdditionalTextLoaded("mod_mnu", 10) do
+        RequestAdditionalText('mod_mnu', 10)
+        while not HasThisAdditionalTextLoaded('mod_mnu', 10) do
             Wait(100)
         end
     end
+
+    local vehModel = GetEntityModel(cache.vehicle)
 
     local id = 'berkie_menu_vehicle_options_mod_menu'
     SetVehicleModKit(cache.vehicle, 0)
@@ -554,13 +577,34 @@ local function createModMenu()
         local defaultIndex = GetVehicleMod(cache.vehicle, k) + 2
         values[1] = ('Stock %s'):format(localizedName)
         args[1] = {-1, k}
+
         for i2 = 2, v do
             local actualIndex = i2 - 2
             local localizedModName = getModLocalizedName(k, actualIndex)
             values[i2] = localizedModName and toProperCase(localizedModName) or ('%s %s'):format(localizedName, actualIndex)
             args[i2] = {actualIndex, k}
         end
+
+        if k == 23 then
+            vehicleFrontWheelIndex = i
+            vehicleFrontWheelTable = {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}
+        end
+
         lib.setMenuOptions(id, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}, i)
+        i += 1
+    end
+
+    if not IsThisModelABoat(vehModel) and not IsThisModelAHeli(vehModel) and not IsThisModelAPlane(vehModel) and not IsThisModelABicycle(vehModel) and not IsThisModelATrain(vehModel) then
+        local valuesWheelType = {}
+        for i2 = 0, #vehicleWheelTypes do
+            valuesWheelType[i2 + 1] = vehicleWheelTypes[i2]
+        end
+        if IsThisModelABike(vehModel) then
+            valuesWheelType = {'Bike Wheels'}
+        elseif GetVehicleClass(cache.vehicle) == 22 then
+            valuesWheelType = {'Open Wheel'}
+        end
+        lib.setMenuOptions(id, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or GetVehicleWheelType(cache.vehicle) + 1, close = false}, i)
         i += 1
     end
 end
@@ -572,8 +616,9 @@ local function createVehiclesForSpawner(vehs, id)
 
     for i = 1, #vehs do
         local data = vehs[i]
-        local label = GetLabelText(GetDisplayNameFromVehicleModel(data.model))
-        label = label ~= 'NULL' and label or GetDisplayNameFromVehicleModel(data.model)
+        local displayName = GetDisplayNameFromVehicleModel(data.model)
+        local label = GetLabelText(displayName)
+        label = label ~= 'NULL' and label or displayName
         label = label ~= 'CARNOTFOUND' and label or data.modelName
         lib.setMenuOptions(id, {label = firstToUpper(label:lower()), args = data.model, close = false}, i)
     end
@@ -606,6 +651,9 @@ local function createVehicleSpawnerMenu()
             onClose = function(keyPressed)
                 closeMenu(false, keyPressed, id)
             end,
+            onSelected = function(selected)
+                menuIndexes[formattedId] = selected
+            end,
             options = {}
         }, function(_, _, args)
             spawnVehicleOnPlayer(args)
@@ -627,6 +675,9 @@ lib.registerMenu({
     onClose = function()
         closeMenu(true)
     end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_main'] = selected
+    end,
     options = {
         {label = 'Online Players', icon = 'user-group', args = 'berkie_menu_online_players'},
         {label = 'Player Related Options', icon = 'user-gear', args = 'berkie_menu_player_related_options'},
@@ -639,7 +690,7 @@ lib.registerMenu({
         createPlayerMenu()
     end
 
-    lib.showMenu(args)
+    lib.showMenu(args, menuIndexes[args])
 end)
 
 lib.registerMenu({
@@ -649,9 +700,12 @@ lib.registerMenu({
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_main')
     end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_online_players'] = selected
+    end,
     options = {}
 }, function(_, _, args)
-    lib.showMenu(args)
+    lib.showMenu(args, menuIndexes[args])
 end)
 
 lib.registerMenu({
@@ -660,6 +714,9 @@ lib.registerMenu({
     position = 'top-right',
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_main')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_related_options'] = selected
     end,
     options = {
         {label = 'Options', icon = 'wrench', description = 'Common vehicle options including tuning and styling', args = 'berkie_menu_vehicle_options'},
@@ -671,7 +728,7 @@ lib.registerMenu({
         createVehicleSpawnerMenu()
     end
 
-    lib.showMenu(args)
+    lib.showMenu(args, menuIndexes[args])
 end)
 
 lib.registerMenu({
@@ -680,6 +737,9 @@ lib.registerMenu({
     position = 'top-right',
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
         local val = scrollIndex == 1
@@ -729,7 +789,7 @@ lib.registerMenu({
         createModMenu()
     end
 
-    lib.showMenu(args)
+    lib.showMenu(args, menuIndexes[args])
 end)
 
 lib.registerMenu({
@@ -738,6 +798,9 @@ lib.registerMenu({
     position = 'top-right',
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_god_mode_menu'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
         local val = scrollIndex == 1 and vehicleGodMode
@@ -784,11 +847,26 @@ lib.registerMenu({
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
     end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_mod_menu'] = selected
+    end,
     onSideScroll = function(_, scrollIndex, args)
-        SetVehicleModKit(cache.vehicle, 0)
+        -- preset or custom mode with tire smoke for rgb
+        local customTires = GetVehicleModVariation(cache.vehicle, 23)
+        local vehClass = GetVehicleClass(cache.vehicle)
+        local vehModel = GetEntityModel(cache.vehicle)
         if type(args) == 'table' then
             local curArg = args[scrollIndex]
-            SetVehicleMod(cache.vehicle, curArg[2], curArg[1], GetVehicleModVariation(cache.vehicle, 23))
+            SetVehicleMod(cache.vehicle, curArg[2], curArg[1], customTires)
+        else
+            if args == 'wheel_type' then
+                if IsThisModelABike(vehModel) or vehClass == 22 then return end
+                SetVehicleWheelType(cache.vehicle, scrollIndex - 1)
+                SetVehicleMod(cache.vehicle, 23, -1, customTires)
+                vehicleFrontWheelTable.defaultIndex = 1
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleFrontWheelTable, vehicleFrontWheelIndex)
+                lib.showMenu('berkie_menu_vehicle_options_mod_menu', menuIndexes['berkie_menu_vehicle_options_mod_menu'])
+            end
         end
     end,
     options = {}
@@ -800,6 +878,9 @@ lib.registerMenu({
     position = 'top-right',
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_spawner'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
         if args == 'inside_vehicle' then
@@ -830,7 +911,7 @@ lib.registerMenu({
         args = 'berkie_menu_vehicle_spawner'
     end
 
-    lib.showMenu(args)
+    lib.showMenu(args, menuIndexes[args])
 end)
 
 lib.registerMenu({
@@ -839,6 +920,9 @@ lib.registerMenu({
     position = 'top-right',
     onClose = function(keyPressed)
         closeMenu(false, keyPressed, 'berkie_menu_main')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_miscellaneous_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
         if args == 'show_effects' then
@@ -852,14 +936,14 @@ lib.registerMenu({
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
 
-    lib.showMenu(args)
+    lib.showMenu(args, menuIndexes[args])
 end)
 
 RegisterCommand('berkiemenu', function()
     menuOpen = not menuOpen
 
     if menuOpen then
-        lib.showMenu('berkie_menu_main')
+        lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
     else
         lib.hideMenu(true)
     end
