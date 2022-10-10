@@ -1029,13 +1029,11 @@ CreateThread(function()
 
                     local setter = vehicleInvincible and SetBit or ClearBit
 
-                    ---@diagnostic disable
                     setter(memoryAddress, 4) -- IsBulletProof
                     setter(memoryAddress, 5) -- IsFireProof
                     setter(memoryAddress, 6) -- IsCollisionProof
                     setter(memoryAddress, 7) -- IsMeleeProof
                     setter(memoryAddress, 11) -- IsExplosionProof
-                    ---@diagnostic enable
                 end
 
                 :: skipAddresses ::
