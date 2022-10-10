@@ -156,7 +156,6 @@ local vehicleWheelTypes = {
     [12] = 'Track'
 }
 local vehicleModsMenuData = {}
-local reopenedModMenu = 1 -- Don't touch this, if this is anything different, changing a mod might update later or not at all
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
 local replacePreviousVehicle = true -- Replace the previous vehicle you were in when spawning a new vehicle
@@ -863,7 +862,6 @@ lib.registerMenu({
         local vehClass = GetVehicleClass(cache.vehicle)
         local vehModel = GetEntityModel(cache.vehicle)
         if type(args) == 'table' then
-            reopenedModMenu = 1
             local curArg = args[scrollIndex]
             SetVehicleMod(cache.vehicle, curArg[2], curArg[1], customTires)
             vehicleModsMenuData[curArg[2]][2].defaultIndex = scrollIndex
@@ -877,13 +875,8 @@ lib.registerMenu({
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[23][2], vehicleModsMenuData[23][1])
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-                reopenedModMenu += 1
-                if reopenedModMenu ~= 2 then return end
-                reopenedModMenu = 0
                 lib.hideMenu(false)
                 lib.showMenu('berkie_menu_vehicle_options_mod_menu', menuIndexes['berkie_menu_vehicle_options_mod_menu'])
-            else
-                reopenedModMenu = 1
             end
         end
     end,
