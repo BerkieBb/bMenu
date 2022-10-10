@@ -606,6 +606,10 @@ local function createModMenu()
     vehicleModsMenuData['custom_tires'] = {i, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = vehicleCustomTires and 1 or 2, close = false}}
     lib.setMenuOptions(id, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleModVariation(cache.vehicle, 23) and 1 or 2, close = false}, i)
     i += 1
+
+    vehicleModsMenuData['xenon_headlights'] = {i, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}}
+    lib.setMenuOptions(id, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}, i)
+    i += 1
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -880,6 +884,10 @@ lib.registerMenu({
                 if IsThisModelABike(vehModel) then
                     SetVehicleMod(cache.vehicle, 24, GetVehicleMod(cache.vehicle, 24), not customTires)
                 end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'xenon_headlights' then
+                ToggleVehicleMod(cache.vehicle, 22, scrollIndex == 1)
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             end
