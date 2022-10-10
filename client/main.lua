@@ -59,8 +59,6 @@ local vehicleModTypes = {
     [14] = {'CMOD_MOD_HRN', 'Horns'},
     [15] = {'CMOD_MOD_SUS', 'Suspension'},
     [16] = {'CMOD_MOD_ARM', 'Armor'},
-    [18] = {nil, 'Turbo'},
-    [22] = {nil, 'Headlights'},
     [23] = {'CMOD_WHE0_0', 'Front Wheel'},
     [24] = {'CMOD_WHE0_1', 'Rear Wheel'},
     [25] = {'CMM_MOD_S0', 'Plate Holder'},
@@ -610,6 +608,10 @@ local function createModMenu()
     vehicleModsMenuData['xenon_headlights'] = {i, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}}
     lib.setMenuOptions(id, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}, i)
     i += 1
+
+    vehicleModsMenuData['turbo'] = {i, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}}
+    lib.setMenuOptions(id, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}, i)
+    i += 1
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -888,6 +890,10 @@ lib.registerMenu({
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_headlights' then
                 ToggleVehicleMod(cache.vehicle, 22, scrollIndex == 1)
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'turbo' then
+                ToggleVehicleMod(cache.vehicle, 18, scrollIndex == 1)
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             end
