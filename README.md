@@ -6,6 +6,8 @@ Another note, please don't change the name of this resource when using this, I w
 
 Releases will be pushed once version 1.0.0 is ready, I won't be updating the version until I find that the menu is ready-to-use (thus 1.0.0 will be created).
 
+If you've got any ideas that you'd like implemented or things you'd want changed, feel free to make an issue.
+
 ## Requirements
 
 Without any of the following requirements, this resource won't start
