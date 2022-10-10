@@ -921,6 +921,11 @@ lib.registerMenu({
             local model = joaat(vehicle[1])
             if IsModelInCdimage(model) then
                 spawnVehicleOnPlayer(model)
+            else
+                lib.notify({
+                    description = ('Vehicle model %s doesn\'t exist in the game'):format(vehicle[1]),
+                    type = 'error'
+                })
             end
         end
         Wait(500)
