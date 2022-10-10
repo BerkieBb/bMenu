@@ -20,6 +20,10 @@ Without any of the following requirements, this resource won't start
 
 * [vMenu](https://github.com/TomGrobbe/vMenu) made by [TomGrobbe](https://github.com/TomGrobbe)
 
+## Contact
+
+If you want to contact me, you can do that in either the issues or on Discord by adding me as a friend by my user tag `BerkieB#5038`
+
 ## License
 
 [LGPL-3.0-or-later](https://www.gnu.org/licenses/lgpl-3.0.en.html)
