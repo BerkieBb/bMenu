@@ -155,8 +155,8 @@ local vehicleWheelTypes = {
     [11] = 'Street',
     [12] = 'Track'
 }
-local vehicleFrontWheelIndex = 0
-local vehicleFrontWheelTable = {}
+local vehicleModsMenuData = {}
+local reopenedModMenu = 1 -- Don't touch this, if this is anything different, changing a mod might update later or not at all
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
 local replacePreviousVehicle = true -- Replace the previous vehicle you were in when spawning a new vehicle
@@ -585,10 +585,7 @@ local function createModMenu()
             args[i2] = {actualIndex, k}
         end
 
-        if k == 23 then
-            vehicleFrontWheelIndex = i
-            vehicleFrontWheelTable = {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}
-        end
+        vehicleModsMenuData[k] = {i, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}}
 
         lib.setMenuOptions(id, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}, i)
         i += 1
@@ -604,7 +601,12 @@ local function createModMenu()
         elseif GetVehicleClass(cache.vehicle) == 22 then
             valuesWheelType = {'Open Wheel'}
         end
-        lib.setMenuOptions(id, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or GetVehicleWheelType(cache.vehicle) + 1, close = false}, i)
+
+        local wheelTypeIndex = GetVehicleWheelType(cache.vehicle) + 1
+
+        vehicleModsMenuData['wheel_type'] = {i, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}}
+
+        lib.setMenuOptions(id, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}, i)
         i += 1
     end
 end
@@ -771,6 +773,11 @@ lib.registerMenu({
             description = reason,
             type = 'error'
         })
+
+        if args == 'berkie_menu_vehicle_options_mod_menu' or args == 'berkie_menu_vehicle_options_god_mode_menu' then
+            menuOpen = false
+        end
+
         return
     end
 
@@ -856,16 +863,27 @@ lib.registerMenu({
         local vehClass = GetVehicleClass(cache.vehicle)
         local vehModel = GetEntityModel(cache.vehicle)
         if type(args) == 'table' then
+            reopenedModMenu = 1
             local curArg = args[scrollIndex]
             SetVehicleMod(cache.vehicle, curArg[2], curArg[1], customTires)
+            vehicleModsMenuData[curArg[2]][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[curArg[2]][2], vehicleModsMenuData[curArg[2]][1])
         else
             if args == 'wheel_type' then
                 if IsThisModelABike(vehModel) or vehClass == 22 then return end
                 SetVehicleWheelType(cache.vehicle, scrollIndex - 1)
                 SetVehicleMod(cache.vehicle, 23, -1, customTires)
-                vehicleFrontWheelTable.defaultIndex = 1
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleFrontWheelTable, vehicleFrontWheelIndex)
+                vehicleModsMenuData[23][2].defaultIndex = 1
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[23][2], vehicleModsMenuData[23][1])
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+                reopenedModMenu += 1
+                if reopenedModMenu ~= 2 then return end
+                reopenedModMenu = 0
+                lib.hideMenu(false)
                 lib.showMenu('berkie_menu_vehicle_options_mod_menu', menuIndexes['berkie_menu_vehicle_options_mod_menu'])
+            else
+                reopenedModMenu = 1
             end
         end
     end,
