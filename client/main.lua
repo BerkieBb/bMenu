@@ -612,6 +612,10 @@ local function createModMenu()
     vehicleModsMenuData['turbo'] = {i, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}}
     lib.setMenuOptions(id, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}, i)
     i += 1
+
+    vehicleModsMenuData['bullet_proof_tires'] = {i, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}}
+    lib.setMenuOptions(id, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}, i)
+    i += 1
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -894,6 +898,10 @@ lib.registerMenu({
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'turbo' then
                 ToggleVehicleMod(cache.vehicle, 18, scrollIndex == 1)
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'bullet_proof_tires' then
+                SetVehicleTyresCanBurst(cache.vehicle, scrollIndex == 2)
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             end
