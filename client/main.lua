@@ -169,10 +169,6 @@ local vehicleAutoRepair = false
 local vehicleNeverDirty = false
 local vehicleDirtLevelSetter = 0
 
-local function firstToUpper(str)
-    return str:gsub('^%l', string.upper)
-end
-
 local function toProperCase(str)
     return string.gsub(str, '(%a)([%w_\']*)', function(first, rest)
         return first:upper()..rest:lower()
@@ -602,12 +598,14 @@ local function createModMenu()
         end
 
         local wheelTypeIndex = GetVehicleWheelType(cache.vehicle) + 1
-
         vehicleModsMenuData['wheel_type'] = {i, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}}
-
         lib.setMenuOptions(id, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}, i)
         i += 1
     end
+
+    vehicleModsMenuData['custom_tires'] = {i, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = vehicleCustomTires and 1 or 2, close = false}}
+    lib.setMenuOptions(id, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleModVariation(cache.vehicle, 23) and 1 or 2, close = false}, i)
+    i += 1
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -621,7 +619,7 @@ local function createVehiclesForSpawner(vehs, id)
         local label = GetLabelText(displayName)
         label = label ~= 'NULL' and label or displayName
         label = label ~= 'CARNOTFOUND' and label or data.modelName
-        lib.setMenuOptions(id, {label = firstToUpper(label:lower()), args = data.model, close = false}, i)
+        lib.setMenuOptions(id, {label = toProperCase(label:lower()), args = data.model, close = false}, i)
     end
 end
 
@@ -877,6 +875,13 @@ lib.registerMenu({
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
                 lib.hideMenu(false)
                 lib.showMenu('berkie_menu_vehicle_options_mod_menu', menuIndexes['berkie_menu_vehicle_options_mod_menu'])
+            elseif args == 'custom_tires' then
+                SetVehicleMod(cache.vehicle, 23, GetVehicleMod(cache.vehicle, 23), not customTires)
+                if IsThisModelABike(vehModel) then
+                    SetVehicleMod(cache.vehicle, 24, GetVehicleMod(cache.vehicle, 24), not customTires)
+                end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             end
         end
     end,
@@ -1055,7 +1060,7 @@ colors:
   primary color:
   secondary color:
   chrome (option)
-  enveff scale (nog kijken)
+  enveff scale (probably make it a list of some set enveffs)
   generaten:
 neon kits:
   front light (yes or no)
