@@ -169,6 +169,19 @@ local vehicleXenonColors = {
     [11] = 'Purple',
     [12] = 'Blacklight'
 }
+local vehicleTireSmokeColors = {
+    {'Red', vec3(244, 65, 65)},
+    {'Orange', vec3(244, 167, 66)},
+    {'Yellow', vec3(244, 217, 65)},
+    {'Gold', vec3(181, 120, 0)},
+    {'Light Green', vec3(158, 255, 84)},
+    {'Dark Green', vec3(44, 94, 5)},
+    {'Light Blue', vec3(65, 211, 244)},
+    {'Dark Blue', vec3(24, 54, 163)},
+    {'Purple', vec3(108, 24, 192)},
+    {'Pink', vec3(192, 24, 172)},
+    {'Black', vec3(1, 1, 1)}
+}
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -182,7 +195,8 @@ local vehicleRampDamage = false
 local vehicleAutoRepair = false
 local vehicleNeverDirty = false
 local vehicleDirtLevelSetter = 0
-local vehicleUseCustomColor = false
+local vehicleUseCustomXenonColor = false
+local vehicleUseCustomTireSmokeColor = false
 
 local function toProperCase(str)
     return string.gsub(str, '(%a)([%w_\']*)', function(first, rest)
@@ -597,7 +611,7 @@ local function createModMenu()
 
         vehicleModsMenuData[k] = {i, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}}
 
-        lib.setMenuOptions(id, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}, i)
+        lib.setMenuOptions(id, vehicleModsMenuData[k][2], i)
         i += 1
     end
 
@@ -614,24 +628,24 @@ local function createModMenu()
 
         local wheelTypeIndex = GetVehicleWheelType(cache.vehicle) + 1
         vehicleModsMenuData['wheel_type'] = {i, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}}
-        lib.setMenuOptions(id, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}, i)
+        lib.setMenuOptions(id, vehicleModsMenuData['wheel_type'][2], i)
         i += 1
     end
 
     vehicleModsMenuData['custom_tires'] = {i, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = vehicleCustomTires and 1 or 2, close = false}}
-    lib.setMenuOptions(id, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleModVariation(cache.vehicle, 23) and 1 or 2, close = false}, i)
+    lib.setMenuOptions(id, vehicleModsMenuData['custom_tires'][2], i)
     i += 1
 
     vehicleModsMenuData['xenon_headlights'] = {i, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}}
-    lib.setMenuOptions(id, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}, i)
+    lib.setMenuOptions(id, vehicleModsMenuData['xenon_headlights'][2], i)
     i += 1
 
     vehicleModsMenuData['turbo'] = {i, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}}
-    lib.setMenuOptions(id, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}, i)
+    lib.setMenuOptions(id, vehicleModsMenuData['turbo'][2], i)
     i += 1
 
     vehicleModsMenuData['bullet_proof_tires'] = {i, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}}
-    lib.setMenuOptions(id, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}, i)
+    lib.setMenuOptions(id, vehicleModsMenuData['bullet_proof_tires'][2], i)
     i += 1
 
     local vehiclePresetXenonColors = {}
@@ -640,15 +654,15 @@ local function createModMenu()
         vehiclePresetXenonColors[i2 + 2] = vehicleXenonColors[i2]
     end
 
-    local currentColor = GetVehicleXenonLightsColor(cache.vehicle)
-    currentColor = (currentColor < 0 or currentColor > 12) and -1 or currentColor
+    local currentXenonColor = GetVehicleXenonLightsColor(cache.vehicle)
+    currentXenonColor = (currentXenonColor < 0 or currentXenonColor > 12) and -1 or currentXenonColor
 
-    vehicleModsMenuData['xenon_color_mode'] = {i, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = 'xenon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomColor and 2 or 1, close = false}}
-    lib.setMenuOptions(id, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = 'xenon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomColor and 2 or 1, close = false}, i)
+    vehicleModsMenuData['xenon_color_mode'] = {i, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = 'xenon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomXenonColor and 2 or 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['xenon_color_mode'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_preset_color'] = {i, {label = 'Xenon Headlights Color', description = 'Set a color for your xenon headlights', args = 'xenon_preset_color', values = vehiclePresetXenonColors, defaultIndex = currentColor + 2, close = false}}
-    lib.setMenuOptions(id, {label = 'Xenon Headlights Color', description = 'Set a color for your xenon headlights', args = 'xenon_preset_color', values = vehiclePresetXenonColors, defaultIndex = currentColor + 2, close = false}, i)
+    vehicleModsMenuData['xenon_preset_color'] = {i, {label = 'Xenon Headlights Preset Color', description = 'Set a preset color for your xenon headlights', args = 'xenon_preset_color', values = vehiclePresetXenonColors, defaultIndex = currentXenonColor + 2, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['xenon_preset_color'][2], i)
     i += 1
 
     local redXenonColors = {}
@@ -662,21 +676,74 @@ local function createModMenu()
         blueXenonColors[i2] = val
     end
 
-    local hasCustomXenon, defaultRed, defaultGreen, defaultBlue = GetVehicleXenonLightsCustomColor(cache.vehicle)
-    defaultRed = hasCustomXenon and defaultRed or 0
-    defaultGreen = hasCustomXenon and defaultGreen or 0
-    defaultBlue = hasCustomXenon and defaultBlue or 0
+    local hasCustomXenon, defaultXenonRed, defaultXenonGreen, defaultXenonBlue = GetVehicleXenonLightsCustomColor(cache.vehicle)
+    defaultXenonRed = hasCustomXenon and defaultXenonRed or 0
+    defaultXenonGreen = hasCustomXenon and defaultXenonGreen or 0
+    defaultXenonBlue = hasCustomXenon and defaultXenonBlue or 0
 
-    vehicleModsMenuData['xenon_custom_color_red'] = {i, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = 'xenon_custom_color_red', values = redXenonColors, defaultIndex = defaultRed + 1, close = false}}
-    lib.setMenuOptions(id, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = 'xenon_custom_color_red', values = redXenonColors, defaultIndex = defaultRed + 1, close = false}, i)
+    vehicleModsMenuData['xenon_custom_color_red'] = {i, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = 'xenon_custom_color_red', values = redXenonColors, defaultIndex = defaultXenonRed + 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_red'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_custom_color_green'] = {i, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = 'xenon_custom_color_green', values = greenXenonColors, defaultIndex = defaultGreen + 1, close = false}}
-    lib.setMenuOptions(id, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = 'xenon_custom_color_green', values = greenXenonColors, defaultIndex = defaultGreen + 1, close = false}, i)
+    vehicleModsMenuData['xenon_custom_color_green'] = {i, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = 'xenon_custom_color_green', values = greenXenonColors, defaultIndex = defaultXenonGreen + 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_green'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_custom_color_blue'] = {i, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = 'xenon_custom_color_blue', values = blueXenonColors, defaultIndex = defaultBlue + 1, close = false}}
-    lib.setMenuOptions(id, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = 'xenon_custom_color_blue', values = blueXenonColors, defaultIndex = defaultBlue + 1, close = false}, i)
+    vehicleModsMenuData['xenon_custom_color_blue'] = {i, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = 'xenon_custom_color_blue', values = blueXenonColors, defaultIndex = defaultXenonBlue + 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_blue'][2], i)
+    i += 1
+
+    local defaultTireSmokeRed, defaultTireSmokeGreen, defaultTireSmokeBlue = GetVehicleTyreSmokeColor(cache.vehicle)
+    local hasTireSmoke = IsToggleModOn(cache.vehicle, 20)
+    defaultTireSmokeRed = hasTireSmoke and defaultTireSmokeRed or 255
+    defaultTireSmokeGreen = hasTireSmoke and defaultTireSmokeGreen or 255
+    defaultTireSmokeBlue = hasTireSmoke and defaultTireSmokeBlue or 255
+
+    local defaultTireSmokePresetIndex = 1
+    local defaultTireSmokeVec = vec3(defaultTireSmokeRed, defaultTireSmokeGreen, defaultTireSmokeBlue)
+
+    local vehiclePresetTireSmokeColors = {}
+
+    for i2 = 1, #vehicleTireSmokeColors do
+        vehiclePresetTireSmokeColors[i2] = vehicleTireSmokeColors[i2][1]
+        if vehicleTireSmokeColors[i2][2] == defaultTireSmokeVec then
+            defaultTireSmokePresetIndex = i2
+        end
+    end
+
+    vehicleModsMenuData['tire_smoke'] = {i, {label = 'Tire Smoke', description = 'Enable or disable tire smoke', args = 'tire_smoke', values = {'Yes', 'No'}, defaultIndex = hasTireSmoke and 1 or 2, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke'][2], i)
+    i += 1
+
+    vehicleModsMenuData['tire_smoke_color_mode'] = {i, {label = 'Tire Smoke Color Mode', description = 'Set the color mode for your tire smoke', args = 'tire_smoke_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomTireSmokeColor and 2 or 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_color_mode'][2], i)
+    i += 1
+
+    vehicleModsMenuData['tire_smoke_preset_color'] = {i, {label = 'Tire Smoke Preset Color', description = 'Set a preset color for your tire smoke', args = 'tire_smoke_preset_color', values = vehiclePresetTireSmokeColors, defaultIndex = defaultTireSmokePresetIndex, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_preset_color'][2], i)
+    i += 1
+
+    local redTireSmokeColors = {}
+    local greenTireSmokeColors = {}
+    local blueTireSmokeColors = {}
+
+    for i2 = 1, 256 do
+        local val = i2 - 1
+        redTireSmokeColors[i2] = val
+        greenTireSmokeColors[i2] = val
+        blueTireSmokeColors[i2] = val
+    end
+
+    vehicleModsMenuData['tire_smoke_custom_color_red'] = {i, {label = 'Tire Smoke Custom Color Red', description = 'Set the red part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_red', values = redTireSmokeColors, defaultIndex = defaultTireSmokeRed + 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_red'][2], i)
+    i += 1
+
+    vehicleModsMenuData['tire_smoke_custom_color_green'] = {i, {label = 'Tire Smoke Custom Color Green', description = 'Set the green part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_green', values = greenTireSmokeColors, defaultIndex = defaultTireSmokeGreen + 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_green'][2], i)
+    i += 1
+
+    vehicleModsMenuData['tire_smoke_custom_color_blue'] = {i, {label = 'Tire Smoke Custom Color Blue', description = 'Set the blue part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_blue', values = blueTireSmokeColors, defaultIndex = defaultTireSmokeBlue + 1, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_blue'][2], i)
     i += 1
 end
 
@@ -927,7 +994,6 @@ lib.registerMenu({
         menuIndexes['berkie_menu_vehicle_options_mod_menu'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        -- preset or custom mode with tire smoke for rgb
         local customTires = GetVehicleModVariation(cache.vehicle, 23)
         local vehClass = GetVehicleClass(cache.vehicle)
         local vehModel = GetEntityModel(cache.vehicle)
@@ -967,7 +1033,7 @@ lib.registerMenu({
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_color_mode' then
-                vehicleUseCustomColor = scrollIndex == 2
+                vehicleUseCustomXenonColor = scrollIndex == 2
                 if scrollIndex == 1 then
                     SetVehicleXenonLightsColor(cache.vehicle, vehicleModsMenuData['xenon_preset_color'][2].defaultIndex - 1)
                 else
@@ -976,27 +1042,83 @@ lib.registerMenu({
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_preset_color' then
-                if not vehicleUseCustomColor and IsToggleModOn(cache.vehicle, 22) then
+                if not vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     local newIndex = scrollIndex == -1 and 255 or scrollIndex - 1
                     SetVehicleXenonLightsColor(cache.vehicle, newIndex)
                 end
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_custom_color_red' then
-                if vehicleUseCustomColor and IsToggleModOn(cache.vehicle, 22) then
+                if vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     SetVehicleXenonLightsCustomColor(cache.vehicle, scrollIndex - 1, vehicleModsMenuData['xenon_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['xenon_custom_color_blue'][2].defaultIndex - 1)
                 end
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_custom_color_green' then
-                if vehicleUseCustomColor and IsToggleModOn(cache.vehicle, 22) then
+                if vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     SetVehicleXenonLightsCustomColor(cache.vehicle, vehicleModsMenuData['xenon_custom_color_red'][2].defaultIndex - 1, scrollIndex - 1, vehicleModsMenuData['xenon_custom_color_blue'][2].defaultIndex - 1)
                 end
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_custom_color_blue' then
-                if vehicleUseCustomColor and IsToggleModOn(cache.vehicle, 22) then
+                if vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     SetVehicleXenonLightsCustomColor(cache.vehicle, vehicleModsMenuData['xenon_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['xenon_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
+                end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'tire_smoke' then
+                ToggleVehicleMod(cache.vehicle, 20, scrollIndex == 1)
+                if scrollIndex == 1 then
+                    local val
+                    if vehicleModsMenuData['tire_smoke_color_mode'][2].defaultIndex == 1 then
+                        val = vehicleTireSmokeColors[vehicleModsMenuData['tire_smoke_preset_color'][2].defaultIndex][2]
+                    else
+                        val = vec3(vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
+                    end
+                    SetVehicleTyreSmokeColor(cache.vehicle, val.r, val.g, val.b)
+                else
+                    SetVehicleTyreSmokeColor(cache.vehicle, 255, 255, 255)
+                    RemoveVehicleMod(cache.vehicle, 20)
+                    vehicleModsMenuData['tire_smoke_preset_color'][2].defaultIndex = 1
+                    lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData['tire_smoke_preset_color'][2], vehicleModsMenuData['tire_smoke_preset_color'][1])
+                    lib.hideMenu(false)
+                    lib.showMenu('berkie_menu_vehicle_options_mod_menu', menuIndexes['berkie_menu_vehicle_options_mod_menu'])
+                end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'tire_smoke_color_mode' then
+                vehicleUseCustomTireSmokeColor = scrollIndex == 2
+                local val
+                if not vehicleUseCustomTireSmokeColor then
+                    val = vehicleTireSmokeColors[scrollIndex][2]
+                else
+                    val = vec3(vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
+                end
+                SetVehicleTyreSmokeColor(cache.vehicle, val.r, val.g, val.b)
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'tire_smoke_preset_color' then
+                if not vehicleUseCustomTireSmokeColor then
+                    local val = vehicleTireSmokeColors[scrollIndex][2]
+                    SetVehicleTyreSmokeColor(cache.vehicle, val.r, val.g, val.b)
+                end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'tire_smoke_custom_color_red' then
+                if vehicleUseCustomTireSmokeColor then
+                    SetVehicleTyreSmokeColor(cache.vehicle, scrollIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
+                end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'tire_smoke_custom_color_green' then
+                if vehicleUseCustomTireSmokeColor then
+                    SetVehicleTyreSmokeColor(cache.vehicle, vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, scrollIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
+                end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'tire_smoke_custom_color_blue' then
+                if vehicleUseCustomTireSmokeColor then
+                    SetVehicleTyreSmokeColor(cache.vehicle, vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
                 end
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
