@@ -182,6 +182,15 @@ local vehicleTireSmokeColors = {
     {'Pink', vec3(192, 24, 172)},
     {'Black', vec3(1, 1, 1)}
 }
+local vehicleWindowTints = {
+    {0, 'None'},
+    {4, 'Stock'},
+    {5, 'Limo'},
+    {3, 'Light Smoke'},
+    {2, 'Dark Smoke'},
+    {1, 'Pure Black'},
+    {6, 'Green'}
+}
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -745,6 +754,19 @@ local function createModMenu()
     vehicleModsMenuData['tire_smoke_custom_color_blue'] = {i, {label = 'Tire Smoke Custom Color Blue', description = 'Set the blue part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_blue', values = blueTireSmokeColors, defaultIndex = defaultTireSmokeBlue + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_blue'][2], i)
     i += 1
+
+    local defaultWindowTint = GetVehicleWindowTint(cache.vehicle)
+    defaultWindowTint = defaultWindowTint == -1 and 5 or defaultWindowTint
+
+    local windowTints = {}
+
+    for i2 = 1, #vehicleWindowTints do
+        windowTints[i2] = vehicleWindowTints[i2][2]
+    end
+
+    vehicleModsMenuData['window_tint'] = {i, {label = 'Window Tint', description = 'Apply tint to your windows', args = 'window_tint', values = windowTints, defaultIndex = defaultWindowTint, close = false}}
+    lib.setMenuOptions(id, vehicleModsMenuData['window_tint'][2], i)
+    i += 1
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -1120,6 +1142,10 @@ lib.registerMenu({
                 if vehicleUseCustomTireSmokeColor then
                     SetVehicleTyreSmokeColor(cache.vehicle, vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
                 end
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'window_tint' then
+                SetVehicleWindowTint(cache.vehicle, vehicleWindowTints[scrollIndex][1])
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             end
