@@ -967,6 +967,7 @@ lib.registerMenu({
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'xenon_color_mode' then
+                vehicleUseCustomColor = scrollIndex == 2
                 if scrollIndex == 1 then
                     SetVehicleXenonLightsColor(cache.vehicle, vehicleModsMenuData['xenon_preset_color'][2].defaultIndex - 1)
                 else
