@@ -153,6 +153,22 @@ local vehicleWheelTypes = {
     [11] = 'Street',
     [12] = 'Track'
 }
+local vehicleXenonColors = {
+    [-1] = 'Default',
+    [0] = 'White',
+    [1] = 'Blue',
+    [2] = 'Electric Blue',
+    [3] = 'Mint Green',
+    [4] = 'Lime Green',
+    [5] = 'Yellow',
+    [6] = 'Golden Shower',
+    [7] = 'Orange',
+    [8] = 'Red',
+    [9] = 'Pony Pink',
+    [10] = 'Hot Pink',
+    [11] = 'Purple',
+    [12] = 'Blacklight'
+}
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -616,6 +632,19 @@ local function createModMenu()
     vehicleModsMenuData['bullet_proof_tires'] = {i, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}}
     lib.setMenuOptions(id, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}, i)
     i += 1
+
+    local vehiclePresetXenonColors = {}
+
+    for i2 = -1, 12 do
+        vehiclePresetXenonColors[i2 + 2] = vehicleXenonColors[i2]
+    end
+
+    local currentColor = GetVehicleXenonLightsColor(cache.vehicle)
+    currentColor = (currentColor < 0 or currentColor > 12 and -1) or currentColor
+
+    vehicleModsMenuData['xenon_preset_color'] = {i, {label = 'Xenon Headlights Color', description = 'Set a color for your xenon headlights', args = 'xenon_preset_color', values = vehiclePresetXenonColors, defaultIndex = currentColor + 2, close = false}}
+    lib.setMenuOptions(id, {label = 'Xenon Headlights Color', description = 'Set a color for your xenon headlights', args = 'xenon_preset_color', values = vehiclePresetXenonColors, defaultIndex = currentColor + 2, close = false}, i)
+    i += 1
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -904,6 +933,11 @@ lib.registerMenu({
                 SetVehicleTyresCanBurst(cache.vehicle, scrollIndex == 2)
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+            elseif args == 'xenon_preset_color' then
+                local newIndex = scrollIndex == -1 and 255 or scrollIndex - 1
+                SetVehicleXenonLightsColor(cache.vehicle, newIndex)
+                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             end
         end
     end,
@@ -1080,55 +1114,55 @@ CreateThread(function()
 end)
 
 --[[
-    vehicle options menu:
-colors:
-  primary color:
-  secondary color:
-  chrome (option)
-  enveff scale (probably make it a list of some set enveffs)
-  generaten:
-neon kits:
-  front light (yes or no)
-  rear light (yes or no)
-  left light (yes or no)
-  right light (yes or no)
-  color (selection)
-liveries:
-  generate, don't show if no liveries
-extras:
-  generate, don't show if no extras
-toggle engine on/off (option)
-set license plate text (input)
-license plate type (selection)
-vehicle doors:
-  generate
-  open all doors (option)
-  close all doors (option)
-  remove door (selection)
-  delete removed doors (yes or no)
-vehicle windows:
-  roll down and roll up (option)
-bike seatbelt (yes or no)
-speed limiter (selection to input)
-enable torque multiplier (yes or no)
-set engine torque multiplier (selection)
-enable power multiplier (yes or no)
-set engine power multiplier (selection)
-disable plane turbulence (yes or no)
-flip vehicle (option)
-toggle vehicle alarm (option)
-cycle through vehicle seats (option)
-vehicle lights (selection)
-fix / destroy tires (selection)
-freeze vehicle (yes or no)
-set vehicle visibility (yes or no)
-engine always on (yes or no)
-infinite fuel (yes or no)
-show vehicle health (yes or no)
-default radio station (yes or no)
-disable siren (yes or no)
-no bike helmet (yes or no)
-flash highbeams on honk (yes or no)
-delete vehicle:
-  confirm or go back
+vehicle options menu:
+    colors:
+        primary color:
+        secondary color:
+        chrome (option)
+        enveff scale (probably make it a list of some set enveffs)
+        generaten:
+    neon kits:
+        front light (yes or no)
+        rear light (yes or no)
+        left light (yes or no)
+        right light (yes or no)
+        color (selection)
+    liveries:
+        generate, don't show if no liveries
+    extras:
+        generate, don't show if no extras
+    toggle engine on/off (option)
+    set license plate text (input)
+    license plate type (selection)
+    vehicle doors:
+        generate
+        open all doors (option)
+        close all doors (option)
+        remove door (selection)
+        delete removed doors (yes or no)
+    vehicle windows:
+        roll down and roll up (option)
+    bike seatbelt (yes or no)
+    speed limiter (selection to input)
+    enable torque multiplier (yes or no)
+    set engine torque multiplier (selection)
+    enable power multiplier (yes or no)
+    set engine power multiplier (selection)
+    disable plane turbulence (yes or no)
+    flip vehicle (option)
+    toggle vehicle alarm (option)
+    cycle through vehicle seats (option)
+    vehicle lights (selection)
+    fix / destroy tires (selection)
+    freeze vehicle (yes or no)
+    set vehicle visibility (yes or no)
+    engine always on (yes or no)
+    infinite fuel (yes or no)
+    show vehicle health (yes or no)
+    default radio station (yes or no)
+    disable siren (yes or no)
+    no bike helmet (yes or no)
+    flash highbeams on honk (yes or no)
+    delete vehicle:
+        confirm or go back
 ]]
