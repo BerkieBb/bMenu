@@ -641,7 +641,7 @@ local function createModMenu()
     end
 
     local currentColor = GetVehicleXenonLightsColor(cache.vehicle)
-    currentColor = (currentColor < 0 or currentColor > 12 and -1) or currentColor
+    currentColor = (currentColor < 0 or currentColor > 12) and -1 or currentColor
 
     vehicleModsMenuData['xenon_color_mode'] = {i, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = 'xenon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomColor and 2 or 1, close = false}}
     lib.setMenuOptions(id, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = 'xenon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomColor and 2 or 1, close = false}, i)
