@@ -3,7 +3,7 @@ local playerId = PlayerId()
 local serverId = GetPlayerServerId(playerId)
 local playerBlips = {}
 local itemsOnYourself = { -- Put the last part of the argument of the option that you want to be able to use on yourself in here
-    '_kill',
+    'kill',
 }
 local menuIndexes = {}
 local vehicles = {}
