@@ -8,30 +8,30 @@ local itemsOnYourself = { -- Put the last part of the argument of the option tha
 local menuIndexes = {}
 local vehicles = {}
 local vehicleClassNames = {
-    [0] = 'Compacts',
-    [1] = 'Sedans',
-    [2] = 'SUVs',
-    [3] = 'Coupes',
-    [4] = 'Muscle',
-    [5] = 'Sports Classics',
-    [6] = 'Sports',
-    [7] = 'Super',
-    [8] = 'Motorcycles',
-    [9] = 'Off-road',
-    [10] = 'Industrial',
-    [11] = 'Utility',
-    [12] = 'Vans',
-    [13] = 'Cycles',
-    [14] = 'Boats',
-    [15] = 'Helicopters',
-    [16] = 'Planes',
-    [17] = 'Service',
-    [18] = 'Emergency',
-    [19] = 'Military',
-    [20] = 'Commercial',
-    [21] = 'Trains',
-    [22] = 'Open Wheel',
-    [69] = 'Misc'
+    [0] = GetLabelText('VEH_CLASS_0'), -- Compacts
+    [1] = GetLabelText('VEH_CLASS_1'), -- Sedans
+    [2] = GetLabelText('VEH_CLASS_2'), -- SUVs
+    [3] = GetLabelText('VEH_CLASS_3'), -- Coupes
+    [4] = GetLabelText('VEH_CLASS_4'), -- Muscle
+    [5] = GetLabelText('VEH_CLASS_5'), -- Sports Classics
+    [6] = GetLabelText('VEH_CLASS_6'), -- Sports
+    [7] = GetLabelText('VEH_CLASS_7'), -- Super
+    [8] = GetLabelText('VEH_CLASS_8'), -- Motorcycles
+    [9] = GetLabelText('VEH_CLASS_9'), -- Offroad
+    [10] = GetLabelText('VEH_CLASS_10'), -- Industrial
+    [11] = GetLabelText('VEH_CLASS_11'), -- Utility
+    [12] = GetLabelText('VEH_CLASS_12'), -- Vans
+    [13] = GetLabelText('VEH_CLASS_13'), -- Cycles
+    [14] = GetLabelText('VEH_CLASS_14'), -- Boats
+    [15] = GetLabelText('VEH_CLASS_15'), -- Helicopters
+    [16] = GetLabelText('VEH_CLASS_16'), -- Planes
+    [17] = GetLabelText('VEH_CLASS_17'), -- Service
+    [18] = GetLabelText('VEH_CLASS_18'), -- Emergency
+    [19] = GetLabelText('VEH_CLASS_19'), -- Military
+    [20] = GetLabelText('VEH_CLASS_20'), -- Commercial
+    [21] = GetLabelText('VEH_CLASS_21'), -- Trains
+    [22] = GetLabelText('VEH_CLASS_22'), -- Open Wheel
+    [69] = 'Misc' -- For any other vehicles that haven't got a class set for some reason.
 }
 local vehicleDoorBoneNames = {
     [0] = 'door_dside_f',
@@ -191,6 +191,261 @@ local vehicleWindowTints = {
     {1, 'Pure Black'},
     {6, 'Green'}
 }
+
+if GetLabelText('veh_color_taxi_yellow') == 'NULL' then
+    AddTextEntry('veh_color_taxi_yellow', ('Taxi %s'):format(GetLabelText('IEC_T20_2')))
+end
+
+if GetLabelText('veh_color_off_white') == 'NULL' then
+    AddTextEntry('veh_color_off_white', 'Off White')
+end
+
+if GetLabelText('VERY_DARK_BLUE') == 'NULL' then
+    AddTextEntry('VERY_DARK_BLUE', 'Very Dark Blue')
+end
+
+local vehicleClassicColors = {
+    {0, GetLabelText('BLACK')},
+    {1, GetLabelText('GRAPHITE')},
+    {2, GetLabelText('BLACK_STEEL')},
+    {3, GetLabelText('DARK_SILVER')},
+    {4, GetLabelText('SILVER')},
+    {5, GetLabelText('BLUE_SILVER')},
+    {6, GetLabelText('ROLLED_STEEL')},
+    {7, GetLabelText('SHADOW_SILVER')},
+    {8, GetLabelText('STONE_SILVER')},
+    {9, GetLabelText('MIDNIGHT_SILVER')},
+    {10, GetLabelText('CAST_IRON_SIL')},
+    {11, GetLabelText('ANTHR_BLACK')},
+
+    {27, GetLabelText('RED')},
+    {28, GetLabelText('TORINO_RED')},
+    {29, GetLabelText('FORMULA_RED')},
+    {30, GetLabelText('BLAZE_RED')},
+    {31, GetLabelText('GRACE_RED')},
+    {32, GetLabelText('GARNET_RED')},
+    {33, GetLabelText('SUNSET_RED')},
+    {34, GetLabelText('CABERNET_RED')},
+    {35, GetLabelText('CANDY_RED')},
+    {36, GetLabelText('SUNRISE_ORANGE')},
+    {37, GetLabelText('GOLD')},
+    {38, GetLabelText('ORANGE')},
+
+    {49, GetLabelText('DARK_GREEN')},
+    {50, GetLabelText('RACING_GREEN')},
+    {51, GetLabelText('SEA_GREEN')},
+    {52, GetLabelText('OLIVE_GREEN')},
+    {53, GetLabelText('BRIGHT_GREEN')},
+    {54, GetLabelText('PETROL_GREEN')},
+
+    {61, GetLabelText('GALAXY_BLUE')},
+    {62, GetLabelText('DARK_BLUE')},
+    {63, GetLabelText('SAXON_BLUE')},
+    {64, GetLabelText('BLUE')},
+    {65, GetLabelText('MARINER_BLUE')},
+    {66, GetLabelText('HARBOR_BLUE')},
+    {67, GetLabelText('DIAMOND_BLUE')},
+    {68, GetLabelText('SURF_BLUE')},
+    {69, GetLabelText('NAUTICAL_BLUE')},
+    {70, GetLabelText('ULTRA_BLUE')},
+    {71, GetLabelText('PURPLE')},
+    {72, GetLabelText('SPIN_PURPLE')},
+    {73, GetLabelText('RACING_BLUE')},
+    {74, GetLabelText('LIGHT_BLUE')},
+
+    {88, GetLabelText('YELLOW')},
+    {89, GetLabelText('RACE_YELLOW')},
+    {90, GetLabelText('BRONZE')},
+    {91, GetLabelText('FLUR_YELLOW')},
+    {92, GetLabelText('LIME_GREEN')},
+
+    {94, GetLabelText('UMBER_BROWN')},
+    {95, GetLabelText('CREEK_BROWN')},
+    {96, GetLabelText('CHOCOLATE_BROWN')},
+    {97, GetLabelText('MAPLE_BROWN')},
+    {98, GetLabelText('SADDLE_BROWN')},
+    {99, GetLabelText('STRAW_BROWN')},
+    {100, GetLabelText('MOSS_BROWN')},
+    {101, GetLabelText('BISON_BROWN')},
+    {102, GetLabelText('WOODBEECH_BROWN')},
+    {103, GetLabelText('BEECHWOOD_BROWN')},
+    {104, GetLabelText('SIENNA_BROWN')},
+    {105, GetLabelText('SANDY_BROWN')},
+    {106, GetLabelText('BLEECHED_BROWN')},
+    {107, GetLabelText('CREAM')},
+
+    {111, GetLabelText('WHITE')},
+    {112, GetLabelText('FROST_WHITE')},
+
+    {135, GetLabelText('HOT PINK')},
+    {136, GetLabelText('SALMON_PINK')},
+    {137, GetLabelText('PINK')},
+    {138, GetLabelText('BRIGHT_ORANGE')},
+
+    {141, GetLabelText('MIDNIGHT_BLUE')},
+    {142, GetLabelText('MIGHT_PURPLE')},
+    {143, GetLabelText('WINE_RED')},
+
+    {145, GetLabelText('BRIGHT_PURPLE')},
+    {146, GetLabelText('VERY_DARK_BLUE')},
+    {147, GetLabelText('BLACK_GRAPHITE')},
+
+    {150, GetLabelText('LAVA_RED')},
+}
+
+local vehicleClassicColorsArray = {}
+
+for i = 1, #vehicleClassicColors do
+    vehicleClassicColorsArray[i] = vehicleClassicColors[i][2]
+end
+
+local vehicleMatteColors = {
+    {12, GetLabelText('BLACK')},
+    {13, GetLabelText('GREY')},
+    {14, GetLabelText('LIGHT_GREY')},
+
+    {39, GetLabelText('RED')},
+    {40, GetLabelText('DARK_RED')},
+    {41, GetLabelText('ORANGE')},
+    {42, GetLabelText('YELLOW')},
+
+    {55, GetLabelText('LIME_GREEN')},
+
+    {82, GetLabelText('DARK_BLUE')},
+    {83, GetLabelText('BLUE')},
+    {84, GetLabelText('MIDNIGHT_BLUE')},
+
+    {128, GetLabelText('GREEN')},
+
+    {148, GetLabelText('Purple')},
+    {149, GetLabelText('MIGHT_PURPLE')},
+
+    {151, GetLabelText('MATTE_FOR')},
+    {152, GetLabelText('MATTE_OD')},
+    {153, GetLabelText('MATTE_DIRT')},
+    {154, GetLabelText('MATTE_DESERT')},
+    {155, GetLabelText('MATTE_FOIL')},
+}
+
+local vehicleMatteColorsArray = {}
+
+for i = 1, #vehicleMatteColors do
+    vehicleMatteColorsArray[i] = vehicleMatteColors[i][2]
+end
+
+local vehicleMetalColors = {
+    {117, GetLabelText('BR_STEEL')},
+    {118, GetLabelText('BR BLACK_STEEL')},
+    {119, GetLabelText('BR_ALUMINIUM')},
+
+    {158, GetLabelText('GOLD_P')},
+    {159, GetLabelText('GOLD_S')},
+}
+
+local vehicleMetalColorsArray = {}
+
+for i = 1, #vehicleMetalColors do
+    vehicleMetalColorsArray[i] = vehicleMetalColors[i][2]
+end
+
+local vehicleUtilColors = {
+    {15, GetLabelText('BLACK')},
+    {16, GetLabelText('FMMC_COL1_1')},
+    {17, GetLabelText('DARK_SILVER')},
+    {18, GetLabelText('SILVER')},
+    {19, GetLabelText('BLACK_STEEL')},
+    {20, GetLabelText('SHADOW_SILVER')},
+
+    {43, GetLabelText('DARK_RED')},
+    {44, GetLabelText('RED')},
+    {45, GetLabelText('GARNET_RED')},
+
+    {56, GetLabelText('DARK_GREEN')},
+    {57, GetLabelText('GREEN')},
+
+    {75, GetLabelText('DARK_BLUE')},
+    {76, GetLabelText('MIDNIGHT_BLUE')},
+    {77, GetLabelText('SAXON_BLUE')},
+    {78, GetLabelText('NAUTICAL_BLUE')},
+    {79, GetLabelText('BLUE')},
+    {80, GetLabelText('FMMC_COL1_13')},
+    {81, GetLabelText('BRIGHT_PURPLE')},
+
+    {93, GetLabelText('STRAW_BROWN')},
+
+    {108, GetLabelText('UMBER_BROWN')},
+    {109, GetLabelText('MOSS_BROWN')},
+    {110, GetLabelText('SANDY_BROWN')},
+
+    {122, GetLabelText('veh_color_off_white')},
+
+    {125, GetLabelText('BRIGHT_GREEN')},
+
+    {127, GetLabelText('HARBOR_BLUE')},
+
+    {134, GetLabelText('FROST_WHITE')},
+
+    {139, GetLabelText('LIME_GREEN')},
+    {140, GetLabelText('ULTRA_BLUE')},
+
+    {144, GetLabelText('GREY')},
+
+    {157, GetLabelText('LIGHT_BLUE')},
+
+    {160, GetLabelText('YELLOW')},
+}
+
+local vehicleUtilColorsArray = {}
+
+for i = 1, #vehicleUtilColors do
+    vehicleUtilColorsArray[i] = vehicleUtilColors[i][2]
+end
+
+local vehicleWornColors = {
+    {21, GetLabelText('BLACK')},
+    {22, GetLabelText('GRAPHITE')},
+    {23, GetLabelText('LIGHT_GREY')},
+    {24, GetLabelText('SILVER')},
+    {25, GetLabelText('BLUE_SILVER')},
+    {26, GetLabelText('SHADOW_SILVER')},
+
+    {46, GetLabelText('RED')},
+    {47, GetLabelText('SALMON_PINK')},
+    {48, GetLabelText('DARK_RED')},
+
+    {58, GetLabelText('DARK_GREEN')},
+    {59, GetLabelText('GREEN')},
+    {60, GetLabelText('SEA_GREEN')},
+
+    {85, GetLabelText('DARK_BLUE')},
+    {86, GetLabelText('BLUE')},
+    {87, GetLabelText('LIGHT_BLUE')},
+
+    {113, GetLabelText('SANDY_BROWN')},
+    {114, GetLabelText('BISON_BROWN')},
+    {115, GetLabelText('CREEK_BROWN')},
+    {116, GetLabelText('BLEECHED_BROWN')},
+
+    {121, GetLabelText('veh_color_off_white')},
+
+    {123, GetLabelText('ORANGE')},
+    {124, GetLabelText('SUNRISE_ORANGE')},
+
+    {126, GetLabelText('veh_color_taxi_yellow')},
+
+    {129, GetLabelText('RACING_GREEN')},
+    {130, GetLabelText('ORANGE')},
+    {131, GetLabelText('WHITE')},
+    {132, GetLabelText('FROST_WHITE')},
+    {133, GetLabelText('OLIVE_GREEN')},
+}
+
+local vehicleWornColorsArray = {}
+
+for i = 1, #vehicleWornColors do
+    vehicleWornColorsArray[i] = vehicleWornColors[i][2]
+end
+
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -920,7 +1175,8 @@ lib.registerMenu({
         {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false},
         {label = 'Wash Vehicle', description = 'Clean your vehicle', args = 'wash_vehicle', close = false},
         {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false},
-        {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = 'berkie_menu_vehicle_options_mod_menu'}
+        {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = 'berkie_menu_vehicle_options_mod_menu'},
+        {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = 'berkie_menu_vehicle_options_colors'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex and args ~= 'set_dirt_level' then return end
@@ -1155,6 +1411,24 @@ lib.registerMenu({
 })
 
 lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_colors',
+    title = 'Vehicle Colors',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_colors'] = selected
+    end,
+    options = {
+        {label = 'Primary Color', args = 'berkie_menu_vehicle_options_colors_primary'},
+        {label = 'Secondary Color', args = 'berkie_menu_vehicle_options_colors_secondary'}
+    }
+}, function(_, scrollIndex, args)
+
+end)
+
+lib.registerMenu({
     id = 'berkie_menu_vehicle_spawner',
     title = 'Vehicle Spawner',
     position = 'top-right',
@@ -1375,4 +1649,16 @@ vehicle options menu:
     flash highbeams on honk (yes or no)
     delete vehicle:
         confirm or go back
+]]
+
+--[[
+    updates to add:
+
+        https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-los-santos-tuners-update-patch-notes-summer-2021
+
+        https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-the-contract-update-december-2021-patch-notes-fixers
+
+        https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-v-title-update-1-56-1-59-patch-notes-next-gen-bug-fixes
+
+        https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-summer-2022-dlc-update-patch-notes-features
 ]]
