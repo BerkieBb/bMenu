@@ -1097,7 +1097,7 @@ lib.registerMenu({
                     else
                         val = vec3(vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
                     end
-                    SetVehicleTyreSmokeColor(cache.vehicle, val.r, val.g, val.b)
+                    SetVehicleTyreSmokeColor(cache.vehicle, val.x, val.y, val.z)
                 else
                     SetVehicleTyreSmokeColor(cache.vehicle, 255, 255, 255)
                     RemoveVehicleMod(cache.vehicle, 20)
@@ -1116,13 +1116,13 @@ lib.registerMenu({
                 else
                     val = vec3(vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
                 end
-                SetVehicleTyreSmokeColor(cache.vehicle, val.r, val.g, val.b)
+                SetVehicleTyreSmokeColor(cache.vehicle, val.x, val.y, val.z)
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
             elseif args == 'tire_smoke_preset_color' then
                 if not vehicleUseCustomTireSmokeColor then
                     local val = vehicleTireSmokeColors[scrollIndex][2]
-                    SetVehicleTyreSmokeColor(cache.vehicle, val.r, val.g, val.b)
+                    SetVehicleTyreSmokeColor(cache.vehicle, val.x, val.y, val.z)
                 end
                 vehicleModsMenuData[args][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
