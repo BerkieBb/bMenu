@@ -7,7 +7,7 @@ lib.callback.register('berkie_menu:server:getOnlinePlayers', function()
     local data = {}
     for i = 1, #players do
         local src = players[i]
-        data[#data+1] = {
+        data[#data + 1] = {
             source = tonumber(src),
             name = GetPlayerName(src)
         }

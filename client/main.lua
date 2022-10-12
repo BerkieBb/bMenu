@@ -446,6 +446,23 @@ for i = 1, #vehicleWornColors do
     vehicleWornColorsArray[i] = vehicleWornColors[i][2]
 end
 
+local vehicleWheelColors = {
+    {156, 'Default Alloy'},
+    table.unpack(vehicleClassicColors)
+}
+
+local vehicleWheelColorsArray = {}
+
+for i = 1, #vehicleWheelColors do
+    vehicleWheelColorsArray[i] = vehicleWheelColors[i][2]
+end
+
+local rgbValuesArray = {}
+
+for i = 1, 256 do
+    rgbValuesArray[i] = i - 1
+end
+
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -646,6 +663,7 @@ end
 
 local function createPlayerMenu()
     local id = 'berkie_menu_online_players'
+    lib.setMenuOptions(id, {[1] = true})
     local onlinePlayers = lib.callback.await('berkie_menu:server:getOnlinePlayers', false)
     for i = 1, #onlinePlayers do
         local data = onlinePlayers[i]
@@ -855,6 +873,7 @@ local function createModMenu()
     local vehModel = GetEntityModel(cache.vehicle)
 
     local id = 'berkie_menu_vehicle_options_mod_menu'
+    lib.setMenuOptions(id, {[1] = true}) -- Add the one arg to make the override successful, otherwise it fails because it expects atleast one option, but it'll override down here anyway
     SetVehicleModKit(cache.vehicle, 0)
     local mods = getAllPossibleMods()
     local i = 1
@@ -862,18 +881,17 @@ local function createModMenu()
         local values = {}
         local args = {}
         local localizedName = getModLocalizedType(k)
-        local defaultIndex = GetVehicleMod(cache.vehicle, k) + 2
         values[1] = ('Stock %s'):format(localizedName)
         args[1] = {-1, k}
 
-        for i2 = 2, v do
-            local actualIndex = i2 - 2
+        for i2 = 1, v do
+            local actualIndex = i2 - 1
             local localizedModName = getModLocalizedName(k, actualIndex)
-            values[i2] = localizedModName and toProperCase(localizedModName) or ('%s %s'):format(localizedName, actualIndex)
-            args[i2] = {actualIndex, k}
+            values[i2 + 1] = localizedModName and toProperCase(localizedModName) or ('%s #%s'):format(localizedName, actualIndex)
+            args[i2 + 1] = {actualIndex, k}
         end
 
-        vehicleModsMenuData[k] = {i, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = defaultIndex, close = false}}
+        vehicleModsMenuData[k] = {i, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = GetVehicleMod(cache.vehicle, k) + 2, close = false}}
 
         lib.setMenuOptions(id, vehicleModsMenuData[k][2], i)
         i += 1
@@ -929,31 +947,20 @@ local function createModMenu()
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_preset_color'][2], i)
     i += 1
 
-    local redXenonColors = {}
-    local greenXenonColors = {}
-    local blueXenonColors = {}
-
-    for i2 = 1, 256 do
-        local val = i2 - 1
-        redXenonColors[i2] = val
-        greenXenonColors[i2] = val
-        blueXenonColors[i2] = val
-    end
-
     local hasCustomXenon, defaultXenonRed, defaultXenonGreen, defaultXenonBlue = GetVehicleXenonLightsCustomColor(cache.vehicle)
     defaultXenonRed = hasCustomXenon and defaultXenonRed or 0
     defaultXenonGreen = hasCustomXenon and defaultXenonGreen or 0
     defaultXenonBlue = hasCustomXenon and defaultXenonBlue or 0
 
-    vehicleModsMenuData['xenon_custom_color_red'] = {i, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = 'xenon_custom_color_red', values = redXenonColors, defaultIndex = defaultXenonRed + 1, close = false}}
+    vehicleModsMenuData['xenon_custom_color_red'] = {i, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = 'xenon_custom_color_red', values = rgbValuesArray, defaultIndex = defaultXenonRed + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_red'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_custom_color_green'] = {i, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = 'xenon_custom_color_green', values = greenXenonColors, defaultIndex = defaultXenonGreen + 1, close = false}}
+    vehicleModsMenuData['xenon_custom_color_green'] = {i, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = 'xenon_custom_color_green', values = rgbValuesArray, defaultIndex = defaultXenonGreen + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_green'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_custom_color_blue'] = {i, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = 'xenon_custom_color_blue', values = blueXenonColors, defaultIndex = defaultXenonBlue + 1, close = false}}
+    vehicleModsMenuData['xenon_custom_color_blue'] = {i, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = 'xenon_custom_color_blue', values = rgbValuesArray, defaultIndex = defaultXenonBlue + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_blue'][2], i)
     i += 1
 
@@ -987,26 +994,15 @@ local function createModMenu()
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_preset_color'][2], i)
     i += 1
 
-    local redTireSmokeColors = {}
-    local greenTireSmokeColors = {}
-    local blueTireSmokeColors = {}
-
-    for i2 = 1, 256 do
-        local val = i2 - 1
-        redTireSmokeColors[i2] = val
-        greenTireSmokeColors[i2] = val
-        blueTireSmokeColors[i2] = val
-    end
-
-    vehicleModsMenuData['tire_smoke_custom_color_red'] = {i, {label = 'Tire Smoke Custom Color Red', description = 'Set the red part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_red', values = redTireSmokeColors, defaultIndex = defaultTireSmokeRed + 1, close = false}}
+    vehicleModsMenuData['tire_smoke_custom_color_red'] = {i, {label = 'Tire Smoke Custom Color Red', description = 'Set the red part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_red', values = rgbValuesArray, defaultIndex = defaultTireSmokeRed + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_red'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_custom_color_green'] = {i, {label = 'Tire Smoke Custom Color Green', description = 'Set the green part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_green', values = greenTireSmokeColors, defaultIndex = defaultTireSmokeGreen + 1, close = false}}
+    vehicleModsMenuData['tire_smoke_custom_color_green'] = {i, {label = 'Tire Smoke Custom Color Green', description = 'Set the green part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_green', values = rgbValuesArray, defaultIndex = defaultTireSmokeGreen + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_green'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_custom_color_blue'] = {i, {label = 'Tire Smoke Custom Color Blue', description = 'Set the blue part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_blue', values = blueTireSmokeColors, defaultIndex = defaultTireSmokeBlue + 1, close = false}}
+    vehicleModsMenuData['tire_smoke_custom_color_blue'] = {i, {label = 'Tire Smoke Custom Color Blue', description = 'Set the blue part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_blue', values = rgbValuesArray, defaultIndex = defaultTireSmokeBlue + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_blue'][2], i)
     i += 1
 
@@ -1022,6 +1018,109 @@ local function createModMenu()
     vehicleModsMenuData['window_tint'] = {i, {label = 'Window Tint', description = 'Apply tint to your windows', args = 'window_tint', values = windowTints, defaultIndex = defaultWindowTint, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['window_tint'][2], i)
     i += 1
+end
+
+local function updateColorsMenu()
+    local id = 'berkie_menu_vehicle_options_colors'
+
+    local classicPrimary, classicSecondary = 1, 1
+    local mattePrimary, matteSecondary = 1, 1
+    local metalPrimary, metalSecondary = 1, 1
+    local utilPrimary, utilSecondary = 1, 1
+    local wornPrimary, wornSecondary = 1, 1
+    local colorPrimary, colorSecondary = GetVehicleColours(cache.vehicle)
+
+    for i = 1, #vehicleClassicColors do
+        if vehicleClassicColors[i][1] == colorPrimary then
+            classicPrimary = i
+        end
+
+        if vehicleClassicColors[i][1] == colorSecondary then
+            classicSecondary = i
+        end
+    end
+
+    for i = 1, #vehicleMatteColors do
+        if vehicleMatteColors[i][1] == colorPrimary then
+            mattePrimary = i
+        end
+
+        if vehicleMatteColors[i][1] == colorSecondary then
+            matteSecondary = i
+        end
+    end
+
+    for i = 1, #vehicleMetalColors do
+        if vehicleMetalColors[i][1] == colorPrimary then
+            metalPrimary = i
+        end
+
+        if vehicleMetalColors[i][1] == colorSecondary then
+            metalSecondary = i
+        end
+    end
+
+    for i = 1, #vehicleUtilColors do
+        if vehicleUtilColors[i][1] == colorPrimary then
+            utilPrimary = i
+        end
+
+        if vehicleUtilColors[i][1] == colorSecondary then
+            utilSecondary = i
+        end
+    end
+
+    for i = 1, #vehicleWornColors do
+        if vehicleWornColors[i][1] == colorPrimary then
+            wornPrimary = i
+        end
+
+        if vehicleWornColors[i][1] == colorSecondary then
+            wornSecondary = i
+        end
+    end
+
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = classicPrimary, close = false}, 1)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = mattePrimary, close = false}, 2)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = metalPrimary, close = false}, 3)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = utilPrimary, close = false}, 4)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = wornPrimary, close = false}, 5)
+
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = classicSecondary, close = false}, 1)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = matteSecondary, close = false}, 2)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = metalSecondary, close = false}, 3)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = utilSecondary, close = false}, 4)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = wornSecondary, close = false}, 5)
+
+    local dashboard = 1
+    local interior = 1
+    local wheel = 1
+
+    local defaultDashboard = GetVehicleDashboardColor(cache.vehicle)
+    local defaultInterior = GetVehicleInteriorColor(cache.vehicle)
+    local _, defaultWheelColor = GetVehicleExtraColours(cache.vehicle)
+
+    for i = 1, #vehicleClassicColorsArray do
+        if vehicleClassicColorsArray[i][1] == defaultDashboard then
+            dashboard = i
+        end
+    end
+
+    for i = 1, #vehicleClassicColorsArray do
+        if vehicleClassicColorsArray[i][1] == defaultInterior then
+            interior = i
+        end
+    end
+
+    for i = 1, #vehicleWheelColorsArray do
+        if vehicleWheelColorsArray[i][1] == defaultWheelColor then
+            wheel = i
+        end
+    end
+
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = dashboard, close = false}, 3)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = interior, close = false}, 4)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
 end
 
 local function createVehiclesForSpawner(vehs, id)
@@ -1208,6 +1307,8 @@ lib.registerMenu({
         return
     elseif args == 'berkie_menu_vehicle_options_mod_menu' then
         createModMenu()
+    elseif args == 'berkie_menu_vehicle_options_colors' then
+        updateColorsMenu()
     end
 
     lib.showMenu(args, menuIndexes[args])
@@ -1420,12 +1521,119 @@ lib.registerMenu({
     onSelected = function(selected)
         menuIndexes['berkie_menu_vehicle_options_colors'] = selected
     end,
+    onSideScroll = function(_, scrollIndex, args)
+        if args == 'dashboard_color' then
+            SetVehicleDashboardColor(cache.vehicle, vehicleClassicColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args == 'interior_color' then
+            SetVehicleInteriorColor(cache.vehicle, vehicleClassicColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args == 'wheel_color' then
+            SetVehicleExtraColours(cache.vehicle, vehicleClassicColors[scrollIndex][1], vehicleWheelColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+        end
+    end,
     options = {
         {label = 'Primary Color', args = 'berkie_menu_vehicle_options_colors_primary'},
-        {label = 'Secondary Color', args = 'berkie_menu_vehicle_options_colors_secondary'}
+        {label = 'Secondary Color', args = 'berkie_menu_vehicle_options_colors_secondary'},
+        {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
+    if scrollIndex then return end
 
+    lib.showMenu(args)
+end)
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_colors_primary',
+    title = 'Primary Color',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options_colors')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_colors_primary'] = selected
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        local _, colorSecondary = GetVehicleColours(cache.vehicle)
+        if args == 'classic' then
+            SetVehicleColours(cache.vehicle, vehicleClassicColors[scrollIndex][1], colorSecondary)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 1)
+        elseif args == 'matte' then
+            SetVehicleColours(cache.vehicle, vehicleMatteColors[scrollIndex][1], colorSecondary)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = scrollIndex, close = false}, 2)
+        elseif args == 'metals' then
+            SetVehicleColours(cache.vehicle, vehicleMetalColors[scrollIndex][1], colorSecondary)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args == 'util' then
+            SetVehicleColours(cache.vehicle, vehicleUtilColors[scrollIndex][1], colorSecondary)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args == 'worn' then
+            SetVehicleColours(cache.vehicle, vehicleWornColors[scrollIndex][1], colorSecondary)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+        end
+    end,
+    options = {
+        {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = 1, close = false},
+        {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = 1, close = false},
+        {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = 1, close = false},
+        {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = 1, close = false},
+        {label = 'Chrome', description = 'Set your vehicle\'s primary color to chrome', close = false},
+    }
+}, function(_, scrollIndex)
+    if scrollIndex then return end
+
+    local _, colorSecondary = GetVehicleColours(cache.vehicle)
+
+    SetVehicleColours(cache.vehicle, 120, colorSecondary) -- Set to chrome
+end)
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_colors_secondary',
+    title = 'Secondary Color',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options_colors')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_colors_secondary'] = selected
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        local colorPrimary = GetVehicleColours(cache.vehicle)
+        if args == 'classic' then
+            SetVehicleColours(cache.vehicle, colorPrimary, vehicleClassicColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 1)
+        elseif args == 'matte' then
+            SetVehicleColours(cache.vehicle, colorPrimary, vehicleMatteColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = scrollIndex, close = false}, 2)
+        elseif args == 'metals' then
+            SetVehicleColours(cache.vehicle, colorPrimary, vehicleMetalColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args == 'util' then
+            SetVehicleColours(cache.vehicle, colorPrimary, vehicleUtilColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args == 'worn' then
+            SetVehicleColours(cache.vehicle, colorPrimary, vehicleWornColors[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+        end
+    end,
+    options = {
+        {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = 1, close = false},
+        {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = 1, close = false},
+        {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = 1, close = false},
+        {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = 1, close = false},
+        {label = 'Chrome', description = 'Set your vehicle\'s secondary color to chrome', close = false},
+    }
+}, function(_, scrollIndex)
+    if scrollIndex then return end
+
+    local colorPrimary = GetVehicleColours(cache.vehicle)
+
+    SetVehicleColours(cache.vehicle, colorPrimary, 120) -- Set to chrome
 end)
 
 lib.registerMenu({
@@ -1599,12 +1807,6 @@ end)
 
 --[[
 vehicle options menu:
-    colors:
-        primary color:
-        secondary color:
-        chrome (option)
-        enveff scale (probably make it a list of some set enveffs)
-        generaten:
     neon kits:
         front light (yes or no)
         rear light (yes or no)
