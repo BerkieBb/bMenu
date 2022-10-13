@@ -463,6 +463,29 @@ for i = 1, 256 do
     rgbValuesArray[i] = i - 1
 end
 
+local neonLightColors = {
+    {0, GetLabelText('CMOD_NEONCOL_0')},
+    {1, GetLabelText('CMOD_NEONCOL_1')},
+    {2, GetLabelText('CMOD_NEONCOL_2')},
+    {3, GetLabelText('CMOD_NEONCOL_3')},
+    {4, GetLabelText('CMOD_NEONCOL_4')},
+    {5, GetLabelText('CMOD_NEONCOL_5')},
+    {6, GetLabelText('CMOD_NEONCOL_6')},
+    {7, GetLabelText('CMOD_NEONCOL_7')},
+    {8, GetLabelText('CMOD_NEONCOL_8')},
+    {9, GetLabelText('CMOD_NEONCOL_9')},
+    {10, GetLabelText('CMOD_NEONCOL_10')},
+    {11, GetLabelText('CMOD_NEONCOL_11')},
+    {12, GetLabelText('CMOD_NEONCOL_12')},
+    {13, GetLabelText('CMOD_NEONCOL_13')}
+}
+
+local neonLightColorsArray = {}
+
+for i = 1, #neonLightColors do
+    neonLightColorsArray[i] = neonLightColors[i][2]
+end
+
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -697,7 +720,7 @@ local function createPlayerMenu()
                 {label = 'Kill Player', icon = 'bullseye', description = 'Kill the player, just because you can', args = killArg, close = false}
             }
         }, function(_, _, args)
-            local canActOnSelf = arrayIncludes(args, itemsOnYourself, true)
+            local canActOnSelf = arrayIncludes(args, itemsOnYourself)
             if data.source == serverId and not canActOnSelf then
                 lib.notify({
                     description = 'You can\'t do this on yourself',
@@ -1118,9 +1141,36 @@ local function updateColorsMenu()
         end
     end
 
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = dashboard, close = false}, 3)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = interior, close = false}, 4)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
+    lib.setMenuOptions(id, {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = dashboard, close = false}, 3)
+    lib.setMenuOptions(id, {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = interior, close = false}, 4)
+    lib.setMenuOptions(id, {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
+end
+
+local function setupNeonMenu(vehicle)
+    local id = 'berkie_menu_vehicle_options_neon_menu'
+    local i = 1
+
+    lib.setMenuOptions(id, {[1] = true}) -- Add the one arg to make the override successful, otherwise it fails because it expects atleast one option, but it'll override down here anyway
+
+    if GetEntityBoneIndexByName(cache.vehicle, 'neon_l') ~= -1 then
+        lib.setMenuOptions(id, {label = 'Enable Left Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0), close = false}, i)
+        i += 1
+    end
+
+    if GetEntityBoneIndexByName(cache.vehicle, 'neon_r') ~= -1 then
+        lib.setMenuOptions(id, {label = 'Enable Right Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1), close = false}, i)
+        i += 1
+    end
+
+    if GetEntityBoneIndexByName(cache.vehicle, 'neon_f') ~= -1 then
+        lib.setMenuOptions(id, {label = 'Enable Front Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2), close = false}, i)
+        i += 1
+    end
+
+    if GetEntityBoneIndexByName(cache.vehicle, 'neon_b') ~= -1 then
+        lib.setMenuOptions(id, {label = 'Enable Back Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3), close = false}, i)
+        i += 1
+    end
 end
 
 local function createVehiclesForSpawner(vehs, id)
