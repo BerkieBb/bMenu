@@ -1153,25 +1153,25 @@ local function setupNeonMenu()
     lib.setMenuOptions(id, {[1] = true}) -- Add the one arg to make the override successful, otherwise it fails because it expects atleast one option, but it'll override down here anyway
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_l') ~= -1 then
-        vehicleModsMenuData['light_0'] = {i, {label = 'Enable Left Light', args = 'light_0', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0), close = false}}
+        vehicleModsMenuData['light_0'] = {i, {label = 'Enable Left Light', args = 'light_0', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_0'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_r') ~= -1 then
-        vehicleModsMenuData['light_1'] = {i, {label = 'Enable Right Light', args = 'light_1', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1), close = false}}
+        vehicleModsMenuData['light_1'] = {i, {label = 'Enable Right Light', args = 'light_1', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_1'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_f') ~= -1 then
-        vehicleModsMenuData['light_2'] = {i, {label = 'Enable Front Light', args = 'light_2', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2), close = false}}
+        vehicleModsMenuData['light_2'] = {i, {label = 'Enable Front Light', args = 'light_2', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_2'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_b') ~= -1 then
-        vehicleModsMenuData['light_3'] = {i, {label = 'Enable Back Light', args = 'light_3', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3), close = false}}
+        vehicleModsMenuData['light_3'] = {i, {label = 'Enable Back Light', args = 'light_3', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_3'][2], i)
         i += 1
     end
@@ -1752,7 +1752,7 @@ lib.registerMenu({
             vehicleModsMenuData[args][2].defaultIndex = scrollIndex
             lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
         elseif args == 'neon_preset_color' then
-            if vehicleUseCustomNeonColor then
+            if not vehicleUseCustomNeonColor then
                 local color = vehicleNeonLightColors[scrollIndex][3]
                 SetVehicleNeonLightsColour(cache.vehicle, color.x, color.y, color.z)
             end
