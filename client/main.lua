@@ -463,27 +463,26 @@ for i = 1, 256 do
     rgbValuesArray[i] = i - 1
 end
 
-local neonLightColors = {
-    {0, GetLabelText('CMOD_NEONCOL_0')},
-    {1, GetLabelText('CMOD_NEONCOL_1')},
-    {2, GetLabelText('CMOD_NEONCOL_2')},
-    {3, GetLabelText('CMOD_NEONCOL_3')},
-    {4, GetLabelText('CMOD_NEONCOL_4')},
-    {5, GetLabelText('CMOD_NEONCOL_5')},
-    {6, GetLabelText('CMOD_NEONCOL_6')},
-    {7, GetLabelText('CMOD_NEONCOL_7')},
-    {8, GetLabelText('CMOD_NEONCOL_8')},
-    {9, GetLabelText('CMOD_NEONCOL_9')},
-    {10, GetLabelText('CMOD_NEONCOL_10')},
-    {11, GetLabelText('CMOD_NEONCOL_11')},
-    {12, GetLabelText('CMOD_NEONCOL_12')},
-    {13, GetLabelText('CMOD_NEONCOL_13')}
+local vehicleNeonLightColors = {
+    {0, GetLabelText('CMOD_NEONCOL_0'), vec3(222, 222, 255)},
+    {1, GetLabelText('CMOD_NEONCOL_1'), vec3(2, 21, 255)},
+    {2, GetLabelText('CMOD_NEONCOL_2'), vec3(3, 83, 255)},
+    {3, GetLabelText('CMOD_NEONCOL_3'), vec3(0, 255, 140)},
+    {4, GetLabelText('CMOD_NEONCOL_4'), vec3(94, 255, 1)},
+    {5, GetLabelText('CMOD_NEONCOL_5'), vec3(255, 255, 0)},
+    {6, GetLabelText('CMOD_NEONCOL_6'), vec3(255, 150, 0)},
+    {7, GetLabelText('CMOD_NEONCOL_7'), vec3(255, 62, 0)},
+    {8, GetLabelText('CMOD_NEONCOL_8'), vec3(255, 1, 1)},
+    {9, GetLabelText('CMOD_NEONCOL_9'), vec3(255, 50, 100)},
+    {10, GetLabelText('CMOD_NEONCOL_10'), vec3(255, 5, 190)},
+    {11, GetLabelText('CMOD_NEONCOL_11'), vec3(35, 1, 255)},
+    {12, GetLabelText('CMOD_NEONCOL_12'), vec3(15, 3, 255)},
 }
 
-local neonLightColorsArray = {}
+local vehicleNeonLightColorsArray = {}
 
-for i = 1, #neonLightColors do
-    neonLightColorsArray[i] = neonLightColors[i][2]
+for i = 1, #vehicleNeonLightColors do
+    vehicleNeonLightColorsArray[i] = vehicleNeonLightColors[i][2]
 end
 
 local vehicleModsMenuData = {}
@@ -501,6 +500,7 @@ local vehicleNeverDirty = false
 local vehicleDirtLevelSetter = 0
 local vehicleUseCustomXenonColor = false
 local vehicleUseCustomTireSmokeColor = false
+local vehicleUseCustomNeonColor = false
 
 local function toProperCase(str)
     return string.gsub(str, '(%a)([%w_\']*)', function(first, rest)
@@ -1146,29 +1146,73 @@ local function updateColorsMenu()
     lib.setMenuOptions(id, {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
 end
 
-local function setupNeonMenu(vehicle)
+local function setupNeonMenu()
     local id = 'berkie_menu_vehicle_options_neon_menu'
     local i = 1
 
     lib.setMenuOptions(id, {[1] = true}) -- Add the one arg to make the override successful, otherwise it fails because it expects atleast one option, but it'll override down here anyway
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_l') ~= -1 then
-        lib.setMenuOptions(id, {label = 'Enable Left Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0), close = false}, i)
+        vehicleModsMenuData['light_0'] = {i, {label = 'Enable Left Light', args = 'light_0', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0), close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['light_0'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_r') ~= -1 then
-        lib.setMenuOptions(id, {label = 'Enable Right Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1), close = false}, i)
+        vehicleModsMenuData['light_1'] = {i, {label = 'Enable Right Light', args = 'light_1', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1), close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['light_1'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_f') ~= -1 then
-        lib.setMenuOptions(id, {label = 'Enable Front Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2), close = false}, i)
+        vehicleModsMenuData['light_2'] = {i, {label = 'Enable Front Light', args = 'light_2', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2), close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['light_2'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_b') ~= -1 then
-        lib.setMenuOptions(id, {label = 'Enable Back Light', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3), close = false}, i)
+        vehicleModsMenuData['light_3'] = {i, {label = 'Enable Back Light', args = 'light_3', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3), close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['light_3'][2], i)
+        i += 1
+    end
+
+    if i == 1 then
+        CreateThread(function()
+            Wait(200)
+            lib.hideMenu(false)
+            lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+        end)
+    else
+        local defaultIndex = 1
+
+        vehicleModsMenuData['neon_color_mode'] = {i, {label = 'Neon Color Mode', description = 'Choose between a preset or custom color for your neon underglow', args = 'neon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomNeonColor and 2 or 1, close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['neon_color_mode'][2], i)
+        i += 1
+
+        local r, g, b = GetVehicleNeonLightsColour(cache.vehicle)
+        local curColor = vec3(r, g, b)
+
+        for i2 = 1, #vehicleNeonLightColors do
+            if vehicleNeonLightColors[i2][3] == curColor then
+                defaultIndex = i2
+                break
+            end
+        end
+
+        vehicleModsMenuData['neon_preset_color'] = {i, {label = 'Neon Preset Color', description = 'Select a preset color for the neon underglow', args = 'neon_preset_color', values = vehicleNeonLightColorsArray, defaultIndex = defaultIndex, close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['neon_preset_color'][2], i)
+        i += 1
+
+        vehicleModsMenuData['neon_custom_color_red'] = {i, {label = 'Neon Custom Color Red', description = 'Set the red part of the custom color for your neon underglow', args = 'neon_custom_color_red', values = rgbValuesArray, defaultIndex = r + 1, close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['neon_custom_color_red'][2], i)
+        i += 1
+
+        vehicleModsMenuData['neon_custom_color_green'] = {i, {label = 'Neon Custom Color Green', description = 'Set the green part of the custom color for your neon underglow', args = 'neon_custom_color_green', values = rgbValuesArray, defaultIndex = g + 1, close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['neon_custom_color_green'][2], i)
+        i += 1
+
+        vehicleModsMenuData['neon_custom_color_blue'] = {i, {label = 'Neon Custom Color Blue', description = 'Set the blue part of the custom color for your neon underglow', args = 'neon_custom_color_blue', values = rgbValuesArray, defaultIndex = b + 1, close = false}}
+        lib.setMenuOptions(id, vehicleModsMenuData['neon_custom_color_blue'][2], i)
         i += 1
     end
 end
@@ -1325,7 +1369,8 @@ lib.registerMenu({
         {label = 'Wash Vehicle', description = 'Clean your vehicle', args = 'wash_vehicle', close = false},
         {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false},
         {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = 'berkie_menu_vehicle_options_mod_menu'},
-        {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = 'berkie_menu_vehicle_options_colors'}
+        {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = 'berkie_menu_vehicle_options_colors'},
+        {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = 'berkie_menu_vehicle_options_neon_menu'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex and args ~= 'set_dirt_level' then return end
@@ -1359,6 +1404,8 @@ lib.registerMenu({
         createModMenu()
     elseif args == 'berkie_menu_vehicle_options_colors' then
         updateColorsMenu()
+    elseif args == 'berkie_menu_vehicle_options_neon_menu' then
+        setupNeonMenu()
     end
 
     lib.showMenu(args, menuIndexes[args])
@@ -1685,6 +1732,54 @@ lib.registerMenu({
 
     SetVehicleColours(cache.vehicle, colorPrimary, 120) -- Set to chrome
 end)
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_neon_menu',
+    title = 'Neon Kits',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_neon_menu'] = selected
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        if string.find(args, 'light') then
+            local index = tonumber(string.match(args, '%d+'))
+            SetVehicleNeonLightEnabled(cache.vehicle, index, scrollIndex == 1)
+        elseif args == 'neon_color_mode' then
+            vehicleUseCustomNeonColor = scrollIndex == 2
+            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+        elseif args == 'neon_preset_color' then
+            if vehicleUseCustomNeonColor then
+                local color = vehicleNeonLightColors[scrollIndex][3]
+                SetVehicleNeonLightsColour(cache.vehicle, color.x, color.y, color.z)
+            end
+            vehicleModsMenuData[args].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+        elseif args == 'neon_custom_color_red' then
+            if vehicleUseCustomNeonColor then
+                SetVehicleNeonLightsColour(cache.vehicle, scrollIndex - 1, vehicleModsMenuData['neon_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['neon_custom_color_blue'][2].defaultIndex - 1)
+            end
+            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+        elseif args == 'neon_custom_color_green' then
+            if vehicleUseCustomNeonColor then
+                SetVehicleNeonLightsColour(cache.vehicle, vehicleModsMenuData['neon_custom_color_red'][2].defaultIndex - 1, scrollIndex - 1, vehicleModsMenuData['neon_custom_color_blue'][2].defaultIndex - 1)
+            end
+            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+        elseif args == 'neon_custom_color_blue' then
+            if vehicleUseCustomNeonColor then
+                SetVehicleNeonLightsColour(cache.vehicle, vehicleModsMenuData['neon_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['neon_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
+            end
+            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+        end
+    end,
+    options = {}
+})
 
 lib.registerMenu({
     id = 'berkie_menu_vehicle_spawner',
