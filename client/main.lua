@@ -1,12 +1,17 @@
+--#region Variables
+
 local menuOpen = false
 local playerId = PlayerId()
 local serverId = GetPlayerServerId(playerId)
 local playerBlips = {}
+
 local itemsOnYourself = { -- Put the last part of the argument of the option that you want to be able to use on yourself in here
     'kill',
 }
+
 local menuIndexes = {}
 local vehicles = {}
+
 local vehicleClassNames = {
     [0] = GetLabelText('VEH_CLASS_0'), -- Compacts
     [1] = GetLabelText('VEH_CLASS_1'), -- Sedans
@@ -33,6 +38,7 @@ local vehicleClassNames = {
     [22] = GetLabelText('VEH_CLASS_22'), -- Open Wheel
     [69] = 'Misc' -- For any other vehicles that haven't got a class set for some reason.
 }
+
 local vehicleDoorBoneNames = {
     [0] = 'door_dside_f',
     [1] = 'door_pside_f',
@@ -41,6 +47,7 @@ local vehicleDoorBoneNames = {
     [4] = 'bonnet',
     [5] = 'boot'
 }
+
 local vehicleModTypes = {
     [0] = {nil, 'Spoilers'},
     [1] = {nil, 'Front Bumper'},
@@ -86,6 +93,7 @@ local vehicleModTypes = {
     [47] = {'CMM_MOD_S22', 'Mod 47'},
     [48] = {'CMM_MOD_S23', 'Livery'}
 }
+
 local vehicleHornNames = {
     [-1] = {'CMOD_HRN_0', 'Stock Horn'},
     [0] = {'CMOD_HRN_TRK','Truck Horn'},
@@ -138,6 +146,7 @@ local vehicleHornNames = {
     [47] = {'HORN_XM15_2', 'Festive Loop 2'},
     [48] = {'HORN_XM15_3', 'Festive Loop 3'}
 }
+
 local vehicleWheelTypes = {
     [0] = 'Sports',
     [1] = 'Muscle',
@@ -153,6 +162,7 @@ local vehicleWheelTypes = {
     [11] = 'Street',
     [12] = 'Track'
 }
+
 local vehicleXenonColors = {
     [-1] = 'Default',
     [0] = 'White',
@@ -169,6 +179,7 @@ local vehicleXenonColors = {
     [11] = 'Purple',
     [12] = 'Blacklight'
 }
+
 local vehicleTireSmokeColors = {
     {'Red', vec3(244, 65, 65)},
     {'Orange', vec3(244, 167, 66)},
@@ -182,6 +193,7 @@ local vehicleTireSmokeColors = {
     {'Pink', vec3(192, 24, 172)},
     {'Black', vec3(1, 1, 1)}
 }
+
 local vehicleWindowTints = {
     {0, 'None'},
     {4, 'Stock'},
@@ -485,6 +497,21 @@ for i = 1, #vehicleNeonLightColors do
     vehicleNeonLightColorsArray[i] = vehicleNeonLightColors[i][2]
 end
 
+local vehicleLicensePlates = {
+    {3, GetLabelText('CMOD_PLA_0')},
+    {0, GetLabelText('CMOD_PLA_1')},
+    {4, GetLabelText('CMOD_PLA_2')},
+    {1, GetLabelText('CMOD_PLA_3')},
+    {2, GetLabelText('CMOD_PLA_4')},
+    {5, 'North Yankton'}
+}
+
+local vehicleLicensePlatesArray = {}
+
+for i = 1, #vehicleLicensePlates do
+    vehicleLicensePlatesArray[i] = vehicleLicensePlates[i][2]
+end
+
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -501,6 +528,11 @@ local vehicleDirtLevelSetter = 0
 local vehicleUseCustomXenonColor = false
 local vehicleUseCustomTireSmokeColor = false
 local vehicleUseCustomNeonColor = false
+local vehiclePlateIndex = 0
+
+--#endregion Variables
+
+--#region Functions
 
 local function toProperCase(str)
     return string.gsub(str, '(%a)([%w_\']*)', function(first, rest)
@@ -1324,6 +1356,10 @@ local function createVehicleSpawnerMenu()
     end
 end
 
+--#endregion Functions
+
+--#region Menu Registration
+
 lib.registerMenu({
     id = 'berkie_menu_main',
     title = 'Berkie Menu',
@@ -1407,6 +1443,13 @@ lib.registerMenu({
             if val == vehicleNeverDirty then return end
             vehicleNeverDirty = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false}, 4)
+        elseif args == 'set_dirt_level' then
+            vehicleDirtLevelSetter = scrollIndex - 1
+            SetVehicleDirtLevel(cache.vehicle, vehicleDirtLevelSetter)
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = scrollIndex, close = false}, 6)
+        elseif args == 'license_plate_type' then
+            SetVehicleNumberPlateTextIndex(cache.vehicle, vehicleLicensePlates[scrollIndex][1])
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = scrollIndex, close = false}, 13)
         end
     end,
     options = {
@@ -1421,10 +1464,11 @@ lib.registerMenu({
         {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = 'berkie_menu_vehicle_options_neon_menu'},
         {label = 'Extras', description = 'Add or remove vehicle extras', args = 'berkie_menu_vehicle_options_extras'},
         {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false},
-        {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'}
+        {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'},
+        {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false}
     }
 }, function(_, scrollIndex, args)
-    if scrollIndex and args ~= 'set_dirt_level' then return end
+    if scrollIndex then return end
 
     local inVeh, reason = isInVehicle(true)
     if not inVeh then
@@ -1447,11 +1491,7 @@ lib.registerMenu({
         return
     elseif args == 'wash_vehicle' then
         SetVehicleDirtLevel(cache.vehicle, 0)
-        return
-    elseif args == 'set_dirt_level' then
-        vehicleDirtLevelSetter = scrollIndex - 1
-        SetVehicleDirtLevel(cache.vehicle, vehicleDirtLevelSetter)
-        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false}, 6)
+        vehicleDirtLevelSetter = 1
         return
     elseif args == 'berkie_menu_vehicle_options_mod_menu' then
         setupModMenu()
@@ -1937,6 +1977,10 @@ lib.registerMenu({
     lib.showMenu(args, menuIndexes[args])
 end)
 
+--#endregion Menu Registration
+
+--#region Commands
+
 RegisterCommand('berkiemenu', function()
     menuOpen = not menuOpen
 
@@ -1953,6 +1997,10 @@ AddEventHandler('onResourceStop', function(resource)
 
     closeMenu(true)
 end)
+
+--#endregion Commands
+
+--#region Threads
 
 CreateThread(function()
     local vehicleModels = GetAllVehicleModels()
@@ -2034,10 +2082,10 @@ CreateThread(function()
     end
 end)
 
+--#endregion Threads
+
 --[[
 vehicle options menu:
-    set license plate text (input)
-    license plate type (selection)
     vehicle doors:
         generate
         open all doors (option)
