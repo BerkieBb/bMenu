@@ -1231,6 +1231,40 @@ local function setupExtrasMenu()
     end
 end
 
+local function setCustomLicensePlate()
+    local inVeh, reason = isInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
+
+        return
+    end
+
+    local input = lib.inputDialog('Custom License Plate (Max. 8 characters)',  {'License Plate'})
+
+    if not input or not input[1] or input[1] == '' then
+        Wait(200)
+        lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+        return
+    end
+
+    if #input[1] > 8 then
+        Wait(200)
+        lib.notify({
+            description = 'You can only enter a maximum of 8 characters',
+            type = 'error'
+        })
+        lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+        return
+    end
+
+    SetVehicleNumberPlateText(cache.vehicle, input[1])
+end
+
 local function createVehiclesForSpawner(vehs, id)
     table.sort(vehs, function(a, b)
         return a.name < b.name
@@ -1386,7 +1420,8 @@ lib.registerMenu({
         {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = 'berkie_menu_vehicle_options_colors'},
         {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = 'berkie_menu_vehicle_options_neon_menu'},
         {label = 'Extras', description = 'Add or remove vehicle extras', args = 'berkie_menu_vehicle_options_extras'},
-        {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false}
+        {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false},
+        {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex and args ~= 'set_dirt_level' then return end
@@ -1398,9 +1433,11 @@ lib.registerMenu({
             type = 'error'
         })
 
-        if args == 'berkie_menu_vehicle_options_mod_menu' or args == 'berkie_menu_vehicle_options_god_mode_menu' then
-            menuOpen = false
+        if args ~= 'berkie_menu_vehicle_options_mod_menu' and args ~= 'berkie_menu_vehicle_options_god_mode_menu' then
+            lib.hideMenu(false)
         end
+
+        lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
 
         return
     end
@@ -1426,6 +1463,9 @@ lib.registerMenu({
         setupExtrasMenu()
     elseif args == 'toggle_engine' then
         SetVehicleEngineOn(cache.vehicle, not GetIsVehicleEngineRunning(cache.vehicle), false, true)
+        return
+    elseif args == 'set_license_plate' then
+        setCustomLicensePlate()
         return
     end
 
@@ -1996,7 +2036,6 @@ end)
 
 --[[
 vehicle options menu:
-    toggle engine on/off (option)
     set license plate text (input)
     license plate type (selection)
     vehicle doors:
