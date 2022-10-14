@@ -1385,7 +1385,8 @@ lib.registerMenu({
         {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = 'berkie_menu_vehicle_options_mod_menu'},
         {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = 'berkie_menu_vehicle_options_colors'},
         {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = 'berkie_menu_vehicle_options_neon_menu'},
-        {label = 'Extras', description = 'Add or remove vehicle extras', args = 'berkie_menu_vehicle_options_extras'}
+        {label = 'Extras', description = 'Add or remove vehicle extras', args = 'berkie_menu_vehicle_options_extras'},
+        {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex and args ~= 'set_dirt_level' then return end
@@ -1423,6 +1424,9 @@ lib.registerMenu({
         setupNeonMenu()
     elseif args == 'berkie_menu_vehicle_options_extras' then
         setupExtrasMenu()
+    elseif args == 'toggle_engine' then
+        SetVehicleEngineOn(cache.vehicle, not GetIsVehicleEngineRunning(cache.vehicle), false, true)
+        return
     end
 
     lib.showMenu(args, menuIndexes[args])
