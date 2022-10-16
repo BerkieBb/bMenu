@@ -1161,10 +1161,11 @@ local function updateColorsMenu()
     local dashboard = 1
     local interior = 1
     local wheel = 1
+    local pearlescent = 1
 
     local defaultDashboard = GetVehicleDashboardColor(cache.vehicle)
     local defaultInterior = GetVehicleInteriorColor(cache.vehicle)
-    local _, defaultWheelColor = GetVehicleExtraColours(cache.vehicle)
+    local defaultPearlescentColor, defaultWheelColor = GetVehicleExtraColours(cache.vehicle)
 
     for i = 1, #vehicleClassicColorsArray do
         if vehicleClassicColorsArray[i][1] == defaultDashboard then
@@ -1184,9 +1185,16 @@ local function updateColorsMenu()
         end
     end
 
+    for i = 1, #vehicleClassicColorsArray do
+        if vehicleClassicColorsArray[i][1] == defaultPearlescentColor then
+            pearlescent = i
+        end
+    end
+
     lib.setMenuOptions(id, {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = dashboard, close = false}, 3)
     lib.setMenuOptions(id, {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = interior, close = false}, 4)
     lib.setMenuOptions(id, {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
+    lib.setMenuOptions(id, {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = pearlescent, close = false}, 6)
 end
 
 local function setupNeonMenu()
@@ -1772,6 +1780,9 @@ lib.registerMenu({
         elseif args == 'wheel_color' then
             SetVehicleExtraColours(cache.vehicle, pearlescentColor, vehicleWheelColors[scrollIndex][1])
             lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+        elseif args == 'pearlescent_color' then
+            SetVehicleExtraColours(cache.vehicle, vehicleClassicColors[scrollIndex][1], wheelColor)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 6)
         end
     end,
     options = {
@@ -1779,7 +1790,8 @@ lib.registerMenu({
         {label = 'Secondary Color', args = 'berkie_menu_vehicle_options_colors_secondary'},
         {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
         {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
-        {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = 1, close = false}
+        {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = 1, close = false},
+        {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
