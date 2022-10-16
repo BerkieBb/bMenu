@@ -1513,7 +1513,8 @@ lib.registerMenu({
         {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false},
         {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'},
         {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
-        {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'}
+        {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'},
+        {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = 'berkie_menu_vehicle_options_windows'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
@@ -2008,6 +2009,38 @@ lib.registerMenu({
 end)
 
 lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_windows',
+    title = 'Vehicle Windows',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_windows'] = selected
+    end,
+    options = {
+        {label = 'Roll up window', description = 'Roll the specified window up, press enter to apply it', args = 'roll_up', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)'}, defaultIndex = 1, close = false},
+        {label = 'Roll down window', description = 'Roll the specified window down, press enter to apply it', args = 'roll_down', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)'}, defaultIndex = 1, close = false},
+        {label = 'Smash window', description = 'Smash the specified window, press enter to apply it', args = 'smash', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
+        {label = 'Restore window', description = 'Restore the specified window, press enter to apply it', args = 'restore', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
+    }
+}, function(_, scrollIndex, args)
+    if args == 'roll_up' then
+        if IsVehicleWindowIntact(cache.vehicle, scrollIndex - 1) then
+            RollUpWindow(cache.vehicle, scrollIndex - 1)
+        end
+    elseif args == 'roll_down' then
+        if IsVehicleWindowIntact(cache.vehicle, scrollIndex - 1) then
+            RollDownWindow(cache.vehicle, scrollIndex - 1)
+        end
+    elseif args == 'smash' then
+        SmashVehicleWindow(cache.vehicle, scrollIndex - 1)
+    elseif args == 'restore' then
+        FixVehicleWindow(cache.vehicle, scrollIndex - 1)
+    end
+end)
+
+lib.registerMenu({
     id = 'berkie_menu_vehicle_spawner',
     title = 'Vehicle Spawner',
     position = 'top-right',
@@ -2187,15 +2220,12 @@ end)
 --#endregion Threads
 
 --[[
+    TODO
+
+    Add isInVehicle check at every vehicle menu
+    Optimize god mode
+
 vehicle options menu:
-    vehicle doors:
-        generate
-        open all doors (option)
-        close all doors (option)
-        remove door (selection)
-        delete removed doors (yes or no)
-    vehicle windows:
-        roll down and roll up (option)
     bike seatbelt (yes or no)
     speed limiter (selection to input)
     enable torque multiplier (yes or no)
@@ -2219,9 +2249,8 @@ vehicle options menu:
     flash highbeams on honk (yes or no)
     delete vehicle:
         confirm or go back
-]]
 
---[[
+
     updates to add:
 
         https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-los-santos-tuners-update-patch-notes-summer-2021
