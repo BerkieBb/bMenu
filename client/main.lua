@@ -512,6 +512,17 @@ for i = 1, #vehicleLicensePlates do
     vehicleLicensePlatesArray[i] = vehicleLicensePlates[i][2]
 end
 
+local vehicleDoors = {
+    'Left Front Door',
+    'Right Front Door',
+    'Left Rear Door',
+    'Right Rear Door',
+    'Hood',
+    'Trunk',
+    'Extra Door (#1)',
+    'Extra Door (#2)'
+}
+
 local vehicleModsMenuData = {}
 local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
@@ -528,7 +539,7 @@ local vehicleDirtLevelSetter = 0
 local vehicleUseCustomXenonColor = false
 local vehicleUseCustomTireSmokeColor = false
 local vehicleUseCustomNeonColor = false
-local vehiclePlateIndex = 0
+local vehicleRemoveDoors = false
 
 --#endregion Variables
 
@@ -1297,6 +1308,34 @@ local function setCustomLicensePlate()
     SetVehicleNumberPlateText(cache.vehicle, input[1])
 end
 
+local function setupDoorMenu()
+    local id = 'berkie_menu_vehicle_options_doors'
+    local i = 1
+    for i2 = 0, 7 do
+        if GetIsDoorValid(cache.vehicle, i2) then
+            lib.setMenuOptions(id, {label = vehicleDoors[i2 + 1], description = ('Open/close the %s'):format(vehicleDoors[i2 + 1]:lower()), args = i2, close = false}, i)
+            i += 1
+        end
+    end
+
+    if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
+        lib.setMenuOptions(id, {label = 'Bomb Bay', description = 'Open/close the bomb bay', args = 'bomb_bay', close = false}, i)
+        i += 1
+    end
+
+    lib.setMenuOptions(id, {label = 'Open All Doors', args = 'open_all_doors', close = false}, i)
+    i += 1
+
+    lib.setMenuOptions(id, {label = 'Close All Doors', args = 'close_all_doors', close = false}, i)
+    i += 1
+
+    lib.setMenuOptions(id, {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = 'remove_doors', values = {'Yes', 'No'}, defaultIndex = vehicleRemoveDoors and 1 or 2, close = false}, i)
+    i += 1
+
+    lib.setMenuOptions(id, {label = 'Remove Door', description = 'Remove the specified door from the vehicle, press enter to apply it', args = 'remove_door', values = vehicleDoors, defaultIndex = 1, close = false}, i)
+    i += 1
+end
+
 local function createVehiclesForSpawner(vehs, id)
     table.sort(vehs, function(a, b)
         return a.name < b.name
@@ -1465,7 +1504,8 @@ lib.registerMenu({
         {label = 'Extras', description = 'Add or remove vehicle extras', args = 'berkie_menu_vehicle_options_extras'},
         {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false},
         {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'},
-        {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false}
+        {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
+        {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
@@ -1507,6 +1547,8 @@ lib.registerMenu({
     elseif args == 'set_license_plate' then
         setCustomLicensePlate()
         return
+    elseif args == 'berkie_menu_vehicle_options_doors' then
+        setupDoorMenu()
     end
 
     lib.showMenu(args, menuIndexes[args])
@@ -1879,7 +1921,7 @@ lib.registerMenu({
             vehicleModsMenuData[args][2].defaultIndex = scrollIndex
             lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
         elseif args == 'return' then
-            lib.showMenu('berkie_menu_vehicle_options_neon_menu', menuIndexes['berkie_menu_vehicle_options_neon_menu'])
+            lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
         end
     end,
     options = {}
@@ -1903,6 +1945,53 @@ lib.registerMenu({
     if scrollIndex then return end
 
     lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+end)
+
+lib.registerMenu({
+    id = 'berkie_menu_vehicle_options_doors',
+    title = 'Vehicle Doors',
+    position = 'top-right',
+    onClose = function(keyPressed)
+        closeMenu(false, keyPressed, 'berkie_menu_vehicle_options')
+    end,
+    onSelected = function(selected)
+        menuIndexes['berkie_menu_vehicle_options_doors'] = selected
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        if args == 'remove_doors' then
+            vehicleRemoveDoors = scrollIndex == 1
+        end
+    end,
+    options = {}
+}, function(_, scrollIndex, args)
+    if type(args) == 'number' then
+        local isOpen = GetVehicleDoorAngleRatio(cache.vehicle, args) > 0.1
+        if isOpen then
+            SetVehicleDoorShut(cache.vehicle, args, false)
+        else
+            SetVehicleDoorOpen(cache.vehicle, args, false, false)
+        end
+    elseif args == 'bomb_bay' then
+        if AreBombBayDoorsOpen(cache.vehicle) then
+            CloseBombBayDoors(cache.vehicle)
+        else
+            OpenBombBayDoors(cache.vehicle)
+        end
+    elseif args == 'open_all_doors' then
+        for i = 0, 7 do
+            SetVehicleDoorOpen(cache.vehicle, i, false, fale)
+        end
+        if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
+            OpenBombBayDoors(cache.vehicle)
+        end
+    elseif args == 'close_all_doors' then
+        SetVehicleDoorsShut(cache.vehicle, false)
+        if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
+            CloseBombBayDoors(cache.vehicle)
+        end
+    elseif args == 'remove_door' then
+        SetVehicleDoorBroken(cache.vehicle, scrollIndex - 1, vehicleRemoveDoors)
+    end
 end)
 
 lib.registerMenu({
