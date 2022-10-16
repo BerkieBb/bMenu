@@ -501,8 +501,8 @@ local vehicleLicensePlates = {
     {3, GetLabelText('CMOD_PLA_0')},
     {0, GetLabelText('CMOD_PLA_1')},
     {4, GetLabelText('CMOD_PLA_2')},
-    {1, GetLabelText('CMOD_PLA_3')},
-    {2, GetLabelText('CMOD_PLA_4')},
+    {2, GetLabelText('CMOD_PLA_3')},
+    {1, GetLabelText('CMOD_PLA_4')},
     {5, 'North Yankton'}
 }
 
