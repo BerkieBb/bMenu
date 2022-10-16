@@ -1167,26 +1167,26 @@ local function updateColorsMenu()
     local defaultInterior = GetVehicleInteriorColor(cache.vehicle)
     local defaultPearlescentColor, defaultWheelColor = GetVehicleExtraColours(cache.vehicle)
 
-    for i = 1, #vehicleClassicColorsArray do
-        if vehicleClassicColorsArray[i][1] == defaultDashboard then
+    for i = 1, #vehicleClassicColors do
+        if vehicleClassicColors[i][1] == defaultDashboard then
             dashboard = i
         end
     end
 
-    for i = 1, #vehicleClassicColorsArray do
-        if vehicleClassicColorsArray[i][1] == defaultInterior then
+    for i = 1, #vehicleClassicColors do
+        if vehicleClassicColors[i][1] == defaultInterior then
             interior = i
         end
     end
 
-    for i = 1, #vehicleWheelColorsArray do
-        if vehicleWheelColorsArray[i][1] == defaultWheelColor then
+    for i = 1, #vehicleWheelColors do
+        if vehicleWheelColors[i][1] == defaultWheelColor then
             wheel = i
         end
     end
 
-    for i = 1, #vehicleClassicColorsArray do
-        if vehicleClassicColorsArray[i][1] == defaultPearlescentColor then
+    for i = 1, #vehicleClassicColors do
+        if vehicleClassicColors[i][1] == defaultPearlescentColor then
             pearlescent = i
         end
     end
