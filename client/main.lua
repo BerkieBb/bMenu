@@ -540,6 +540,7 @@ local vehicleUseCustomXenonColor = false
 local vehicleUseCustomTireSmokeColor = false
 local vehicleUseCustomNeonColor = false
 local vehicleRemoveDoors = false
+local vehicleUseBikeSeatbelt = false
 
 --#endregion Variables
 
@@ -1497,6 +1498,9 @@ lib.registerMenu({
         elseif args == 'license_plate_type' then
             SetVehicleNumberPlateTextIndex(cache.vehicle, vehicleLicensePlates[scrollIndex][1])
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = scrollIndex, close = false}, 13)
+        elseif args == 'bike_seatbelt' then
+            vehicleUseBikeSeatbelt = scrollIndex == 1
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 16)
         end
     end,
     options = {
@@ -1514,7 +1518,8 @@ lib.registerMenu({
         {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'},
         {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
         {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'},
-        {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = 'berkie_menu_vehicle_options_windows'}
+        {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = 'berkie_menu_vehicle_options_windows'},
+        {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = vehicleUseBikeSeatbelt and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
@@ -2068,7 +2073,7 @@ lib.registerMenu({
     if scrollIndex then return end
 
     if args == 'spawn_by_model' then
-        local vehicle = lib.inputDialog('test', {'Vehicle Model Name'})
+        local vehicle = lib.inputDialog('Spawn Vehicle', {'Vehicle Model Name'})
         if vehicle and table.type(vehicle) ~= 'empty' then
             local model = joaat(vehicle[1])
             if IsModelInCdimage(model) then
@@ -2217,6 +2222,20 @@ CreateThread(function()
     end
 end)
 
+CreateThread(function()
+    Wait(1000)
+    while true do
+        local cantBeKnockedOff = vehicleGodMode or vehicleUseBikeSeatbelt
+        local cantBeDraggedOut = vehicleGodMode
+        local cantBeShotInVehicle = vehicleGodMode
+
+        SetPedCanBeDraggedOut(cache.ped, not cantBeDraggedOut)
+        SetPedCanBeShotInVehicle(cache.ped, not cantBeShotInVehicle)
+        SetPedCanBeKnockedOffVehicle(cache.ped, cantBeKnockedOff and 1 or 0)
+        Wait(1000)
+    end
+end)
+
 --#endregion Threads
 
 --[[
@@ -2226,7 +2245,6 @@ end)
     Optimize god mode
 
 vehicle options menu:
-    bike seatbelt (yes or no)
     speed limiter (selection to input)
     enable torque multiplier (yes or no)
     set engine torque multiplier (selection)
