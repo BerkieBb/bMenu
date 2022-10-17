@@ -546,6 +546,15 @@ local vehicleUseBikeSeatbelt = false
 
 --#region Functions
 
+function math.sign(v)
+	return v >= 0 and 1 or -1
+end
+
+function math.round(v, bracket)
+	bracket = bracket or 1
+	return math.floor(v / bracket + math.sign(v) * 0.5) * bracket
+end
+
 local function toProperCase(str)
     return string.gsub(str, '(%a)([%w_\']*)', function(first, rest)
         return first:upper()..rest:lower()
@@ -1519,11 +1528,10 @@ lib.registerMenu({
         {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
         {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'},
         {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = 'berkie_menu_vehicle_options_windows'},
-        {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = vehicleUseBikeSeatbelt and 1 or 2, close = false}
+        {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = vehicleUseBikeSeatbelt and 1 or 2, close = false},
+        {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
-    if scrollIndex then return end
-
     local inVeh, reason = isInVehicle(true)
     if not inVeh then
         lib.notify({
@@ -1563,6 +1571,55 @@ lib.registerMenu({
         return
     elseif args == 'berkie_menu_vehicle_options_doors' then
         setupDoorMenu()
+    elseif args == 'speed_limiter' then
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = scrollIndex, close = false}, 17)
+        if scrollIndex == 1 then
+            SetEntityMaxSpeed(cache.vehicle, 500.01)
+            local curSpeed = GetEntitySpeed(cache.vehicle)
+            SetEntityMaxSpeed(cache.vehicle, curSpeed)
+            if ShouldUseMetricMeasurements() then
+                lib.notify({
+                    description = ('Vehicle speed is now limited to %s KPH'):format(math.round(curSpeed * 3.6, 0.1))
+                })
+            else
+                lib.notify({
+                    description = ('Vehicle speed is now limited to %s MPH'):format(math.round(curSpeed * 2.23693629, 0.1))
+                })
+            end
+        elseif scrollIndex == 2 then
+            SetEntityMaxSpeed(cache.vehicle, 500.01)
+            lib.notify({
+                description = 'Vehicle speed is now no longer limited',
+                type = 'inform'
+            })
+        elseif scrollIndex == 3 then
+            lib.hideMenu(false)
+            local input = lib.inputDialog('Custom Speed Limit', {'Speed'})
+            if not input or not input[1] or input[1] == '' or not tonumber(input[1]) then
+                Wait(200)
+                lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+                return
+            end
+
+            input[1] = tonumber(input[1]) + 0.0
+
+            SetEntityMaxSpeed(cache.vehicle, 500.01)
+            SetEntityMaxSpeed(cache.vehicle, input[1] + 0.0)
+
+            if ShouldUseMetricMeasurements() then
+                lib.notify({
+                    description = ('Vehicle speed is now limited to %s KPH'):format(math.round(input[1] * 3.6, 0.1))
+                })
+            else
+                lib.notify({
+                    description = ('Vehicle speed is now limited to %s MPH'):format(math.round(input[1] * 2.23693629, 0.1))
+                })
+            end
+
+            Wait(200)
+            lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+        end
+        return
     end
 
     lib.showMenu(args, menuIndexes[args])
@@ -2245,7 +2302,6 @@ end)
     Optimize god mode
 
 vehicle options menu:
-    speed limiter (selection to input)
     enable torque multiplier (yes or no)
     set engine torque multiplier (selection)
     enable power multiplier (yes or no)
