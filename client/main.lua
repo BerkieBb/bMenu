@@ -541,6 +541,10 @@ local vehicleUseCustomTireSmokeColor = false
 local vehicleUseCustomNeonColor = false
 local vehicleRemoveDoors = false
 local vehicleUseBikeSeatbelt = false
+local vehicleUseTorqueMultiplier = false
+local vehicleUsePowerMultiplier = false
+local vehicleTorqueMultiplier = 2
+local vehiclePowerMultiplier = 2
 
 --#endregion Variables
 
@@ -1508,8 +1512,20 @@ lib.registerMenu({
             SetVehicleNumberPlateTextIndex(cache.vehicle, vehicleLicensePlates[scrollIndex][1])
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = scrollIndex, close = false}, 13)
         elseif args == 'bike_seatbelt' then
-            vehicleUseBikeSeatbelt = scrollIndex == 1
+            vehicleUseBikeSeatbelt = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 16)
+        elseif args == 'torque_multiplier_toggle' then
+            vehicleUseTorqueMultiplier = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = 'torque_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 18)
+        elseif args == 'power_multiplier_toggle' then
+            vehicleUsePowerMultiplier = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = 'power_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
+        elseif args == 'torque_multiplier' then
+            vehicleTorqueMultiplier = 2 ^ scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 20)
+        elseif args == 'power_multiplier' then
+            vehiclePowerMultiplier = 2 ^ scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 21)
         end
     end,
     options = {
@@ -1529,7 +1545,11 @@ lib.registerMenu({
         {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'},
         {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = 'berkie_menu_vehicle_options_windows'},
         {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = vehicleUseBikeSeatbelt and 1 or 2, close = false},
-        {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = 1, close = false}
+        {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = 1, close = false},
+        {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = 'torque_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUseTorqueMultiplier and 1 or 2, close = false},
+        {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = 'power_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUsePowerMultiplier and 1 or 2, close = false},
+        {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
+        {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(true)
@@ -2218,8 +2238,8 @@ CreateThread(function()
         local sleep = 200
         if isInVehicle(false) then
             sleep = 0
+            local veh = cache.vehicle
             if vehicleGodMode then
-                local veh = cache.vehicle
 
                 SetVehicleReceivesRampDamage(veh, not vehicleRampDamage)
 
@@ -2272,6 +2292,16 @@ CreateThread(function()
                     SetVehicleDirtLevel(veh, 0)
                 end
             end
+
+            if vehicleUseTorqueMultiplier then
+                SetVehicleCheatPowerIncrease(veh, vehicleTorqueMultiplier)
+            end
+
+            if vehicleUsePowerMultiplier then
+                ModifyVehicleTopSpeed(veh, vehiclePowerMultiplier)
+            else
+                ModifyVehicleTopSpeed(veh, 1)
+            end
         else
 
         end
@@ -2299,13 +2329,8 @@ end)
     TODO
 
     Add isInVehicle check at every vehicle menu
-    Optimize god mode
 
 vehicle options menu:
-    enable torque multiplier (yes or no)
-    set engine torque multiplier (selection)
-    enable power multiplier (yes or no)
-    set engine power multiplier (selection)
     disable plane turbulence (yes or no)
     flip vehicle (option)
     toggle vehicle alarm (option)
