@@ -1496,6 +1496,19 @@ lib.registerMenu({
         menuIndexes['berkie_menu_vehicle_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = isInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(false)
+            lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
+
+            return
+        end
+
         local val = scrollIndex == 1
         if args == 'god_mode_enable' then
             if val == vehicleGodMode then return end
@@ -1557,7 +1570,8 @@ lib.registerMenu({
         {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false},
         {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false},
         {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false},
-        {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false}
+        {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false},
+        {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -1697,6 +1711,40 @@ lib.registerMenu({
             description = 'No seats to cycle through',
             type = 'error'
         })
+    elseif args == 'vehicle_lights' then
+        -- We need to do % 4 because this seems to be some sort of flags system. For a taxi, this function returns 65, 66, etc.
+        -- So % 4 takes care of that.
+        local indicatorState = GetVehicleIndicatorLights(cache.vehicle) % 4 -- 0 = none, 1 = left, 2 = right, 3 = both
+        if scrollIndex == 1 then
+            if indicatorState ~= 3 then -- Either all lights are off, or one of the two (left/right) is off.
+                SetVehicleIndicatorLights(cache.vehicle, 1, true)
+                SetVehicleIndicatorLights(cache.vehicle, 0, true)
+            else -- Both are on
+                SetVehicleIndicatorLights(cache.vehicle, 1, false)
+                SetVehicleIndicatorLights(cache.vehicle, 0, false)
+            end
+        elseif scrollIndex == 2 then
+            if indicatorState ~= 1 then -- Left indicator is (only) off
+                SetVehicleIndicatorLights(cache.vehicle, 1, true)
+                SetVehicleIndicatorLights(cache.vehicle, 0, false)
+            else
+                SetVehicleIndicatorLights(cache.vehicle, 1, false)
+                SetVehicleIndicatorLights(cache.vehicle, 0, false)
+            end
+        elseif scrollIndex == 3 then
+            if indicatorState ~= 2 then -- Right indicator is (only) off
+                SetVehicleIndicatorLights(cache.vehicle, 1, false)
+                SetVehicleIndicatorLights(cache.vehicle, 0, true)
+            else
+                SetVehicleIndicatorLights(cache.vehicle, 1, false)
+                SetVehicleIndicatorLights(cache.vehicle, 0, false)
+            end
+        elseif scrollIndex == 4 then
+            SetVehicleInteriorlight(cache.vehicle, not IsVehicleInteriorLightOn(cache.vehicle))
+        elseif scrollIndex == 5 then
+            SetVehicleSearchlight(cache.vehicle, not IsVehicleSearchlightOn(cache.vehicle), true)
+        end
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = scrollIndex, close = false}, 26)
     end
 end)
 
