@@ -546,6 +546,9 @@ local vehicleUsePowerMultiplier = false
 local vehicleTorqueMultiplier = 2
 local vehiclePowerMultiplier = 2
 local disablePlaneTurbulence = false
+local vehicleFrozen = false
+local vehicleFrozenRPM = 0
+local vehicleFrozenSpeed = 0
 
 --#endregion Variables
 
@@ -1571,8 +1574,9 @@ lib.registerMenu({
         {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false},
         {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false},
         {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false},
-        {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
-        {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false}
+        {label = 'Lights', description = 'Toggle your vehicle lights, press enter to apply it', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
+        {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles. Press enter to apply it', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false},
+        {label = 'Freeze Vehicle', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -1781,6 +1785,20 @@ lib.registerMenu({
                     type = 'success'
                 })
             end
+        end
+    elseif args == 'freeze_vehicle' then
+        vehicleFrozen = scrollIndex == 1
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Freeze Vehicle', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 28)
+        if scrollIndex == 1 then
+            vehicleFrozenSpeed = GetEntitySpeedVector(cache.vehicle, true).y
+            vehicleFrozenRPM = GetVehicleCurrentRpm(cache.vehicle)
+        end
+        FreezeEntityPosition(cache.vehicle, scrollIndex == 1)
+        if scrollIndex == 2 then
+            if not IsThisModelATrain(GetEntityModel(cache.vehicle)) then
+                SetVehicleForwardSpeed(cache.vehicle, vehicleFrozenSpeed)
+            end
+            SetVehicleCurrentRpm(cache.vehicle, vehicleFrozenRPM)
         end
     end
 end)
@@ -2450,6 +2468,10 @@ CreateThread(function()
                     SetPlaneTurbulenceMultiplier(cache.vehicle, 1.0)
                 end
             end
+
+            if vehicleFrozen then
+                FreezeEntityPosition(cache.vehicle, true)
+            end
         else
 
         end
@@ -2479,7 +2501,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    freeze vehicle (yes or no)
     set vehicle visibility (yes or no)
     engine always on (yes or no)
     infinite fuel (yes or no)
