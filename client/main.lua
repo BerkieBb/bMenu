@@ -545,6 +545,7 @@ local vehicleUseTorqueMultiplier = false
 local vehicleUsePowerMultiplier = false
 local vehicleTorqueMultiplier = 2
 local vehiclePowerMultiplier = 2
+local disablePlaneTurbulence = false
 
 --#endregion Variables
 
@@ -1526,6 +1527,9 @@ lib.registerMenu({
         elseif args == 'power_multiplier' then
             vehiclePowerMultiplier = 2 ^ scrollIndex
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 21)
+        elseif args == 'plane_turbulence' then
+            disablePlaneTurbulence = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 22)
         end
     end,
     options = {
@@ -1549,7 +1553,8 @@ lib.registerMenu({
         {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = 'torque_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUseTorqueMultiplier and 1 or 2, close = false},
         {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = 'power_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUsePowerMultiplier and 1 or 2, close = false},
         {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
-        {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false}
+        {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
+        {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(true)
@@ -2301,6 +2306,14 @@ CreateThread(function()
                 ModifyVehicleTopSpeed(veh, vehiclePowerMultiplier)
             else
                 ModifyVehicleTopSpeed(veh, 1)
+            end
+
+            if IsThisModelAPlane(GetEntityModel(cache.vehicle)) then
+                if disablePlaneTurbulence then
+                    SetPlaneTurbulenceMultiplier(cache.vehicle, 0.0)
+                else
+                    SetPlaneTurbulenceMultiplier(cache.vehicle, 1.0)
+                end
             end
         else
 
