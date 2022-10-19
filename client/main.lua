@@ -1571,7 +1571,8 @@ lib.registerMenu({
         {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false},
         {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false},
         {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false},
-        {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false}
+        {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
+        {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -1745,6 +1746,42 @@ lib.registerMenu({
             SetVehicleSearchlight(cache.vehicle, not IsVehicleSearchlightOn(cache.vehicle), true)
         end
         lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = scrollIndex, close = false}, 26)
+    elseif args == 'fix_destroy_tires' then
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = scrollIndex, close = false}, 27)
+        if scrollIndex == 1 then
+            if IsVehicleTyreBurst(cache.vehicle, 0, false) then
+                for i = 0, 7 do
+                    SetVehicleTyreFixed(cache.vehicle, i)
+                end
+                lib.notify({
+                    description = 'All vehicle tires have been fixed',
+                    type = 'success'
+                })
+            else
+                for i = 0, 7 do
+                    SetVehicleTyreBurst(cache.vehicle, i, false, 1.0)
+                end
+                lib.notify({
+                    description = 'All vehicle tires have been destroyed',
+                    type = 'success'
+                })
+            end
+        else
+            local tireIndex = scrollIndex - 2
+            if IsVehicleTyreBurst(cache.vehicle, tireIndex, false) then
+                SetVehicleTyreFixed(cache.vehicle, tireIndex)
+                lib.notify({
+                    description = ('Vehicle tire #%s has been fixed'):format(scrollIndex - 1),
+                    type = 'success'
+                })
+            else
+                SetVehicleTyreBurst(cache.vehicle, tireIndex, false, 1.0)
+                lib.notify({
+                    description = ('Vehicle tire #%s has been destroyed'):format(scrollIndex - 1),
+                    type = 'success'
+                })
+            end
+        end
     end
 end)
 
@@ -2442,8 +2479,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    vehicle lights (selection)
-    fix / destroy tires (selection)
     freeze vehicle (yes or no)
     set vehicle visibility (yes or no)
     engine always on (yes or no)
