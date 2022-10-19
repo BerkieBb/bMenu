@@ -549,6 +549,7 @@ local disablePlaneTurbulence = false
 local vehicleFrozen = false
 local vehicleFrozenRPM = 0
 local vehicleFrozenSpeed = 0
+local vehicleEngineAlwaysOn = false
 
 --#endregion Variables
 
@@ -1499,17 +1500,19 @@ lib.registerMenu({
         menuIndexes['berkie_menu_vehicle_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        local inVeh, reason = isInVehicle(true)
-        if not inVeh then
-            lib.notify({
-                description = reason,
-                type = 'error'
-            })
+        if args ~= 'engine_always_on' then
+            local inVeh, reason = isInVehicle(true)
+            if not inVeh then
+                lib.notify({
+                    description = reason,
+                    type = 'error'
+                })
 
-            lib.hideMenu(false)
-            lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
+                lib.hideMenu(false)
+                lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
 
-            return
+                return
+            end
         end
 
         local val = scrollIndex == 1
@@ -1546,6 +1549,9 @@ lib.registerMenu({
         elseif args == 'plane_turbulence' then
             disablePlaneTurbulence = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 22)
+        elseif args == 'engine_always_on' then
+            vehicleEngineAlwaysOn = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false}, 30)
         end
     end,
     options = {
@@ -1577,7 +1583,8 @@ lib.registerMenu({
         {label = 'Lights', description = 'Toggle your vehicle lights, press enter to apply it', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
         {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles. Press enter to apply it', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false},
         {label = 'Freeze', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false},
-        {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false}
+        {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false},
+        {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -2509,6 +2516,22 @@ CreateThread(function()
     end
 end)
 
+CreateThread(function()
+    while true do
+        local vehicle = GetVehiclePedIsIn(cache.ped, true)
+        if vehicle ~= 0 and not IsPedInAnyVehicle(cache.ped, false) then
+            if vehicleEngineAlwaysOn then
+                SetVehicleEngineOn(vehicle, true, true, true)
+            end
+
+            if not IsEntityVisible(vehicle) then
+                SetEntityVisible(vehicle, true, false)
+            end
+        end
+        Wait(100)
+    end
+end)
+
 --#endregion Threads
 
 --[[
@@ -2517,7 +2540,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    engine always on (yes or no)
     infinite fuel (yes or no)
     show vehicle health (yes or no)
     default radio station (yes or no)
