@@ -1555,7 +1555,8 @@ lib.registerMenu({
         {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
         {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
         {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false},
-        {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false}
+        {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false},
+        {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(true)
@@ -1648,6 +1649,15 @@ lib.registerMenu({
         end
     elseif args == 'flip_vehicle' then
         SetVehicleOnGroundProperly(cache.vehicle)
+    elseif args == 'vehicle_alarm' then
+        if IsVehicleAlarmActivated(cache.vehicle) then
+            SetVehicleAlarmTimeLeft(cache.vehicle, 0)
+            SetVehicleAlarm(cache.vehicle, false)
+        else
+            SetVehicleAlarm(cache.vehicle, true)
+            SetVehicleAlarmTimeLeft(cache.vehicle, math.random(8000, 45000))
+            StartVehicleAlarm(cache.vehicle)
+        end
     end
 end)
 
@@ -2345,7 +2355,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    toggle vehicle alarm (option)
     cycle through vehicle seats (option)
     vehicle lights (selection)
     fix / destroy tires (selection)
