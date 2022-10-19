@@ -1556,10 +1556,11 @@ lib.registerMenu({
         {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
         {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false},
         {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false},
-        {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false}
+        {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false},
+        {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false}
     }
 }, function(_, scrollIndex, args)
-    local inVeh, reason = isInVehicle(true)
+    local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
     if not inVeh then
         lib.notify({
             description = reason,
@@ -1658,6 +1659,44 @@ lib.registerMenu({
             SetVehicleAlarmTimeLeft(cache.vehicle, math.random(8000, 45000))
             StartVehicleAlarm(cache.vehicle)
         end
+    elseif args == 'cycle_seats' then
+        if not AreAnyVehicleSeatsFree(cache.vehicle) then
+            lib.notify({
+                description = 'No seats to cycle through',
+                type = 'error'
+            })
+            return
+        end
+
+        local vehicleModel = GetEntityModel(cache.vehicle)
+        local maxSeats = GetVehicleModelNumberOfSeats(vehicleModel)
+        local foundSeat = false
+        local startingSeat = -1
+
+        for i = -1, maxSeats - 2 do
+            if GetPedInVehicleSeat(cache.vehicle, i) == cache.ped then
+                startingSeat = i
+                break
+            end
+        end
+
+        if startingSeat == maxSeats - 2 then
+            startingSeat = -1
+        end
+
+        for i = startingSeat, maxSeats - 2 do
+            if IsVehicleSeatFree(cache.vehicle, i) then
+                TaskWarpPedIntoVehicle(cache.ped, cache.vehicle, i)
+                foundSeat = true
+                break
+            end
+        end
+
+        if foundSeat then return end
+        lib.notify({
+            description = 'No seats to cycle through',
+            type = 'error'
+        })
     end
 end)
 
@@ -2355,7 +2394,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    cycle through vehicle seats (option)
     vehicle lights (selection)
     fix / destroy tires (selection)
     freeze vehicle (yes or no)
