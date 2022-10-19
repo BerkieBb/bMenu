@@ -1554,7 +1554,8 @@ lib.registerMenu({
         {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = 'power_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUsePowerMultiplier and 1 or 2, close = false},
         {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
         {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
-        {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false}
+        {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false},
+        {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(true)
@@ -1575,27 +1576,28 @@ lib.registerMenu({
 
     if args == 'repair_vehicle' then
         SetVehicleFixed(cache.vehicle)
-        return
     elseif args == 'wash_vehicle' then
         SetVehicleDirtLevel(cache.vehicle, 0)
         vehicleDirtLevelSetter = 1
-        return
     elseif args == 'berkie_menu_vehicle_options_mod_menu' then
         setupModMenu()
+        lib.showMenu(args, menuIndexes[args])
     elseif args == 'berkie_menu_vehicle_options_colors' then
         updateColorsMenu()
+        lib.showMenu(args, menuIndexes[args])
     elseif args == 'berkie_menu_vehicle_options_neon_menu' then
         setupNeonMenu()
+        lib.showMenu(args, menuIndexes[args])
     elseif args == 'berkie_menu_vehicle_options_extras' then
         setupExtrasMenu()
+        lib.showMenu(args, menuIndexes[args])
     elseif args == 'toggle_engine' then
         SetVehicleEngineOn(cache.vehicle, not GetIsVehicleEngineRunning(cache.vehicle), false, true)
-        return
     elseif args == 'set_license_plate' then
         setCustomLicensePlate()
-        return
     elseif args == 'berkie_menu_vehicle_options_doors' then
         setupDoorMenu()
+        lib.showMenu(args, menuIndexes[args])
     elseif args == 'speed_limiter' then
         lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = scrollIndex, close = false}, 17)
         if scrollIndex == 1 then
@@ -1644,10 +1646,9 @@ lib.registerMenu({
             Wait(200)
             lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
         end
-        return
+    elseif args == 'flip_vehicle' then
+        SetVehicleOnGroundProperly(cache.vehicle)
     end
-
-    lib.showMenu(args, menuIndexes[args])
 end)
 
 lib.registerMenu({
@@ -2344,8 +2345,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    disable plane turbulence (yes or no)
-    flip vehicle (option)
     toggle vehicle alarm (option)
     cycle through vehicle seats (option)
     vehicle lights (selection)
