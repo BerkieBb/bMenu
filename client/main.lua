@@ -550,6 +550,7 @@ local vehicleFrozen = false
 local vehicleFrozenRPM = 0
 local vehicleFrozenSpeed = 0
 local vehicleEngineAlwaysOn = false
+local vehicleInfiniteFuel = false
 
 --#endregion Variables
 
@@ -1552,6 +1553,9 @@ lib.registerMenu({
         elseif args == 'engine_always_on' then
             vehicleEngineAlwaysOn = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false}, 30)
+        elseif args == 'infinite_fuel' then
+            vehicleInfiniteFuel = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false}, 31)
         end
     end,
     options = {
@@ -1584,7 +1588,8 @@ lib.registerMenu({
         {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles. Press enter to apply it', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false},
         {label = 'Freeze', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false},
         {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false},
-        {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false}
+        {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false},
+        {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -2484,16 +2489,20 @@ CreateThread(function()
                 ModifyVehicleTopSpeed(veh, 1)
             end
 
-            if IsThisModelAPlane(GetEntityModel(cache.vehicle)) then
+            if IsThisModelAPlane(GetEntityModel(veh)) then
                 if disablePlaneTurbulence then
-                    SetPlaneTurbulenceMultiplier(cache.vehicle, 0.0)
+                    SetPlaneTurbulenceMultiplier(veh, 0.0)
                 else
-                    SetPlaneTurbulenceMultiplier(cache.vehicle, 1.0)
+                    SetPlaneTurbulenceMultiplier(veh, 1.0)
                 end
             end
 
             if vehicleFrozen then
-                FreezeEntityPosition(cache.vehicle, true)
+                FreezeEntityPosition(veh, true)
+            end
+
+            if vehicleInfiniteFuel and GetVehicleFuelLevel(veh) < 99.0 then
+                SetVehicleFuelLevel(veh, 100.0)
             end
         else
 
@@ -2540,7 +2549,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    infinite fuel (yes or no)
     show vehicle health (yes or no)
     default radio station (yes or no)
     disable siren (yes or no)
