@@ -1576,7 +1576,8 @@ lib.registerMenu({
         {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false},
         {label = 'Lights', description = 'Toggle your vehicle lights, press enter to apply it', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
         {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles. Press enter to apply it', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false},
-        {label = 'Freeze Vehicle', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false}
+        {label = 'Freeze', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false},
+        {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -1799,6 +1800,21 @@ lib.registerMenu({
                 SetVehicleForwardSpeed(cache.vehicle, vehicleFrozenSpeed)
             end
             SetVehicleCurrentRpm(cache.vehicle, vehicleFrozenRPM)
+        end
+    elseif args == 'toggle_visibility' then
+        if IsEntityVisible(cache.vehicle) then
+            local pedsInVeh = {}
+            for i = -1, GetVehicleMaxNumberOfPassengers(cache.vehicle) - 1 do
+                if not IsVehicleSeatFree(cache.vehicle, i) then
+                    pedsInVeh[#pedsInVeh + 1] = GetPedInVehicleSeat(cache.vehicle, i)
+                end
+            end
+            SetEntityVisible(cache.vehicle, false, false)
+            for i = 1, #pedsInVeh do
+                SetEntityVisible(pedsInVeh[i], true, false)
+            end
+        else
+            SetEntityVisible(cache.vehicle, true, false)
         end
     end
 end)
@@ -2501,7 +2517,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    set vehicle visibility (yes or no)
     engine always on (yes or no)
     infinite fuel (yes or no)
     show vehicle health (yes or no)
