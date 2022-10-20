@@ -1686,7 +1686,8 @@ lib.registerMenu({
         {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false},
         {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = 1, close = false},
         {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = canWearHelmet and 1 or 2, close = false},
-        {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = 'highbeams_on_honk', values = {'Yes', 'No'}, defaultIndex = vehicleHighbeamsOnHonk and 1 or 2, close = false}
+        {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = 'highbeams_on_honk', values = {'Yes', 'No'}, defaultIndex = vehicleHighbeamsOnHonk and 1 or 2, close = false},
+        {label = 'Delete Vehicle', description = 'Delete your current vehicle, no time travel is involved in this action', args = 'delete_vehicle'}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -1696,11 +1697,9 @@ lib.registerMenu({
             type = 'error'
         })
 
-        if args ~= 'berkie_menu_vehicle_options_mod_menu' and args ~= 'berkie_menu_vehicle_options_god_mode_menu' then
-            lib.hideMenu(false)
+        if args == 'berkie_menu_vehicle_options_mod_menu' or args == 'berkie_menu_vehicle_options_god_mode_menu' or args == 'delete_vehicle' then
+            lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
         end
-
-        lib.showMenu('berkie_menu_vehicle_related_options', menuIndexes['berkie_menu_vehicle_related_options'])
 
         return
     end
@@ -1924,6 +1923,23 @@ lib.registerMenu({
             end
         else
             SetEntityVisible(cache.vehicle, true, false)
+        end
+    elseif args == 'delete_vehicle' then
+        local alert = lib.alertDialog({
+            header = 'Sure?',
+            content = 'Are you sure you want to delete your vehicle?\nThis action cannot be undone.',
+            centered = true,
+            cancel = true
+        })
+        if alert == 'confirm' then
+            SetVehicleHasBeenOwnedByPlayer(cache.vehicle, false)
+            SetEntityAsMissionEntity(cache.vehicle, false, true)
+            DeleteEntity(cache.vehicle)
+            Wait(200)
+            lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
+        elseif alert == 'cancel' then
+            Wait(200)
+            lib.showMenu('berkie_menu_vehicle_options', menuIndexes['berkie_menu_vehicle_options'])
         end
     end
 end)
@@ -2663,10 +2679,6 @@ end)
     TODO
 
     Add isInVehicle check at every vehicle menu
-
-vehicle options menu:
-    delete vehicle:
-        confirm or go back
 
 
     updates to add:
