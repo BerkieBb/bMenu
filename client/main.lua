@@ -512,6 +512,20 @@ for i = 1, #vehicleLicensePlates do
     vehicleLicensePlatesArray[i] = vehicleLicensePlates[i][2]
 end
 
+local vehicleRadioStations = {}
+
+vehicleRadioStations[1] = {'OFF', GetLabelText('RADIO_OFF')}
+
+for i = 0, 23 do
+    vehicleRadioStations[i + 2] = {GetRadioStationName(i), GetLabelText(GetRadioStationName(i))}
+end
+
+local vehicleRadioStationsArray = {}
+
+for i = 1, #vehicleRadioStations do
+    vehicleRadioStationsArray[i] = vehicleRadioStations[i][2]
+end
+
 local vehicleDoors = {
     'Left Front Door',
     'Right Front Door',
@@ -552,6 +566,7 @@ local vehicleFrozenSpeed = 0
 local vehicleEngineAlwaysOn = false
 local vehicleInfiniteFuel = false
 local vehicleShowHealth = false
+local vehicleDefaultRadio = 'OFF'
 
 --#endregion Variables
 
@@ -941,7 +956,8 @@ local function spawnVehicleOnPlayer(model)
     SetVehicleCurrentRpm(vehicle, rpm)
 
     SetVehicleRadioEnabled(vehicle, true)
-    SetVehRadioStation(vehicle, 'OFF')
+    Wait(10) -- SetVehicleRadioEnabled sets the radio to a random one or the previous one, so we have to wait before overriding it
+    SetVehRadioStation(vehicle, vehicleDefaultRadio)
 
     SetModelAsNoLongerNeeded(model)
 
@@ -1610,6 +1626,9 @@ lib.registerMenu({
         elseif args == 'show_health' then
             vehicleShowHealth = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false}, 32)
+        elseif args == 'radio_station' then
+            vehicleDefaultRadio = vehicleRadioStations[scrollIndex][1]
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = scrollIndex, close = false}, 33)
         end
     end,
     options = {
@@ -1644,7 +1663,8 @@ lib.registerMenu({
         {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false},
         {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false},
         {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false},
-        {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false}
+        {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false},
+        {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -2481,7 +2501,6 @@ CreateThread(function()
             sleep = 0
             local veh = cache.vehicle
             if vehicleGodMode then
-
                 SetVehicleReceivesRampDamage(veh, not vehicleRampDamage)
 
                 if vehicleVisualDamage then
@@ -2610,8 +2629,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    default radio station (yes or no)
-    disable siren (yes or no)
     no bike helmet (yes or no)
     flash highbeams on honk (yes or no)
     delete vehicle:
