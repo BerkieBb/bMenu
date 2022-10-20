@@ -567,6 +567,7 @@ local vehicleEngineAlwaysOn = false
 local vehicleInfiniteFuel = false
 local vehicleShowHealth = false
 local vehicleDefaultRadio = 'OFF'
+local canWearHelmet = true
 
 --#endregion Variables
 
@@ -1327,7 +1328,7 @@ local function setCustomLicensePlate()
             type = 'error'
         })
 
-        lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
+        lib.showMenu('berkie_menu_vehicle_related_options', menuIndexes['berkie_menu_vehicle_related_options'])
 
         return
     end
@@ -1552,6 +1553,18 @@ lib.registerMenu({
 }, function(_, _, args)
     if args == 'berkie_menu_vehicle_spawner' then
         createVehicleSpawnerMenu()
+    elseif args == 'berkie_menu_vehicle_personal' then
+        local inVeh, reason = isInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.showMenu('berkie_menu_vehicle_related_options', menuIndexes['berkie_menu_vehicle_related_options'])
+
+            return
+        end
     end
 
     lib.showMenu(args, menuIndexes[args])
@@ -1568,7 +1581,7 @@ lib.registerMenu({
         menuIndexes['berkie_menu_vehicle_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args ~= 'engine_always_on' then
+        if args ~= 'engine_always_on' and args ~= 'bike_helmet' and args ~= 'radio_station' then
             local inVeh, reason = isInVehicle(true)
             if not inVeh then
                 lib.notify({
@@ -1577,7 +1590,7 @@ lib.registerMenu({
                 })
 
                 lib.hideMenu(false)
-                lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
+                lib.showMenu('berkie_menu_vehicle_related_options', menuIndexes['berkie_menu_vehicle_related_options'])
 
                 return
             end
@@ -1629,6 +1642,9 @@ lib.registerMenu({
         elseif args == 'radio_station' then
             vehicleDefaultRadio = vehicleRadioStations[scrollIndex][1]
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = scrollIndex, close = false}, 33)
+        elseif args == 'bike_helmet' then
+            canWearHelmet = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 34)
         end
     end,
     options = {
@@ -1664,7 +1680,8 @@ lib.registerMenu({
         {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false},
         {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false},
         {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false},
-        {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = 1, close = false}
+        {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = 1, close = false},
+        {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = canWearHelmet and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -1678,7 +1695,7 @@ lib.registerMenu({
             lib.hideMenu(false)
         end
 
-        lib.showMenu('berkie_menu_main', menuIndexes['berkie_menu_main'])
+        lib.showMenu('berkie_menu_vehicle_related_options', menuIndexes['berkie_menu_vehicle_related_options'])
 
         return
     end
@@ -2497,6 +2514,7 @@ CreateThread(function()
 
     while true do
         local sleep = 200
+        local ped = cache.ped
         if isInVehicle(false) then
             sleep = 0
             local veh = cache.vehicle
@@ -2584,6 +2602,10 @@ CreateThread(function()
                 drawTextOnScreen(('~n~~n~Body health: %s'):format(getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001))), 0.5, 0.0)
                 drawTextOnScreen(('~n~~n~~n~Tank health: %s'):format(getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
             end
+
+            if GetVehicleClass(veh) == 8 then
+                SetPedHelmet(ped, canWearHelmet)
+            end
         else
 
         end
@@ -2629,7 +2651,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    no bike helmet (yes or no)
     flash highbeams on honk (yes or no)
     delete vehicle:
         confirm or go back
