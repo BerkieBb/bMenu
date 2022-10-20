@@ -551,6 +551,7 @@ local vehicleFrozenRPM = 0
 local vehicleFrozenSpeed = 0
 local vehicleEngineAlwaysOn = false
 local vehicleInfiniteFuel = false
+local vehicleShowHealth = false
 
 --#endregion Variables
 
@@ -1423,6 +1424,56 @@ local function createVehicleSpawnerMenu()
     end
 end
 
+local function getHealthString(health)
+    local color = ''
+    if health <= 0 then
+        return ('~r~%s'):format(health)
+    end
+
+    local mappedHealth = math.floor(health * 4 / 1000)
+    if mappedHealth == 0 then
+        color = '~r~'
+    elseif mappedHealth == 1 then
+        color = '~o~'
+    elseif mappedHealth == 2 then
+        color = '~y~'
+    else
+        color = '~g~'
+    end
+    return ('%s%s'):format(color, health)
+end
+
+local function drawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
+    if not IsHudPreferenceSwitchedOn()
+    or IsHudHidden()
+    --[[or settings.hidehud]]
+    or IsPlayerSwitchInProgress()
+    or IsScreenFadedOut()
+    or IsPauseMenuActive()
+    or IsFrontendFading()
+    or IsPauseMenuRestarting()
+    then
+        return
+    end
+
+    size = size or 0.48
+    position = position or 1
+    font = font or 6
+
+    SetTextFont(font)
+    SetTextScale(1.0, size)
+    if position == 2 then
+        SetTextWrap(0, x)
+    end
+    SetTextJustification(position)
+    if not disableTextOutline then
+        SetTextOutline()
+    end
+    BeginTextCommandDisplayText('STRING')
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(x, y)
+end
+
 --#endregion Functions
 
 --#region Menu Registration
@@ -1556,6 +1607,9 @@ lib.registerMenu({
         elseif args == 'infinite_fuel' then
             vehicleInfiniteFuel = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false}, 31)
+        elseif args == 'show_health' then
+            vehicleShowHealth = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false}, 32)
         end
     end,
     options = {
@@ -1589,7 +1643,8 @@ lib.registerMenu({
         {label = 'Freeze', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false},
         {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false},
         {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false},
-        {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false}
+        {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false},
+        {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -2504,6 +2559,12 @@ CreateThread(function()
             if vehicleInfiniteFuel and GetVehicleFuelLevel(veh) < 99.0 then
                 SetVehicleFuelLevel(veh, 100.0)
             end
+
+            if vehicleShowHealth then
+                drawTextOnScreen(('~n~Engine health: %s'):format(getHealthString(math.round(GetVehicleEngineHealth(veh), 0.001))), 0.5, 0.0)
+                drawTextOnScreen(('~n~~n~Body health: %s'):format(getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001))), 0.5, 0.0)
+                drawTextOnScreen(('~n~~n~~n~Tank health: %s'):format(getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
+            end
         else
 
         end
@@ -2549,7 +2610,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    show vehicle health (yes or no)
     default radio station (yes or no)
     disable siren (yes or no)
     no bike helmet (yes or no)
