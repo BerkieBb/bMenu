@@ -568,6 +568,7 @@ local vehicleInfiniteFuel = false
 local vehicleShowHealth = false
 local vehicleDefaultRadio = 'OFF'
 local canWearHelmet = true
+local vehicleHighbeamsOnHonk = false
 
 --#endregion Variables
 
@@ -1645,6 +1646,9 @@ lib.registerMenu({
         elseif args == 'bike_helmet' then
             canWearHelmet = val
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 34)
+        elseif args == 'highbeams_on_honk' then
+            vehicleHighbeamsOnHonk = val
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = 'highbeams_on_honk', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 35)
         end
     end,
     options = {
@@ -1681,7 +1685,8 @@ lib.registerMenu({
         {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false},
         {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false},
         {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = 1, close = false},
-        {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = canWearHelmet and 1 or 2, close = false}
+        {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = canWearHelmet and 1 or 2, close = false},
+        {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = 'highbeams_on_honk', values = {'Yes', 'No'}, defaultIndex = vehicleHighbeamsOnHonk and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = isInVehicle(args ~= 'cycle_seats')
@@ -2606,6 +2611,15 @@ CreateThread(function()
             if GetVehicleClass(veh) == 8 then
                 SetPedHelmet(ped, canWearHelmet)
             end
+
+            if vehicleHighbeamsOnHonk then
+                if IsControlPressed(0, 86) then
+                    SetVehicleFullbeam(veh, true)
+                end
+                if IsControlJustReleased(0, 86) then
+                    SetVehicleFullbeam(veh, false)
+                end
+            end
         else
 
         end
@@ -2651,7 +2665,6 @@ end)
     Add isInVehicle check at every vehicle menu
 
 vehicle options menu:
-    flash highbeams on honk (yes or no)
     delete vehicle:
         confirm or go back
 
