@@ -589,10 +589,10 @@ local function toProperCase(str)
     end)
 end
 
-local function arrayIncludes(value, array, useFormat)
+local function arrayIncludes(value, array)
     for i = 1, #array do
         local arrayVal = array[i]
-        if useFormat and string.find(value, arrayVal) or value == arrayVal then
+        if value == arrayVal then
             return true
         end
     end
