@@ -11,19 +11,19 @@ use_experimental_fxv2_oal 'yes'
 
 shared_scripts {
     '@ox_lib/init.lua',
-    'shared/*.lua'
+    'shared/**/*.lua'
 }
 
 client_scripts {
-    'client/*.lua',
+    'client/**/*.lua',
 }
 
 server_scripts {
-    'server/*.lua'
+    'server/**/*.lua'
 }
 
 dependencies {
-    '/server:5848',
+    '/server:5904',
     '/onesync',
     'ox_lib'
 }

@@ -993,12 +993,22 @@ local function spawnVehicleOnPlayer(model)
     end
 
     if IsPedInAnyVehicle(cache.ped, false) then
-        local _, dimensionMax = GetModelDimensions(model)
-        local offset = GetOffsetFromEntityInWorldCoords(GetVehiclePedIsIn(cache.ped, false), 0, dimensionMax.y, 0.0) - vec3(0, 6, 0)
+        local offset = GetOffsetFromEntityInWorldCoords(cache.vehicle, 0, 10 + GetEntitySpeed(cache.vehicle) / 2, 0)
         coords = vec4(offset.x, offset.y, offset.z, coords.w)
     end
 
-    local vehicle = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, true, false)
+    local netVeh = lib.callback.await('berkie_menu:server:spawnVehicle', false, model, coords)
+    while netVeh == 0 or not DoesEntityExist(NetToVeh(netVeh)) do
+        Wait(0)
+    end
+    local vehicle = NetToVeh(netVeh)
+    if vehicle == 0 then
+        lib.notify({
+            description = 'Something went wrong spawning the vehicle',
+            type = 'error'
+        })
+        return
+    end
     SetVehicleNeedsToBeHotwired(vehicle, false)
     SetVehicleHasBeenOwnedByPlayer(vehicle, true)
     SetEntityAsMissionEntity(vehicle, true, false)
@@ -1028,8 +1038,6 @@ local function spawnVehicleOnPlayer(model)
     SetVehRadioStation(vehicle, vehicleDefaultRadio)
 
     SetModelAsNoLongerNeeded(model)
-
-    return vehicle
 end
 
 local function setupModMenu()
@@ -2500,10 +2508,10 @@ lib.registerMenu({
     onSideScroll = function(_, scrollIndex, args)
         if args == 'inside_vehicle' then
             spawnInVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false}, 2)
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'inside_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
         elseif args == 'replace_vehicle' then
             replacePreviousVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'replace_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
         end
     end,
     options = {
