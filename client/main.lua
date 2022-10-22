@@ -1778,7 +1778,9 @@ lib.registerMenu({
         return
     end
 
-    if args == 'repair_vehicle' then
+    if args == 'berkie_menu_vehicle_options_mod_menu' or args == 'berkie_menu_vehicle_options_god_mode_menu' then
+        lib.showMenu(args, menuIndexes[args])
+    elseif args == 'repair_vehicle' then
         SetVehicleFixed(cache.vehicle)
     elseif args == 'wash_vehicle' then
         SetVehicleDirtLevel(cache.vehicle, 0)
