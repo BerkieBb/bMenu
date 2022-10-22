@@ -50,7 +50,7 @@ lib.callback.register('berkie_menu:server:playerListAction', function(source, ac
         SetEntityCoords(playerPed, playerCoords.x, playerCoords.y, playerCoords.z, false, false, false, false)
         return true, ('Successfully summoned %s'):format(playerName)
     elseif spectateArg then
-        return false, ('Not implemented yet')
+        return true, ('Successfully spectating %s'):format(playerName), GetEntityCoords(playerPed)
     elseif waypointArg then
         return true, ('Successfully set your waypoint to %s'):format(playerName), GetEntityCoords(playerPed).xy
     elseif blipArg then

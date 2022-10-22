@@ -537,8 +537,10 @@ local vehicleDoors = {
     'Extra Door (#2)'
 }
 
+local currentlySpectating = -1
+local previousPos = vec3(0)
+
 local vehicleModsMenuData = {}
-local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 local spawnInVehicle = true -- Teleport into the vehicle you're spawning
 local replacePreviousVehicle = true -- Replace the previous vehicle you were in when spawning a new vehicle
 local vehicleGodMode = false
@@ -569,6 +571,8 @@ local vehicleShowHealth = false
 local vehicleDefaultRadio = 'OFF'
 local canWearHelmet = true
 local vehicleHighbeamsOnHonk = false
+
+local showEffects = true -- Show effects when going in and out of noclip or when teleporting
 
 --#endregion Variables
 
@@ -859,6 +863,68 @@ local function createPlayerMenu()
                 end
             elseif args == killArg then
                 SetEntityHealth(NetToEnt(extraArg1), 0)
+            elseif args == spectateArg then
+                local player = GetPlayerFromServerId(data.source)
+                local playerPed = GetPlayerPed(player)
+
+                if NetworkIsInSpectatorMode() then
+                    if currentlySpectating ~= player and playerPed ~= 0 then
+                        DoScreenFadeOut(500)
+                        while IsScreenFadingOut() do
+                            Wait(0)
+                        end
+
+                        SetEntityVisible(cache.ped, false, false)
+                        NetworkSetEntityInvisibleToNetwork(cache.ped, true)
+                        SetEntityCollision(cache.ped, false, true)
+                        FreezeEntityPosition(cache.ped, true)
+                        SetEntityCoords(cache.ped, extraArg1.x, extraArg1.y, extraArg1.z + 3, true, false, false, false)
+
+                        NetworkSetInSpectatorMode(false, 0)
+                        NetworkSetInSpectatorMode(true, playerPed)
+
+                        DoScreenFadeIn(500)
+                        currentlySpectating = player
+                    else
+                        DoScreenFadeOut(500)
+                        while IsScreenFadingOut() do
+                            Wait(0)
+                        end
+
+                        NetworkSetInSpectatorMode(false, 0)
+
+                        SetEntityCoords(cache.ped, previousPos.x, previousPos.y, previousPos.z, true, false, false, false)
+                        previousPos = vec3(0)
+                        SetEntityVisible(cache.ped, true, false)
+                        NetworkSetEntityInvisibleToNetwork(cache.ped, false)
+                        SetEntityCollision(cache.ped, true, true)
+                        FreezeEntityPosition(cache.ped, false)
+
+                        DoScreenFadeIn(500)
+                        reason = 'Successfully stopped spectating'
+                        currentlySpectating = -1
+                    end
+                else
+                    if playerPed ~= 0 then
+                        DoScreenFadeOut(500)
+                        while IsScreenFadingOut() do
+                            Wait(0)
+                        end
+
+                        SetEntityVisible(cache.ped, false, false)
+                        NetworkSetEntityInvisibleToNetwork(cache.ped, true)
+                        SetEntityCollision(cache.ped, false, true)
+                        FreezeEntityPosition(cache.ped, true)
+                        previousPos = GetEntityCoords(cache.ped)
+                        SetEntityCoords(cache.ped, extraArg1.x, extraArg1.y, extraArg1.z + 3, true, false, false, false)
+
+                        NetworkSetInSpectatorMode(false, 0)
+                        NetworkSetInSpectatorMode(true, playerPed)
+
+                        DoScreenFadeIn(500)
+                        currentlySpectating = player
+                    end
+                end
             end
 
             lib.notify({
