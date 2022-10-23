@@ -1,6 +1,12 @@
+--#region Initialization
+
 if type(MenuPermission) == 'string' and not IsPrincipalAceAllowed(MenuPermission --[[@as string]], 'command.berkiemenu') then
     lib.addAce(MenuPermission, 'command.berkiemenu')
 end
+
+--#endregion Initialization
+
+--#region Callbacks
 
 lib.callback.register('berkie_menu:server:getOnlinePlayers', function()
     local players = GetPlayers()
@@ -34,7 +40,7 @@ lib.callback.register('berkie_menu:server:playerListAction', function(source, ac
         TriggerClientEvent('chat:addMessage', playerSource, {
             color = { 255, 0, 0 },
             multiline = true,
-            args = {('PM from %s'):format(GetPlayerName(source)), message}
+            args = { ('PM from %s'):format(GetPlayerName(source)), message }
         })
         return true, ('Successfully sent a message to %s'):format(playerName)
     elseif teleportArg then
@@ -75,3 +81,5 @@ lib.callback.register('berkie_menu:server:spawnVehicle', function(_, model, coor
     end
     return NetworkGetNetworkIdFromEntity(veh)
 end)
+
+--#endregion Callbacks
