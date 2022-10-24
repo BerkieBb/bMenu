@@ -5,7 +5,6 @@ LocalPlayerId = PlayerId()
 ServerId = GetPlayerServerId(LocalPlayerId)
 
 MenuIndexes = {}
-Vehicles = {}
 
 --#endregion Variables
 
