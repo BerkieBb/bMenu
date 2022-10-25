@@ -142,6 +142,7 @@ CreateThread(function()
 
             local yOff = 0.0
             local zOff = 0.0
+            local currentHeading = GetEntityHeading(noclipEntity)
 
             if IsInputDisabled(2) and UpdateOnscreenKeyboard() ~= 0 and not IsPauseMenuActive() then
                 if IsControlJustPressed(0, 21) then
@@ -160,11 +161,11 @@ CreateThread(function()
                 end
 
                 if not followCamMode and IsDisabledControlPressed(0, 34) then
-                    SetEntityHeading(noclipEntity, GetEntityHeading(noclipEntity) + 3.0)
+                    currentHeading += 3
                 end
 
                 if not followCamMode and IsDisabledControlPressed(0, 35) then
-                    SetEntityHeading(noclipEntity, GetEntityHeading(noclipEntity) - 3.0)
+                    currentHeading -= 3
                 end
 
                 if IsDisabledControlPressed(0, 44) then
@@ -189,10 +190,9 @@ CreateThread(function()
             moveSpeed = moveSpeed / (1 / GetFrameTime()) * 60
             local newPos = GetOffsetFromEntityInWorldCoords(noclipEntity, 0.0, yOff * (moveSpeed + 0.3), zOff * (moveSpeed + 0.3))
 
-            local heading = GetEntityHeading(noclipEntity)
             SetEntityVelocity(noclipEntity, 0.0, 0.0, 0.0)
             SetEntityRotation(noclipEntity, followCamMode and GetGameplayCamRelativePitch() or 0.0, 0.0, 0.0, 0, false)
-            SetEntityHeading(noclipEntity, followCamMode and GetGameplayCamRelativeHeading() or heading)
+            SetEntityHeading(noclipEntity, followCamMode and GetGameplayCamRelativeHeading() or currentHeading)
             SetEntityCollision(noclipEntity, false, false)
             SetEntityCoordsNoOffset(noclipEntity, newPos.x, newPos.y, newPos.z, true, true, true)
 
