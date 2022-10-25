@@ -36,23 +36,79 @@ lib.registerMenu({
     }
 }, function(_, _, args)
     if args == 'toggle_noclip' then
+        local noclipEntity = cache.vehicle or cache.ped
         noClipEnabled = not noClipEnabled
         if noClipEnabled then
             currentScalefrom = RequestScaleformMovie('INSTRUCTIONAL_BUTTONS')
             while not HasScaleformMovieLoaded(currentScalefrom) do
-                Wait(500)
+                Wait(0)
             end
+
+            BeginScaleformMovieMethod(currentScalefrom, 'CLEAR_ALL')
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+            ScaleformMovieMethodAddParamInt(0)
+            ScaleformMovieMethodAddParamTextureNameString('~INPUT_STRING~')
+            ScaleformMovieMethodAddParamTextureNameString(('Change Speed: %s'):format(movingSpeeds[movingSpeed]))
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+            ScaleformMovieMethodAddParamInt(1)
+            ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_LR~')
+            ScaleformMovieMethodAddParamTextureNameString('Turn Left/Right')
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+            ScaleformMovieMethodAddParamInt(2)
+            ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_UD~')
+            ScaleformMovieMethodAddParamTextureNameString('Move')
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+            ScaleformMovieMethodAddParamInt(3)
+            ScaleformMovieMethodAddParamTextureNameString('~INPUT_MULTIPLAYER_INFO~')
+            ScaleformMovieMethodAddParamTextureNameString('Down')
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+            ScaleformMovieMethodAddParamInt(4)
+            ScaleformMovieMethodAddParamTextureNameString('~INPUT_COVER~')
+            ScaleformMovieMethodAddParamTextureNameString('Up')
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+            ScaleformMovieMethodAddParamInt(5)
+            ScaleformMovieMethodAddParamTextureNameString('~INPUT_VEH_HEADLIGHT~')
+            ScaleformMovieMethodAddParamTextureNameString('Cam Mode')
+            EndScaleformMovieMethod()
+
+            BeginScaleformMovieMethod(currentScalefrom, 'DRAW_INSTRUCTIONAL_BUTTONS')
+            ScaleformMovieMethodAddParamInt(0)
+            EndScaleformMovieMethod()
+
             DrawScaleformMovieFullscreen(currentScalefrom, 255, 255, 255, 0, 0)
+
+            FreezeEntityPosition(noclipEntity, true)
+            SetEntityInvincible(noclipEntity, true)
+
+            SetEntityVisible(noclipEntity, false, false)
+            SetEntityCollision(noclipEntity, false, false)
+            SetLocalPlayerVisibleLocally(true)
+            SetEntityAlpha(noclipEntity, 51, false)
+
+            SetEveryoneIgnorePlayer(LocalPlayerId, true)
+            SetPoliceIgnorePlayer(LocalPlayerId, true)
         else
             currentScalefrom = -1
-            local noclipEntity = cache.vehicle or cache.ped
+            SetScaleformMovieAsNoLongerNeeded()
+
             FreezeEntityPosition(noclipEntity, false)
             SetEntityInvincible(noclipEntity, false)
-            SetEntityCollision(noclipEntity, true, true)
 
             SetEntityVisible(noclipEntity, true, false)
+            SetEntityCollision(noclipEntity, true, true)
             SetLocalPlayerVisibleLocally(true)
-
             ResetEntityAlpha(noclipEntity)
 
             SetEveryoneIgnorePlayer(LocalPlayerId, false)
@@ -71,56 +127,10 @@ CreateThread(function()
     while true do
         if noClipEnabled then
             if not IsHudHidden() and currentScalefrom ~= -1 then
-                BeginScaleformMovieMethod(currentScalefrom, 'CLEAR_ALL')
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-                ScaleformMovieMethodAddParamInt(0)
-                ScaleformMovieMethodAddParamTextureNameString('~INPUT_STRING~')
-                ScaleformMovieMethodAddParamTextureNameString(('Change Speed: %s'):format(movingSpeeds[movingSpeed]))
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-                ScaleformMovieMethodAddParamInt(1)
-                ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_LR~')
-                ScaleformMovieMethodAddParamTextureNameString('Turn Left/Right')
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-                ScaleformMovieMethodAddParamInt(2)
-                ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_UD~')
-                ScaleformMovieMethodAddParamTextureNameString('Move')
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-                ScaleformMovieMethodAddParamInt(3)
-                ScaleformMovieMethodAddParamTextureNameString('~INPUT_MULTIPLAYER_INFO~')
-                ScaleformMovieMethodAddParamTextureNameString('Down')
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-                ScaleformMovieMethodAddParamInt(4)
-                ScaleformMovieMethodAddParamTextureNameString('~INPUT_COVER~')
-                ScaleformMovieMethodAddParamTextureNameString('Up')
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-                ScaleformMovieMethodAddParamInt(5)
-                ScaleformMovieMethodAddParamTextureNameString('~INPUT_VEH_HEADLIGHT~')
-                ScaleformMovieMethodAddParamTextureNameString('Cam Mode')
-                EndScaleformMovieMethod()
-
-                BeginScaleformMovieMethod(currentScalefrom, 'DRAW_INSTRUCTIONAL_BUTTONS')
-                ScaleformMovieMethodAddParamInt(0)
-                EndScaleformMovieMethod()
-
                 DrawScaleformMovieFullscreen(currentScalefrom, 255, 255, 255, 255, 0)
             end
 
             local noclipEntity = cache.vehicle or cache.ped
-
-            FreezeEntityPosition(noclipEntity, true)
-            SetEntityInvincible(noclipEntity, true)
 
             DisableControlAction(0, 20, true)
             DisableControlAction(0, 30, true)
@@ -193,15 +203,9 @@ CreateThread(function()
             SetEntityVelocity(noclipEntity, 0.0, 0.0, 0.0)
             SetEntityRotation(noclipEntity, followCamMode and GetGameplayCamRelativePitch() or 0.0, 0.0, 0.0, 0, false)
             SetEntityHeading(noclipEntity, followCamMode and GetGameplayCamRelativeHeading() or currentHeading)
-            SetEntityCollision(noclipEntity, false, false)
-            SetEntityCoordsNoOffset(noclipEntity, newPos.x, newPos.y, newPos.z, true, true, true)
+            SetEntityCoordsNoOffset(noclipEntity, newPos.x, newPos.y, newPos.z, true, false, false)
 
-            SetEntityVisible(noclipEntity, false, false)
             SetLocalPlayerVisibleLocally(true)
-            SetEntityAlpha(noclipEntity, 51, false)
-
-            SetEveryoneIgnorePlayer(LocalPlayerId, true)
-            SetPoliceIgnorePlayer(LocalPlayerId, true)
         end
         Wait(0)
     end
