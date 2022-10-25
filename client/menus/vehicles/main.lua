@@ -47,9 +47,3 @@ lib.registerMenu({
 end)
 
 --#endregion Menu Registration
-
---[[
-    TODO
-
-        Add IsInVehicle check at every vehicle menu
-]]

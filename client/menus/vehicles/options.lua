@@ -551,9 +551,9 @@ local function getHealthString(health)
 end
 
 local function drawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
-    if not IsHudPreferenceSwitchedOn()
+    if
+    not IsHudPreferenceSwitchedOn()
     or IsHudHidden()
-    --[[or settings.hidehud]]
     or IsPlayerSwitchInProgress()
     or IsScreenFadedOut()
     or IsPauseMenuActive()
@@ -715,6 +715,18 @@ local function getModLocalizedName(modType, mod)
 end
 
 local function setupModMenu()
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
+
+        return
+    end
+
     if not HasThisAdditionalTextLoaded('mod_mnu', 10) then
         ClearAdditionalText(10, true)
         RequestAdditionalText('mod_mnu', 10)
@@ -876,6 +888,18 @@ local function setupModMenu()
 end
 
 local function updateColorsMenu()
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
+
+        return
+    end
+
     local id = 'berkie_menu_vehicle_options_colors'
 
     local classicPrimary, classicSecondary = 1, 1
@@ -989,6 +1013,18 @@ local function updateColorsMenu()
 end
 
 local function setupNeonMenu()
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
+
+        return
+    end
+
     local id = 'berkie_menu_vehicle_options_neon_menu'
     local i = 1
 
@@ -1059,6 +1095,18 @@ local function setupNeonMenu()
 end
 
 local function setupExtrasMenu()
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
+
+        return
+    end
+
     local id = 'berkie_menu_vehicle_options_extras'
     local count = 0
 
@@ -1085,7 +1133,7 @@ local function setCustomLicensePlate()
             type = 'error'
         })
 
-        lib.showMenu('berkie_menu_vehicle_related_options', MenuIndexes['berkie_menu_vehicle_related_options'])
+        lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
 
         return
     end
@@ -1112,6 +1160,18 @@ local function setCustomLicensePlate()
 end
 
 local function setupDoorMenu()
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
+
+        return
+    end
+
     local id = 'berkie_menu_vehicle_options_doors'
     local i = 1
     for i2 = 0, 7 do
@@ -1164,9 +1224,7 @@ lib.registerMenu({
                     type = 'error'
                 })
 
-                lib.hideMenu(false)
-                lib.showMenu('berkie_menu_vehicle_related_options', MenuIndexes['berkie_menu_vehicle_related_options'])
-
+                lib.hideMenu(true)
                 return
             end
         end
@@ -1522,29 +1580,34 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_god_mode_menu'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         local val = scrollIndex == 1 and vehicleGodMode
         if args == 'invincible' then
-            if val == vehicleInvincible then return end
             vehicleInvincible = val
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = 'invincible', values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false}, 1)
         elseif args == 'engine_damage' then
-            if val == vehicleEngineDamage then return end
             vehicleEngineDamage = val
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = 'engine_damage', values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false}, 2)
         elseif args == 'visual_damage' then
-            if val == vehicleVisualDamage then return end
             vehicleVisualDamage = val
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = 'visual_damage', values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false}, 3)
         elseif args == 'strong_wheels' then
-            if val == vehicleStrongWheels then return end
             vehicleStrongWheels = val
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = 'strong_wheels', values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false}, 4)
         elseif args == 'ramp_damage' then
-            if val == vehicleRampDamage then return end
             vehicleRampDamage = val
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = 'ramp_damage', values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false}, 5)
         elseif args == 'auto_repair' then
-            if val == vehicleAutoRepair then return end
             vehicleAutoRepair = val
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = 'auto_repair', values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}, 6)
         end
@@ -1570,6 +1633,17 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_mod_menu'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         local customTires = GetVehicleModVariation(cache.vehicle, 23)
         local vehClass = GetVehicleClass(cache.vehicle)
         local vehModel = GetEntityModel(cache.vehicle)
@@ -1719,6 +1793,17 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_colors'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         local pearlescentColor, wheelColor = GetVehicleExtraColours(cache.vehicle)
         if args == 'dashboard_color' then
             SetVehicleDashboardColor(cache.vehicle, vehicleClassicColors[scrollIndex][1])
@@ -1743,6 +1828,19 @@ lib.registerMenu({
         {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        if args ~= 'berkie_menu_vehicle_options_colors_primary' and args ~= 'berkie_menu_vehicle_options_colors_secondary' then
+            lib.hideMenu(true)
+        end
+        return
+    end
+
     if scrollIndex then return end
 
     lib.showMenu(args)
@@ -1759,6 +1857,17 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_colors_primary'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         local _, colorSecondary = GetVehicleColours(cache.vehicle)
         if args == 'classic' then
             SetVehicleColours(cache.vehicle, vehicleClassicColors[scrollIndex][1], colorSecondary)
@@ -1786,6 +1895,17 @@ lib.registerMenu({
         {label = 'Chrome', description = 'Set your vehicle\'s primary color to chrome', close = false},
     }
 }, function(_, scrollIndex)
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.hideMenu(true)
+        return
+    end
+
     if scrollIndex then return end
 
     local _, colorSecondary = GetVehicleColours(cache.vehicle)
@@ -1804,6 +1924,17 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_colors_secondary'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         local colorPrimary = GetVehicleColours(cache.vehicle)
         if args == 'classic' then
             SetVehicleColours(cache.vehicle, colorPrimary, vehicleClassicColors[scrollIndex][1])
@@ -1831,6 +1962,17 @@ lib.registerMenu({
         {label = 'Chrome', description = 'Set your vehicle\'s secondary color to chrome', close = false},
     }
 }, function(_, scrollIndex)
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.hideMenu(true)
+        return
+    end
+
     if scrollIndex then return end
 
     local colorPrimary = GetVehicleColours(cache.vehicle)
@@ -1849,6 +1991,17 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_neon_menu'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         if string.find(args, 'light') then
             local index = tonumber(string.match(args, '%d+'))
             ---@diagnostic disable-next-line: param-type-mismatch
@@ -1904,6 +2057,19 @@ lib.registerMenu({
     end,
     options = {}
 }, function(_, scrollIndex)
+    local inVeh, reason = IsInVehicle(true)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        if args ~= 'return' then
+            lib.hideMenu(true)
+        end
+        return
+    end
+
     if scrollIndex then return end
 
     lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
@@ -1920,12 +2086,34 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_doors'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
+        local inVeh, reason = IsInVehicle(true)
+        if not inVeh then
+            lib.notify({
+                description = reason,
+                type = 'error'
+            })
+
+            lib.hideMenu(true)
+            return
+        end
+
         if args == 'remove_doors' then
             vehicleRemoveDoors = scrollIndex == 1
         end
     end,
     options = {}
 }, function(_, scrollIndex, args)
+    local inVeh, reason = IsInVehicle(false)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.hideMenu(true)
+        return
+    end
+
     if type(args) == 'number' then
         local isOpen = GetVehicleDoorAngleRatio(cache.vehicle, args) > 0.1
         if isOpen then
@@ -1973,6 +2161,17 @@ lib.registerMenu({
         {label = 'Restore window', description = 'Restore the specified window, press enter to apply it', args = 'restore', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
     }
 }, function(_, scrollIndex, args)
+    local inVeh, reason = IsInVehicle(false)
+    if not inVeh then
+        lib.notify({
+            description = reason,
+            type = 'error'
+        })
+
+        lib.hideMenu(true)
+        return
+    end
+
     if args == 'roll_up' then
         if IsVehicleWindowIntact(cache.vehicle, scrollIndex - 1) then
             RollUpWindow(cache.vehicle, scrollIndex - 1)
@@ -2104,7 +2303,6 @@ CreateThread(function()
 end)
 
 CreateThread(function()
-    Wait(1000)
     while true do
         local cantBeKnockedOff = vehicleGodMode or vehicleUseBikeSeatbelt
         local cantBeDraggedOut = vehicleGodMode
