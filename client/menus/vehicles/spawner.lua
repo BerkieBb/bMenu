@@ -54,7 +54,7 @@ local function spawnVehicleOnPlayer(model)
     local previousVehicle = GetVehiclePedIsIn(cache.ped, true)
 
     if previousVehicle ~= 0 then
-        if IsVehiclePreviouslyOwnedByPlayer(previousVehicle) and ((GetVehicleNumberOfPassengers(previousVehicle) and IsVehicleSeatFree(previousVehicle, -1)) or GetPedInVehicleSeat(previousVehicle, -1) == cache.ped) then
+        if IsVehiclePreviouslyOwnedByPlayer(previousVehicle) and ((GetVehicleNumberOfPassengers(previousVehicle) == 0 and IsVehicleSeatFree(previousVehicle, -1)) or cache.seat == -1) then
             if replacePreviousVehicle then
                 SetVehicleHasBeenOwnedByPlayer(previousVehicle, false)
                 SetEntityAsMissionEntity(previousVehicle, false, true)

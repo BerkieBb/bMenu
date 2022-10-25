@@ -12,7 +12,7 @@ function IsInVehicle(checkDriver)
         return false, 'You need to be in a vehicle to perform this action'
     end
 
-    if checkDriver and GetPedInVehicleSeat(cache.vehicle, -1) ~= cache.ped then
+    if checkDriver and cache.seat ~= -1 then
         return false, 'You need to be the driver of the vehicle to perform this action'
     end
 

@@ -153,7 +153,7 @@ lib.registerMenu({
     elseif DoesEntityExist(NetToVeh(currentVehicle)) then
         if args == 'kick_passengers' then
             local curVeh = NetToVeh(currentVehicle)
-            if IsPedInVehicle(cache.ped, curVeh, false) or (GetVehicleNumberOfPassengers(curVeh) <= 0 and GetPedInVehicleSeat(curVeh, -1) ~= 0) then
+            if IsPedInVehicle(cache.ped, curVeh, false) or (GetVehicleNumberOfPassengers(curVeh) == 0 and not IsVehicleSeatFree(curVeh, -1)) then
                 lib.notify({
                     description = 'No one to kick out of the vehicle',
                     type = 'inform'

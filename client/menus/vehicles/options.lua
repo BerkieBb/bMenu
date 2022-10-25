@@ -1370,17 +1370,12 @@ lib.registerMenu({
         local vehicleModel = GetEntityModel(cache.vehicle)
         local maxSeats = GetVehicleModelNumberOfSeats(vehicleModel)
         local foundSeat = false
-        local startingSeat = -1
-
-        for i = -1, maxSeats - 2 do
-            if GetPedInVehicleSeat(cache.vehicle, i) == cache.ped then
-                startingSeat = i
-                break
-            end
-        end
+        local startingSeat = cache.seat
 
         if startingSeat == maxSeats - 2 then
             startingSeat = -1
+        else
+            startingSeat += 1
         end
 
         for i = startingSeat, maxSeats - 2 do
@@ -1392,6 +1387,7 @@ lib.registerMenu({
         end
 
         if foundSeat then return end
+
         lib.notify({
             description = 'No seats to cycle through',
             type = 'error'
