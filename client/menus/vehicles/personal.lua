@@ -19,7 +19,7 @@ local vehicleDoors = {
 --#region Functions
 
 local function pressKeyFob()
-    if LocalPlayerId == 0 or currentVehicle == 0 or IsPlayerDead(LocalPlayerId) or IsPedInAnyVehicle(cache.ped, false) then return end
+    if not cache.playerId or cache.playerId == 0 or currentVehicle == 0 or IsPlayerDead(cache.playerId) or IsPedInAnyVehicle(cache.ped, false) then return end
     local keyFobHash = `p_car_keys_01`
     lib.requestModel(keyFobHash)
 
@@ -289,7 +289,7 @@ lib.registerMenu({
     elseif args == 'open_all_doors' then
         pressKeyFob()
         for i = 0, 7 do
-            SetVehicleDoorOpen(curVeh, i, false, fale)
+            SetVehicleDoorOpen(curVeh, i, false, false)
         end
         if GetEntityBoneIndexByName(curVeh, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(curVeh, 'door_hatch_r') ~= -1 then
             OpenBombBayDoors(curVeh)

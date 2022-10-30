@@ -142,6 +142,7 @@ function CreatePlayerMenu()
                             Wait(0)
                         end
 
+                        RequestCollisionAtCoord(extraArg1.x, extraArg1.y, extraArg1.z + 3)
                         SetEntityVisible(cache.ped, false, false)
                         NetworkSetEntityInvisibleToNetwork(cache.ped, true)
                         SetEntityCollision(cache.ped, false, true)
@@ -158,6 +159,8 @@ function CreatePlayerMenu()
                         while IsScreenFadingOut() do
                             Wait(0)
                         end
+
+                        RequestCollisionAtCoord(previousPos.x, previousPos.y, previousPos.z)
 
                         NetworkSetInSpectatorMode(false, 0)
 
@@ -178,6 +181,8 @@ function CreatePlayerMenu()
                         while IsScreenFadingOut() do
                             Wait(0)
                         end
+
+                        RequestCollisionAtCoord(extraArg1.x, extraArg1.y, extraArg1.z + 3)
 
                         SetEntityVisible(cache.ped, false, false)
                         NetworkSetEntityInvisibleToNetwork(cache.ped, true)

@@ -1,3 +1,7 @@
+--#region Variables
+
+--#endregion Variables
+
 --#region Menu Registration
 
 lib.registerMenu({
@@ -11,8 +15,10 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_player_weapon_options'] = selected
     end,
     options = {
-        {label = 'Nothing yet', close = false}
+        {label = 'Get All Weapons', args = 'get_all_weapons', close = false}
     }
-})
+}, function(_, _, args)
+
+end)
 
 --#endregion Menu Registration

@@ -1,9 +1,6 @@
 --#region Variables
 
 MenuOpen = false
-LocalPlayerId = PlayerId()
-ServerId = GetPlayerServerId(LocalPlayerId)
-
 MenuIndexes = {}
 
 --#endregion Variables

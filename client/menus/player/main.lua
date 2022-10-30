@@ -97,8 +97,8 @@ lib.registerMenu({
             SetLocalPlayerVisibleLocally(true)
             SetEntityAlpha(noclipEntity, 51, false)
 
-            SetEveryoneIgnorePlayer(LocalPlayerId, true)
-            SetPoliceIgnorePlayer(LocalPlayerId, true)
+            SetEveryoneIgnorePlayer(cache.playerId, true)
+            SetPoliceIgnorePlayer(cache.playerId, true)
         else
             currentScalefrom = -1
             SetScaleformMovieAsNoLongerNeeded()
@@ -111,8 +111,8 @@ lib.registerMenu({
             SetLocalPlayerVisibleLocally(true)
             ResetEntityAlpha(noclipEntity)
 
-            SetEveryoneIgnorePlayer(LocalPlayerId, false)
-            SetPoliceIgnorePlayer(LocalPlayerId, false)
+            SetEveryoneIgnorePlayer(cache.playerId, false)
+            SetPoliceIgnorePlayer(cache.playerId, false)
         end
     else
         lib.showMenu(args, MenuIndexes[args])

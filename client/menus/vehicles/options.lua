@@ -1552,7 +1552,7 @@ lib.registerMenu({
     elseif args == 'delete_vehicle' then
         local alert = lib.alertDialog({
             header = 'Sure?',
-            content = 'Are you sure you want to delete your vehicle?\nThis action cannot be undone.',
+            content = 'Are you sure you want to delete your vehicle? \n This action cannot be undone.',
             centered = true,
             cancel = true
         })
@@ -2129,7 +2129,7 @@ lib.registerMenu({
         end
     elseif args == 'open_all_doors' then
         for i = 0, 7 do
-            SetVehicleDoorOpen(cache.vehicle, i, false, fale)
+            SetVehicleDoorOpen(cache.vehicle, i, false, false)
         end
         if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
             OpenBombBayDoors(cache.vehicle)
@@ -2305,7 +2305,7 @@ end)
 CreateThread(function()
     while true do
         local cantBeKnockedOff = vehicleGodMode or vehicleUseBikeSeatbelt
-        local cantBeDraggedOut = vehicleGodMode
+        local cantBeDraggedOut = vehicleGodMode or IgnorePlayer or StayInVehicle
         local cantBeShotInVehicle = vehicleGodMode
 
         SetPedCanBeDraggedOut(cache.ped, not cantBeDraggedOut)
@@ -2332,3 +2332,9 @@ CreateThread(function()
 end)
 
 --#endregion Threads
+
+--[[
+    TODO
+
+    optimize loops by converting them to using lib.onCache
+]]
