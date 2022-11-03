@@ -31,105 +31,105 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_player_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'godmode' then
+        if args[1] == 'godmode' then
             godmode = scrollIndex == 1
             SetEntityInvincible(cache.ped, godmode)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Godmode', description = 'Makes you invincible', args = 'godmode', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 1)
-        elseif args == 'invisible' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 1)
+        elseif args[1] == 'invisible' then
             invisible = scrollIndex == 1
             SetEntityVisible(cache.ped, not invisible, false)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = 'invisible', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
-        elseif args == 'unlimited_stamina' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
+        elseif args[1] == 'unlimited_stamina' then
             unlimitedStamina = scrollIndex == 1
             StatSetInt(`MP0_STAMINA`, unlimitedStamina and 100 or 0, true)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = 'stamina', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
-        elseif args == 'fast_run' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'stamina'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args[1] == 'fast_run' then
             fastRun = scrollIndex == 1
             SetRunSprintMultiplierForPlayer(cache.playerId, fastRun and 1.49 or 1)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = 'fast_run', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 4)
-        elseif args == 'fast_swim' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args[1] == 'fast_swim' then
             fastSwim = scrollIndex == 1
             SetSwimMultiplierForPlayer(cache.playerId, fastSwim and 1.49 or 1)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = 'fast_swim', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 5)
-        elseif args == 'super_jump' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 5)
+        elseif args[1] == 'super_jump' then
             superJump = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = 'super_jump', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 6)
-        elseif args == 'no_ragdoll' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 6)
+        elseif args[1] == 'no_ragdoll' then
             noRagdoll = scrollIndex == 1
             SetPedCanRagdoll(cache.ped, not noRagdoll)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = 'no_ragdoll', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 7)
-        elseif args == 'never_wanted' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 7)
+        elseif args[1] == 'never_wanted' then
             neverWanted = scrollIndex == 1
             SetMaxWantedLevel(neverWanted and 0 or 5)
-        elseif args == 'set_wanted_level' then
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Wanted Level', args = 'set_wanted_level', values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = scrollIndex, close = false}, 9)
+        elseif args[1] == 'set_wanted_level' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Wanted Level', args = {'set_wanted_level'}, values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = scrollIndex, close = false}, 9)
             if neverWanted then return end
             SetPlayerWantedLevel(cache.playerId, scrollIndex - 1, false)
             SetPlayerWantedLevelNow(cache.playerId, false)
-        elseif args == 'ignore_player' then
+        elseif args[1] == 'ignore_player' then
             IgnorePlayer = scrollIndex == 1
             SetEveryoneIgnorePlayer(cache.playerId, ignorePlayer)
             SetPoliceIgnorePlayer(cache.playerId, ignorePlayer)
             SetPlayerCanBeHassledByGangs(cache.playerId, not ignorePlayer)
-        elseif args == 'stay_in_vehicle' then
+        elseif args[1] == 'stay_in_vehicle' then
             StayInVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = 'stay_in_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 11)
-        elseif args == 'set_armor_type' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = {'stay_in_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 11)
+        elseif args[1] == 'set_armor_type' then
             SetPedArmour(cache.ped, (scrollIndex - 1) * 20)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Armor Type', description = 'Set the armor level/type for your player', args = 'set_armor_type', values = {'No Armor', GetLabelText('WT_BA_0'), GetLabelText('WT_BA_1'), GetLabelText('WT_BA_2'), GetLabelText('WT_BA_3'), GetLabelText('WT_BA_4')}, defaultIndex = 1, close = false}, 13)
-        elseif args == 'freeze' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Armor Type', description = 'Set the armor level/type for your player', args = {'set_armor_type'}, values = {'No Armor', GetLabelText('WT_BA_0'), GetLabelText('WT_BA_1'), GetLabelText('WT_BA_2'), GetLabelText('WT_BA_3'), GetLabelText('WT_BA_4')}, defaultIndex = 1, close = false}, 13)
+        elseif args[1] == 'freeze' then
             freezePlayer = scrollIndex == 1
             FreezeEntityPosition(cache.ped, freezePlayer)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = 'freeze', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
         end
     end,
     options = {
-        {label = 'Godmode', description = 'Makes you invincible', args = 'godmode', values = {'Yes', 'No'}, defaultIndex = godmode and 1 or 2, close = false},
-        {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = 'invisible', values = {'Yes', 'No'}, defaultIndex = invisible and 1 or 2, close = false},
-        {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = 'unlimited_stamina', values = {'Yes', 'No'}, defaultIndex = unlimitedStamina and 1 or 2, close = false},
-        {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = 'fast_run', values = {'Yes', 'No'}, defaultIndex = fastRun and 1 or 2, close = false},
-        {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = 'fast_swim', values = {'Yes', 'No'}, defaultIndex = fastSwim and 1 or 2, close = false},
-        {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = 'super_jump', values = {'Yes', 'No'}, defaultIndex = superJump and 1 or 2, close = false},
-        {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = 'no_ragdoll', values = {'Yes', 'No'}, defaultIndex = noRagdoll and 1 or 2, close = false},
-        {label = 'Never Wanted', description = 'Disables all wanted levels', args = 'never_wanted', values = {'Yes', 'No'}, defaultIndex = neverWanted and 1 or 2, close = false},
-        {label = 'Set Wanted Level', args = 'set_wanted_level', values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = 1, close = false},
-        {label = 'Everyone Ignore Player', description = 'Introverts love this', args = 'ignore_player', values = {'Yes', 'No'}, defaultIndex = IgnorePlayer and 1 or 2, close = false},
-        {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = 'stay_in_vehicle', values = {'Yes', 'No'}, defaultIndex = StayInVehicle and 1 or 2, close = false},
-        {label = 'Heal Player', description = 'Give the player max health', args = 'heal_player', close = false},
-        {label = 'Set Armor Type', description = 'Set the armor level/type for your player', args = 'set_armor_type', values = {'No Armor', GetLabelText('WT_BA_0'), GetLabelText('WT_BA_1'), GetLabelText('WT_BA_2'), GetLabelText('WT_BA_3'), GetLabelText('WT_BA_4')}, defaultIndex = 1, close = false},
-        {label = 'Clean Player Clothes', description = 'Clean your player clothes', args = 'clean_player_clothes', close = false},
-        {label = 'Dry Player Clothes', description = 'Dry your player clothes', args = 'dry_player_clothes', close = false},
-        {label = 'Wet Player Clothes', description = 'Wet your player clothes', args = 'wet_player_clothes', close = false},
-        {label = 'Commit Suicide', description = 'Kill yourself by taking the pill. Or by using a pistol if you have one', args = 'suicide', close = false},
-        {label = 'Auto Pilot', description = 'Vehicle auto pilot options', args = 'berkie_menu_player_autopilot_options'},
-        {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = 'freeze', values = {'Yes', 'No'}, defaultIndex = freezePlayer and 1 or 2, close = false}
+        {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, values = {'Yes', 'No'}, defaultIndex = godmode and 1 or 2, close = false},
+        {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, values = {'Yes', 'No'}, defaultIndex = invisible and 1 or 2, close = false},
+        {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'unlimited_stamina'}, values = {'Yes', 'No'}, defaultIndex = unlimitedStamina and 1 or 2, close = false},
+        {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, values = {'Yes', 'No'}, defaultIndex = fastRun and 1 or 2, close = false},
+        {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, values = {'Yes', 'No'}, defaultIndex = fastSwim and 1 or 2, close = false},
+        {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, values = {'Yes', 'No'}, defaultIndex = superJump and 1 or 2, close = false},
+        {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, values = {'Yes', 'No'}, defaultIndex = noRagdoll and 1 or 2, close = false},
+        {label = 'Never Wanted', description = 'Disables all wanted levels', args = {'never_wanted'}, values = {'Yes', 'No'}, defaultIndex = neverWanted and 1 or 2, close = false},
+        {label = 'Set Wanted Level', args = {'set_wanted_level'}, values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = 1, close = false},
+        {label = 'Everyone Ignore Player', description = 'Introverts love this', args = {'ignore_player'}, values = {'Yes', 'No'}, defaultIndex = IgnorePlayer and 1 or 2, close = false},
+        {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = {'stay_in_vehicle'}, values = {'Yes', 'No'}, defaultIndex = StayInVehicle and 1 or 2, close = false},
+        {label = 'Heal Player', description = 'Give the player max health', args = {'heal_player'}, close = false},
+        {label = 'Set Armor Type', description = 'Set the armor level/type for your player', args = {'set_armor_type'}, values = {'No Armor', GetLabelText('WT_BA_0'), GetLabelText('WT_BA_1'), GetLabelText('WT_BA_2'), GetLabelText('WT_BA_3'), GetLabelText('WT_BA_4')}, defaultIndex = 1, close = false},
+        {label = 'Clean Player Clothes', description = 'Clean your player clothes', args = {'clean_player_clothes'}, close = false},
+        {label = 'Dry Player Clothes', description = 'Dry your player clothes', args = {'dry_player_clothes'}, close = false},
+        {label = 'Wet Player Clothes', description = 'Wet your player clothes', args = {'wet_player_clothes'}, close = false},
+        {label = 'Commit Suicide', description = 'Kill yourself by taking the pill. Or by using a pistol if you have one', args = {'suicide'}, close = false},
+        {label = 'Auto Pilot', description = 'Vehicle auto pilot options', args = {'berkie_menu_player_autopilot_options'}},
+        {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, values = {'Yes', 'No'}, defaultIndex = freezePlayer and 1 or 2, close = false}
     }
 }, function(_, _, args)
-    if args == 'heal_player' then
+    if args[1] == 'heal_player' then
         SetEntityHealth(cache.ped, GetEntityMaxHealth(cache.ped))
         lib.notify({
             description = 'You have been healed',
             type = 'success'
         })
-    elseif args == 'clean_player_clothes' then
+    elseif args[1] == 'clean_player_clothes' then
         ClearPedBloodDamage(cache.ped)
         lib.notify({
             description = 'Your clothes have been cleaned',
             type = 'success'
         })
-    elseif args == 'dry_player_clothes' then
+    elseif args[1] == 'dry_player_clothes' then
         SetPedWetnessHeight(cache.ped, 0)
         lib.notify({
             description = 'Your clothes are now dry',
             type = 'success'
         })
-    elseif args == 'wet_player_clothes' then
+    elseif args[1] == 'wet_player_clothes' then
         SetPedWetnessHeight(cache.ped, 2)
         lib.notify({
             description = 'Your clothes are now wet',
             type = 'success'
         })
-    elseif args == 'suicide' then
+    elseif args[1] == 'suicide' then
         local alert = lib.alertDialog({
             header = 'Sure?',
             content = 'Are you sure you want to commit suicide? \n This action cannot be undone.',
@@ -199,8 +199,8 @@ lib.registerMenu({
             Wait(200)
             lib.showMenu('berkie_menu_player_options', MenuIndexes['berkie_menu_player_options'])
         end
-    elseif args == 'berkie_menu_player_autopilot_options' then
-        lib.showMenu(args, MenuIndexes[args])
+    elseif args[1] == 'berkie_menu_player_autopilot_options' then
+        lib.showMenu(args[1], MenuIndexes[args[1]])
     end
 end)
 
@@ -215,7 +215,7 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_player_autopilot_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'driving_style' then
+        if args[1] == 'driving_style' then
             drivingStyle = scrollIndex
             if scrollIndex == 1 then
                 SetDriveTaskDrivingStyle(cache.ped, 443)
@@ -237,20 +237,20 @@ lib.registerMenu({
                 actualDrivingStyle = tonumber(customDrivingStyle) --[[@as integer]]
                 SetDriveTaskDrivingStyle(cache.ped, actualDrivingStyle)
             end
-            lib.setMenuOptions('berkie_menu_player_autopilot_options', {label = 'Driving Style', description = 'Set the driving style that is used for the Drive to Waypoint and Drive Around Randomly functions', args = 'driving_style', values = {'Normal', 'Rushed', 'Avoid highways', 'Drive in reverse', 'Custom'}, defaultIndex = scrollIndex, close = false}, 1)
+            lib.setMenuOptions('berkie_menu_player_autopilot_options', {label = 'Driving Style', description = 'Set the driving style that is used for the Drive to Waypoint and Drive Around Randomly functions', args = {'driving_style'}, values = {'Normal', 'Rushed', 'Avoid highways', 'Drive in reverse', 'Custom'}, defaultIndex = scrollIndex, close = false}, 1)
         end
     end,
     options = {
-        {label = 'Driving Style', description = 'Set the driving style that is used for the Drive to Waypoint and Drive Around Randomly functions', args = 'driving_style', values = {'Normal', 'Rushed', 'Avoid highways', 'Drive in reverse', 'Custom'}, defaultIndex = drivingStyle, close = false},
-        {label = 'Custom Driving Style', description = 'Select a custom driving style. Make sure to also enable it by selecting the \'Custom\' driving style in the driving styles list', args = 'berkie_menu_player_autopilot_options_custom_driving_style'},
-        {label = 'Drive To Waypoint', description = 'Make your player ped drive your vehicle to your waypoint', args = 'to_waypoint', close = false},
-        {label = 'Drive Around Randomly', description = 'Make your player ped drive your vehicle randomly around the map', args = 'around_randomly', close = false},
-        {label = 'Stop Driving', description = 'The player ped will find a suitable place to stop the vehicle. The task will be stopped once the vehicle has reached the suitable stop location', args = 'stop_driving', close = false},
-        {label = 'Force Stop Driving', description = 'This will stop the driving task immediately without finding a suitable place to stop', args = 'force_stop_driving', close = false}
+        {label = 'Driving Style', description = 'Set the driving style that is used for the Drive to Waypoint and Drive Around Randomly functions', args = {'driving_style'}, values = {'Normal', 'Rushed', 'Avoid highways', 'Drive in reverse', 'Custom'}, defaultIndex = drivingStyle, close = false},
+        {label = 'Custom Driving Style', description = 'Select a custom driving style. Make sure to also enable it by selecting the \'Custom\' driving style in the driving styles list', args = {'berkie_menu_player_autopilot_options_custom_driving_style'}},
+        {label = 'Drive To Waypoint', description = 'Make your player ped drive your vehicle to your waypoint', args = {'to_waypoint'}, close = false},
+        {label = 'Drive Around Randomly', description = 'Make your player ped drive your vehicle randomly around the map', args = {'around_randomly'}, close = false},
+        {label = 'Stop Driving', description = 'The player ped will find a suitable place to stop the vehicle. The task will be stopped once the vehicle has reached the suitable stop location', args = {'stop_driving'}, close = false},
+        {label = 'Force Stop Driving', description = 'This will stop the driving task immediately without finding a suitable place to stop', args = {'force_stop_driving'}, close = false}
     }
 }, function(_, _, args)
-    if args == 'berkie_menu_player_autopilot_options_custom_driving_style' then
-        lib.showMenu(args, MenuIndexes[args])
+    if args[1] == 'berkie_menu_player_autopilot_options_custom_driving_style' then
+        lib.showMenu(args[1], MenuIndexes[args[1]])
     else
         local inVeh, reason = IsInVehicle(true)
         if not inVeh then
@@ -261,7 +261,7 @@ lib.registerMenu({
             return
         end
 
-        if args == 'to_waypoint' then
+        if args[1] == 'to_waypoint' then
             if not IsWaypointActive() then
                 lib.notify({
                     description = 'You need a waypoint set to drive to',
@@ -290,7 +290,7 @@ lib.registerMenu({
                 description = 'Your player ped is now driving the vehicle for you. You can cancel any time by pressing the Stop Driving button. The vehicle will stop when it has reached the destination',
                 type = 'inform'
             })
-        elseif args == 'around_randomly' then
+        elseif args[1] == 'around_randomly' then
             ClearPedTasks(cache.ped)
 
             SetDriverAbility(cache.ped, 1.0)
@@ -302,7 +302,7 @@ lib.registerMenu({
                 description = 'Your player ped is now driving the vehicle for you. You can cancel any time by pressing the Stop Driving button',
                 type = 'inform'
             })
-        elseif args == 'stop_driving' then
+        elseif args[1] == 'stop_driving' then
             local coords = GetEntityCoords(cache.ped)
             local success, closestNode = GetNthClosestVehicleNode(coords.x, coords.y, coords.z, 3, 0, 0, 0)
 
@@ -326,7 +326,7 @@ lib.registerMenu({
                 description = 'Your vehicle is now stopped',
                 type = 'inform'
             })
-        elseif args == 'force_stop_driving' then
+        elseif args[1] == 'force_stop_driving' then
             ClearPedTasks(cache.ped)
         end
     end
@@ -343,7 +343,7 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_player_autopilot_options_custom_driving_style'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        customDrivingStyleList[args] = scrollIndex == 1
+        customDrivingStyleList[args[1]] = scrollIndex == 1
         if drivingStyle == 5 then
             customDrivingStyle = ''
             for i = 0, 30 do
@@ -354,37 +354,37 @@ lib.registerMenu({
         end
     end,
     options = {
-        {label = 'Stop Before Vehicles', args = 0, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Stop Before Peds', args = 1, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Avoid Vehicles', args = 2, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Avoid Empty Vehicles', args = 3, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Avoid Peds', args = 4, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Avoid Objects', args = 5, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 6, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Stop At Traffic Lights', args = 7, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Use Blinkers', args = 8, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Allow Going Wrong Way', args = 9, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Go In Reverse Gear', args = 10, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 11, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 12, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 13, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 14, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 15, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 16, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 17, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Use Shortest Path', args = 18, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 19, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 20, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 21, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Ignore Roads', args = 22, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 23, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Ignore All Pathing', args = 24, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 25, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 26, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 27, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 28, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Avoid Highways (If Possible)', args = 29, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
-        {label = 'Unknown Flag', args = 30, values = {'Yes', 'No'}, defaultIndex = 2, close = false}
+        {label = 'Stop Before Vehicles', args = {0}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Stop Before Peds', args = {1}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Avoid Vehicles', args = {2}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Avoid Empty Vehicles', args = {3}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Avoid Peds', args = {4}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Avoid Objects', args = {5}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {6}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Stop At Traffic Lights', args = {7}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Use Blinkers', args = {8}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Allow Going Wrong Way', args = {9}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Go In Reverse Gear', args = {10}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {11}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {12}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {13}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {14}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {15}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {16}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {17}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Use Shortest Path', args = {18}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {19}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {20}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {21}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Ignore Roads', args = {22}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {23}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Ignore All Pathing', args = {24}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {25}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {26}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {27}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {28}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Avoid Highways (If Possible)', args = {29}, values = {'Yes', 'No'}, defaultIndex = 2, close = false},
+        {label = 'Unknown Flag', args = {30}, values = {'Yes', 'No'}, defaultIndex = 2, close = false}
     }
 })
 

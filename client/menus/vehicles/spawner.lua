@@ -153,7 +153,7 @@ local function createVehiclesForSpawner(vehs, id)
         local label = GetLabelText(displayName)
         label = label ~= 'NULL' and label or displayName
         label = label ~= 'CARNOTFOUND' and label or data.modelName
-        lib.setMenuOptions(id, {label = ToProperCase(label:lower()), args = data.model, close = false}, i)
+        lib.setMenuOptions(id, {label = ToProperCase(label:lower()), args = {data.model}, close = false}, i)
     end
 end
 
@@ -189,10 +189,10 @@ function CreateVehicleSpawnerMenu()
             end,
             options = {}
         }, function(_, _, args)
-            spawnVehicleOnPlayer(args)
+            spawnVehicleOnPlayer(args[1])
         end)
 
-        lib.setMenuOptions(id, {label = v, args = formattedId}, i)
+        lib.setMenuOptions(id, {label = v, args = {formattedId}}, i)
 
         createVehiclesForSpawner(vehs, formattedId)
         i += 1
@@ -216,23 +216,23 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_spawner'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'inside_vehicle' then
+        if args[1] == 'inside_vehicle' then
             spawnInVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'inside_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
-        elseif args == 'replace_vehicle' then
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
+        elseif args[1] == 'replace_vehicle' then
             replacePreviousVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'replace_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
         end
     end,
     options = {
-        {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = 'spawn_by_model'},
-        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = 'inside_vehicle', values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
-        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = 'replace_vehicle', values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
+        {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = {'spawn_by_model'}},
+        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
+        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
 
-    if args == 'spawn_by_model' then
+    if args[1] == 'spawn_by_model' then
         local vehicle = lib.inputDialog('Spawn Vehicle', {'Vehicle Model Name'})
         if vehicle and table.type(vehicle) ~= 'empty' then
             local model = joaat(vehicle[1])
@@ -246,10 +246,10 @@ lib.registerMenu({
             end
         end
         Wait(500)
-        args = 'berkie_menu_vehicle_spawner'
+        args = {'berkie_menu_vehicle_spawner'}
     end
 
-    lib.showMenu(args, MenuIndexes[args])
+    lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 --#endregion Menu Registration

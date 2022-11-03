@@ -30,12 +30,12 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_player_related_options'] = selected
     end,
     options = {
-        {label = 'Player Options', description = 'Common player options can be accessed here', args = 'berkie_menu_player_options'},
-        {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = 'berkie_menu_player_weapon_options'},
-        {label = 'Toggle Noclip', description = 'Toggle NoClip on or off', args = 'toggle_noclip', close = false}
+        {label = 'Player Options', description = 'Common player options can be accessed here', args = {'berkie_menu_player_options'}},
+        {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = {'berkie_menu_player_weapon_options'}},
+        {label = 'Toggle Noclip', description = 'Toggle NoClip on or off', args = {'toggle_noclip'}, close = false}
     }
 }, function(_, _, args)
-    if args == 'toggle_noclip' then
+    if args[1] == 'toggle_noclip' then
         local noclipEntity = cache.vehicle or cache.ped
         noClipEnabled = not noClipEnabled
         if noClipEnabled then
@@ -115,7 +115,7 @@ lib.registerMenu({
             SetPoliceIgnorePlayer(cache.playerId, false)
         end
     else
-        lib.showMenu(args, MenuIndexes[args])
+        lib.showMenu(args[1], MenuIndexes[args[1]])
     end
 end)
 

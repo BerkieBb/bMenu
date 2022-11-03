@@ -23,7 +23,7 @@ lib.registerMenu({
     end,
     options = {}
 }, function(_, _, args)
-    lib.showMenu(args, MenuIndexes[args])
+    lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 --#endregion Menu Registration
@@ -56,32 +56,32 @@ function CreatePlayerMenu()
                 MenuIndexes[formattedId] = selected
             end,
             options = {
-                {label = 'Send Message', icon = 'comment-dots', description = 'Send a message to this player, note that staff can see these', args = messageArg, close = true},
-                {label = 'Teleport To Player', icon = 'hat-wizard', description = 'Teleport to the player', args = teleportArg, close = false},
-                {label = 'Teleport Into Vehicle', icon = 'car-side', description = 'Teleport into the vehicle of the player', args = teleportVehicleArg, close = false},
-                {label = 'Summon Player', icon = 'hat-wizard', description = 'Summon the player to your location', args = summonArg, close = false},
-                {label = 'Spectate Player', icon = 'glasses', description = 'Spectate the player', args = spectateArg, close = false},
-                {label = 'Set Waypoint', icon = 'location-dot', description = 'Set your waypoint on the player', args = waypointArg, close = false},
-                {label = 'Toggle Blip', icon = 'magnifying-glass-location', description = 'Toggle a blip on the map following the player', args = blipArg, close = false},
-                {label = 'Kill Player', icon = 'bullseye', description = 'Kill the player, just because you can', args = killArg, close = false}
+                {label = 'Send Message', icon = 'comment-dots', description = 'Send a message to this player, note that staff can see these', args = {messageArg}, close = true},
+                {label = 'Teleport To Player', icon = 'hat-wizard', description = 'Teleport to the player', args = {teleportArg}, close = false},
+                {label = 'Teleport Into Vehicle', icon = 'car-side', description = 'Teleport into the vehicle of the player', args = {teleportVehicleArg}, close = false},
+                {label = 'Summon Player', icon = 'hat-wizard', description = 'Summon the player to your location', args = {summonArg}, close = false},
+                {label = 'Spectate Player', icon = 'glasses', description = 'Spectate the player', args = {spectateArg}, close = false},
+                {label = 'Set Waypoint', icon = 'location-dot', description = 'Set your waypoint on the player', args = {waypointArg}, close = false},
+                {label = 'Toggle Blip', icon = 'magnifying-glass-location', description = 'Toggle a blip on the map following the player', args = {blipArg}, close = false},
+                {label = 'Kill Player', icon = 'bullseye', description = 'Kill the player, just because you can', args = {killArg}, close = false}
             }
         }, function(_, _, args)
-            local canActOnSelf = ArrayIncludes(args, itemsOnYourself)
+            local canActOnSelf = ArrayIncludes(args[1], itemsOnYourself)
             if data.source == ServerId and not canActOnSelf then
                 lib.notify({
                     description = 'You can\'t do this on yourself',
                     type = 'error'
                 })
-                if args == messageArg then
+                if args[1] == messageArg then
                     lib.showMenu(formattedId, MenuIndexes[formattedId])
                 end
 
                 return
             end
 
-            local message = args == messageArg and lib.hideMenu(true) and lib.inputDialog(('Send a message to %s'):format(data.name), {'Message'})
+            local message = args[1] == messageArg and lib.hideMenu(true) and lib.inputDialog(('Send a message to %s'):format(data.name), {'Message'})
 
-            if args == messageArg and (not message or not message[1] or message[1] == '') then
+            if args[1] == messageArg and (not message or not message[1] or message[1] == '') then
                 Wait(500)
                 lib.showMenu(formattedId, MenuIndexes[formattedId])
                 return
@@ -90,7 +90,7 @@ function CreatePlayerMenu()
             ---@diagnostic disable-next-line: need-check-nil
             local success, reason, extraArg1 = lib.callback.await('berkie_menu:server:playerListAction', false, args, data.source, canActOnSelf, message and message[1] or nil)
 
-            if args == teleportVehicleArg then
+            if args[1] == teleportVehicleArg then
                 local veh = NetToVeh(extraArg1)
                 if not AreAnyVehicleSeatsFree(veh) then
                     success = false
@@ -111,9 +111,9 @@ function CreatePlayerMenu()
                     success = false
                     reason = 'There are no seats available'
                 end
-            elseif args == waypointArg then
+            elseif args[1] == waypointArg then
                 SetNewWaypoint(extraArg1.x, extraArg1.y)
-            elseif args == blipArg then
+            elseif args[1] == blipArg then
                 if playerBlips[data.source] then
                     if DoesBlipExist(playerBlips[data.source]) then
                         RemoveBlip(playerBlips[data.source])
@@ -129,9 +129,9 @@ function CreatePlayerMenu()
                     ShowHeadingIndicatorOnBlip(playerBlips[data.source], true)
                     ShowHeightOnBlip(playerBlips[data.source], true)
                 end
-            elseif args == killArg then
+            elseif args[1] == killArg then
                 SetEntityHealth(NetToEnt(extraArg1), 0)
-            elseif args == spectateArg then
+            elseif args[1] == spectateArg then
                 local player = GetPlayerFromServerId(data.source)
                 local playerPed = GetPlayerPed(player)
 
@@ -211,7 +211,7 @@ function CreatePlayerMenu()
             lib.showMenu(formattedId, MenuIndexes[formattedId])
         end)
 
-        lib.setMenuOptions(id, {label = ('[%s] %s'):format(data.source, data.name), args = formattedId}, i)
+        lib.setMenuOptions(id, {label = ('[%s] %s'):format(data.source, data.name), args = {formattedId}}, i)
     end
 end
 

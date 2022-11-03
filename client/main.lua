@@ -58,18 +58,18 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_main'] = selected
     end,
     options = {
-        {label = 'Online Players', icon = 'user-group', args = 'berkie_menu_online_players'},
-        {label = 'Player Related Options', icon = 'user-gear', args = 'berkie_menu_player_related_options'},
-        {label = 'Vehicle Related Options', icon = 'car', args = 'berkie_menu_vehicle_related_options'},
-        {label = 'Recording Options', icon = 'video', args = 'berkie_menu_recording_options'},
-        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = 'berkie_menu_miscellaneous_options'}
+        {label = 'Online Players', icon = 'user-group', args = {'berkie_menu_online_players'}},
+        {label = 'Player Related Options', icon = 'user-gear', args = {'berkie_menu_player_related_options'}},
+        {label = 'Vehicle Related Options', icon = 'car', args = {'berkie_menu_vehicle_related_options'}},
+        {label = 'Recording Options', icon = 'video', args = {'berkie_menu_recording_options'}},
+        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'berkie_menu_miscellaneous_options'}}
     }
 }, function(_, _, args)
-    if args == 'berkie_menu_online_players' then
+    if args[1] == 'berkie_menu_online_players' then
         CreatePlayerMenu()
     end
 
-    lib.showMenu(args, MenuIndexes[args])
+    lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 --#endregion Menu Registration

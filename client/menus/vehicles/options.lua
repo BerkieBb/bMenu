@@ -756,7 +756,7 @@ local function setupModMenu()
             args[i2 + 1] = {actualIndex, k}
         end
 
-        vehicleModsMenuData[k] = {i, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = args, values = values, defaultIndex = GetVehicleMod(cache.vehicle, k) + 2, close = false}}
+        vehicleModsMenuData[k] = {i, {label = localizedName, description = ('Choose a %s upgrade, it will apply automatically'):format(localizedName), args = {args}, values = values, defaultIndex = GetVehicleMod(cache.vehicle, k) + 2, close = false}}
 
         lib.setMenuOptions(id, vehicleModsMenuData[k][2], i)
         i += 1
@@ -774,24 +774,24 @@ local function setupModMenu()
         end
 
         local wheelTypeIndex = GetVehicleWheelType(cache.vehicle) + 1
-        vehicleModsMenuData['wheel_type'] = {i, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = 'wheel_type', values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}}
+        vehicleModsMenuData['wheel_type'] = {i, {label = 'Wheel Type', description = 'Choose a wheel type for your vehicle', args = {'wheel_type'}, values = valuesWheelType, defaultIndex = #valuesWheelType == 1 and 1 or wheelTypeIndex, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['wheel_type'][2], i)
         i += 1
     end
 
-    vehicleModsMenuData['custom_tires'] = {i, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = 'custom_tires', values = {'Yes', 'No'}, defaultIndex = vehicleCustomTires and 1 or 2, close = false}}
+    vehicleModsMenuData['custom_tires'] = {i, {label = 'Custom Tires', description = 'Enabling this will make your tire have the custom marking on it', args = {'custom_tires'}, values = {'Yes', 'No'}, defaultIndex = vehicleCustomTires and 1 or 2, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['custom_tires'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_headlights'] = {i, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = 'xenon_headlights', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}}
+    vehicleModsMenuData['xenon_headlights'] = {i, {label = 'Xenon Headlights', description = 'Enable or disable xenon headlights', args = {'xenon_headlights'}, values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 22) and 1 or 2, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_headlights'][2], i)
     i += 1
 
-    vehicleModsMenuData['turbo'] = {i, {label = 'Turbo', description = 'Enable or disable turbo', args = 'turbo', values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}}
+    vehicleModsMenuData['turbo'] = {i, {label = 'Turbo', description = 'Enable or disable turbo', args = {'turbo'}, values = {'Yes', 'No'}, defaultIndex = IsToggleModOn(cache.vehicle, 18) and 1 or 2, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['turbo'][2], i)
     i += 1
 
-    vehicleModsMenuData['bullet_proof_tires'] = {i, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = 'bullet_proof_tires', values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}}
+    vehicleModsMenuData['bullet_proof_tires'] = {i, {label = 'Bullet Proof Tires', description = 'Enable or disable bullet proof tires', args = {'bullet_proof_tires'}, values = {'Yes', 'No'}, defaultIndex = GetVehicleTyresCanBurst(cache.vehicle) and 2 or 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['bullet_proof_tires'][2], i)
     i += 1
 
@@ -804,11 +804,11 @@ local function setupModMenu()
     local currentXenonColor = GetVehicleXenonLightsColor(cache.vehicle)
     currentXenonColor = (currentXenonColor < 0 or currentXenonColor > 12) and -1 or currentXenonColor
 
-    vehicleModsMenuData['xenon_color_mode'] = {i, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = 'xenon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomXenonColor and 2 or 1, close = false}}
+    vehicleModsMenuData['xenon_color_mode'] = {i, {label = 'Xenon Headlights Color Mode', description = 'Set the color mode for your xenon headlights', args = {'xenon_color_mode'}, values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomXenonColor and 2 or 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_color_mode'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_preset_color'] = {i, {label = 'Xenon Headlights Preset Color', description = 'Set a preset color for your xenon headlights', args = 'xenon_preset_color', values = vehiclePresetXenonColors, defaultIndex = currentXenonColor + 2, close = false}}
+    vehicleModsMenuData['xenon_preset_color'] = {i, {label = 'Xenon Headlights Preset Color', description = 'Set a preset color for your xenon headlights', args = {'xenon_preset_color'}, values = vehiclePresetXenonColors, defaultIndex = currentXenonColor + 2, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_preset_color'][2], i)
     i += 1
 
@@ -817,15 +817,15 @@ local function setupModMenu()
     defaultXenonGreen = hasCustomXenon and defaultXenonGreen or 0
     defaultXenonBlue = hasCustomXenon and defaultXenonBlue or 0
 
-    vehicleModsMenuData['xenon_custom_color_red'] = {i, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = 'xenon_custom_color_red', values = rgbValuesArray, defaultIndex = defaultXenonRed + 1, close = false}}
+    vehicleModsMenuData['xenon_custom_color_red'] = {i, {label = 'Xenon Headlights Custom Color Red', description = 'Set the red part of the custom color for your xenon headlights', args = {'xenon_custom_color_red'}, values = rgbValuesArray, defaultIndex = defaultXenonRed + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_red'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_custom_color_green'] = {i, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = 'xenon_custom_color_green', values = rgbValuesArray, defaultIndex = defaultXenonGreen + 1, close = false}}
+    vehicleModsMenuData['xenon_custom_color_green'] = {i, {label = 'Xenon Headlights Custom Color Green', description = 'Set the green part of the custom color for your xenon headlights', args = {'xenon_custom_color_green'}, values = rgbValuesArray, defaultIndex = defaultXenonGreen + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_green'][2], i)
     i += 1
 
-    vehicleModsMenuData['xenon_custom_color_blue'] = {i, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = 'xenon_custom_color_blue', values = rgbValuesArray, defaultIndex = defaultXenonBlue + 1, close = false}}
+    vehicleModsMenuData['xenon_custom_color_blue'] = {i, {label = 'Xenon Headlights Custom Color Blue', description = 'Set the blue part of the custom color for your xenon headlights', args = {'xenon_custom_color_blue'}, values = rgbValuesArray, defaultIndex = defaultXenonBlue + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['xenon_custom_color_blue'][2], i)
     i += 1
 
@@ -847,27 +847,27 @@ local function setupModMenu()
         end
     end
 
-    vehicleModsMenuData['tire_smoke'] = {i, {label = 'Tire Smoke', description = 'Enable or disable tire smoke', args = 'tire_smoke', values = {'Yes', 'No'}, defaultIndex = hasTireSmoke and 1 or 2, close = false}}
+    vehicleModsMenuData['tire_smoke'] = {i, {label = 'Tire Smoke', description = 'Enable or disable tire smoke', args = {'tire_smoke'}, values = {'Yes', 'No'}, defaultIndex = hasTireSmoke and 1 or 2, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_color_mode'] = {i, {label = 'Tire Smoke Color Mode', description = 'Set the color mode for your tire smoke', args = 'tire_smoke_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomTireSmokeColor and 2 or 1, close = false}}
+    vehicleModsMenuData['tire_smoke_color_mode'] = {i, {label = 'Tire Smoke Color Mode', description = 'Set the color mode for your tire smoke', args = {'tire_smoke_color_mode'}, values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomTireSmokeColor and 2 or 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_color_mode'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_preset_color'] = {i, {label = 'Tire Smoke Preset Color', description = 'Set a preset color for your tire smoke', args = 'tire_smoke_preset_color', values = vehiclePresetTireSmokeColors, defaultIndex = defaultTireSmokePresetIndex, close = false}}
+    vehicleModsMenuData['tire_smoke_preset_color'] = {i, {label = 'Tire Smoke Preset Color', description = 'Set a preset color for your tire smoke', args = {'tire_smoke_preset_color'}, values = vehiclePresetTireSmokeColors, defaultIndex = defaultTireSmokePresetIndex, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_preset_color'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_custom_color_red'] = {i, {label = 'Tire Smoke Custom Color Red', description = 'Set the red part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_red', values = rgbValuesArray, defaultIndex = defaultTireSmokeRed + 1, close = false}}
+    vehicleModsMenuData['tire_smoke_custom_color_red'] = {i, {label = 'Tire Smoke Custom Color Red', description = 'Set the red part of the custom color for your tire smoke', args = {'tire_smoke_custom_color_red'}, values = rgbValuesArray, defaultIndex = defaultTireSmokeRed + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_red'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_custom_color_green'] = {i, {label = 'Tire Smoke Custom Color Green', description = 'Set the green part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_green', values = rgbValuesArray, defaultIndex = defaultTireSmokeGreen + 1, close = false}}
+    vehicleModsMenuData['tire_smoke_custom_color_green'] = {i, {label = 'Tire Smoke Custom Color Green', description = 'Set the green part of the custom color for your tire smoke', args = {'tire_smoke_custom_color_green'}, values = rgbValuesArray, defaultIndex = defaultTireSmokeGreen + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_green'][2], i)
     i += 1
 
-    vehicleModsMenuData['tire_smoke_custom_color_blue'] = {i, {label = 'Tire Smoke Custom Color Blue', description = 'Set the blue part of the custom color for your tire smoke', args = 'tire_smoke_custom_color_blue', values = rgbValuesArray, defaultIndex = defaultTireSmokeBlue + 1, close = false}}
+    vehicleModsMenuData['tire_smoke_custom_color_blue'] = {i, {label = 'Tire Smoke Custom Color Blue', description = 'Set the blue part of the custom color for your tire smoke', args = {'tire_smoke_custom_color_blue'}, values = rgbValuesArray, defaultIndex = defaultTireSmokeBlue + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_blue'][2], i)
     i += 1
 
@@ -880,7 +880,7 @@ local function setupModMenu()
         windowTints[i2] = vehicleWindowTints[i2][2]
     end
 
-    vehicleModsMenuData['window_tint'] = {i, {label = 'Window Tint', description = 'Apply tint to your windows', args = 'window_tint', values = windowTints, defaultIndex = defaultWindowTint, close = false}}
+    vehicleModsMenuData['window_tint'] = {i, {label = 'Window Tint', description = 'Apply tint to your windows', args = {'window_tint'}, values = windowTints, defaultIndex = defaultWindowTint, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['window_tint'][2], i)
     i += 1
 
@@ -959,17 +959,17 @@ local function updateColorsMenu()
         end
     end
 
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = classicPrimary, close = false}, 1)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = mattePrimary, close = false}, 2)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = metalPrimary, close = false}, 3)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = utilPrimary, close = false}, 4)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = wornPrimary, close = false}, 5)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Classic', args = {'classic'}, values = vehicleClassicColorsArray, defaultIndex = classicPrimary, close = false}, 1)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Matte', args = {'matte'}, values = vehicleMatteColorsArray, defaultIndex = mattePrimary, close = false}, 2)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Metals', args = {'metals'}, values = vehicleMetalColorsArray, defaultIndex = metalPrimary, close = false}, 3)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Util', args = {'util'}, values = vehicleUtilColorsArray, defaultIndex = utilPrimary, close = false}, 4)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Worn', args = {'worn'}, values = vehicleWornColorsArray, defaultIndex = wornPrimary, close = false}, 5)
 
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = classicSecondary, close = false}, 1)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = matteSecondary, close = false}, 2)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = metalSecondary, close = false}, 3)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = utilSecondary, close = false}, 4)
-    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = wornSecondary, close = false}, 5)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Classic', args = {'classic'}, values = vehicleClassicColorsArray, defaultIndex = classicSecondary, close = false}, 1)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Matte', args = {'matte'}, values = vehicleMatteColorsArray, defaultIndex = matteSecondary, close = false}, 2)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Metals', args = {'metals'}, values = vehicleMetalColorsArray, defaultIndex = metalSecondary, close = false}, 3)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Util', args = {'util'}, values = vehicleUtilColorsArray, defaultIndex = utilSecondary, close = false}, 4)
+    lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Worn', args = {'worn'}, values = vehicleWornColorsArray, defaultIndex = wornSecondary, close = false}, 5)
 
     local dashboard = 1
     local interior = 1
@@ -1004,10 +1004,10 @@ local function updateColorsMenu()
         end
     end
 
-    lib.setMenuOptions(id, {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = dashboard, close = false}, 3)
-    lib.setMenuOptions(id, {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = interior, close = false}, 4)
-    lib.setMenuOptions(id, {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
-    lib.setMenuOptions(id, {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = pearlescent, close = false}, 6)
+    lib.setMenuOptions(id, {label = 'Dashboard Color', args = {'dashboard_color'}, values = vehicleClassicColorsArray, defaultIndex = dashboard, close = false}, 3)
+    lib.setMenuOptions(id, {label = 'Interior / Trim Color', args = {'interior_color'}, values = vehicleClassicColorsArray, defaultIndex = interior, close = false}, 4)
+    lib.setMenuOptions(id, {label = 'Wheel Color', args = {'wheel_color'}, values = vehicleWheelColorsArray, defaultIndex = wheel, close = false}, 5)
+    lib.setMenuOptions(id, {label = 'Pearlescent Color', args = {'pearlescent_color'}, values = vehicleClassicColorsArray, defaultIndex = pearlescent, close = false}, 6)
 
     lib.showMenu(id, MenuIndexes[id])
 end
@@ -1031,37 +1031,37 @@ local function setupNeonMenu()
     lib.setMenuOptions(id, {[1] = true}) -- Add the one arg to make the override successful, otherwise it fails because it expects atleast one option, but it'll override down here anyway
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_l') ~= -1 then
-        vehicleModsMenuData['light_0'] = {i, {label = 'Enable Left Light', args = 'light_0', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0) and 1 or 2, close = false}}
+        vehicleModsMenuData['light_0'] = {i, {label = 'Enable Left Light', args = {'light_0'}, values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 0) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_0'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_r') ~= -1 then
-        vehicleModsMenuData['light_1'] = {i, {label = 'Enable Right Light', args = 'light_1', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1) and 1 or 2, close = false}}
+        vehicleModsMenuData['light_1'] = {i, {label = 'Enable Right Light', args = {'light_1'}, values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 1) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_1'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_f') ~= -1 then
-        vehicleModsMenuData['light_2'] = {i, {label = 'Enable Front Light', args = 'light_2', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2) and 1 or 2, close = false}}
+        vehicleModsMenuData['light_2'] = {i, {label = 'Enable Front Light', args = {'light_2'}, values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 2) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_2'][2], i)
         i += 1
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'neon_b') ~= -1 then
-        vehicleModsMenuData['light_3'] = {i, {label = 'Enable Back Light', args = 'light_3', values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3) and 1 or 2, close = false}}
+        vehicleModsMenuData['light_3'] = {i, {label = 'Enable Back Light', args = {'light_3'}, values = {'Yes', 'No'}, defaultIndex = IsVehicleNeonLightEnabled(cache.vehicle, 3) and 1 or 2, close = false}}
         lib.setMenuOptions(id, vehicleModsMenuData['light_3'][2], i)
         i += 1
     end
 
     if i == 1 then
-        lib.setMenuOptions(id, {label = 'No neon kits available, press enter or backspace to return', args = 'return'}, 1)
+        lib.setMenuOptions(id, {label = 'No neon kits available, press enter or backspace to return', args = {'return'}}, 1)
         return
     end
 
     local defaultIndex = 1
 
-    vehicleModsMenuData['neon_color_mode'] = {i, {label = 'Neon Color Mode', description = 'Choose between a preset or custom color for your neon underglow', args = 'neon_color_mode', values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomNeonColor and 2 or 1, close = false}}
+    vehicleModsMenuData['neon_color_mode'] = {i, {label = 'Neon Color Mode', description = 'Choose between a preset or custom color for your neon underglow', args = {'neon_color_mode'}, values = {'Preset', 'Custom'}, defaultIndex = vehicleUseCustomNeonColor and 2 or 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['neon_color_mode'][2], i)
     i += 1
 
@@ -1075,19 +1075,19 @@ local function setupNeonMenu()
         end
     end
 
-    vehicleModsMenuData['neon_preset_color'] = {i, {label = 'Neon Preset Color', description = 'Select a preset color for the neon underglow', args = 'neon_preset_color', values = vehicleNeonLightColorsArray, defaultIndex = defaultIndex, close = false}}
+    vehicleModsMenuData['neon_preset_color'] = {i, {label = 'Neon Preset Color', description = 'Select a preset color for the neon underglow', args = {'neon_preset_color'}, values = vehicleNeonLightColorsArray, defaultIndex = defaultIndex, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['neon_preset_color'][2], i)
     i += 1
 
-    vehicleModsMenuData['neon_custom_color_red'] = {i, {label = 'Neon Custom Color Red', description = 'Set the red part of the custom color for your neon underglow', args = 'neon_custom_color_red', values = rgbValuesArray, defaultIndex = r + 1, close = false}}
+    vehicleModsMenuData['neon_custom_color_red'] = {i, {label = 'Neon Custom Color Red', description = 'Set the red part of the custom color for your neon underglow', args = {'neon_custom_color_red'}, values = rgbValuesArray, defaultIndex = r + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['neon_custom_color_red'][2], i)
     i += 1
 
-    vehicleModsMenuData['neon_custom_color_green'] = {i, {label = 'Neon Custom Color Green', description = 'Set the green part of the custom color for your neon underglow', args = 'neon_custom_color_green', values = rgbValuesArray, defaultIndex = g + 1, close = false}}
+    vehicleModsMenuData['neon_custom_color_green'] = {i, {label = 'Neon Custom Color Green', description = 'Set the green part of the custom color for your neon underglow', args = {'neon_custom_color_green'}, values = rgbValuesArray, defaultIndex = g + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['neon_custom_color_green'][2], i)
     i += 1
 
-    vehicleModsMenuData['neon_custom_color_blue'] = {i, {label = 'Neon Custom Color Blue', description = 'Set the blue part of the custom color for your neon underglow', args = 'neon_custom_color_blue', values = rgbValuesArray, defaultIndex = b + 1, close = false}}
+    vehicleModsMenuData['neon_custom_color_blue'] = {i, {label = 'Neon Custom Color Blue', description = 'Set the blue part of the custom color for your neon underglow', args = {'neon_custom_color_blue'}, values = rgbValuesArray, defaultIndex = b + 1, close = false}}
     lib.setMenuOptions(id, vehicleModsMenuData['neon_custom_color_blue'][2], i)
     i += 1
 
@@ -1113,13 +1113,13 @@ local function setupExtrasMenu()
     for i = 1, 20 do -- Doing it 20 times just to be sure that I don't miss any (normally should've been 14 probably)
         local extraId = i - 1
         if DoesExtraExist(cache.vehicle, extraId) then
-            lib.setMenuOptions(id, {label = ('Extra %s'):format(extraId), args = extraId, values = {'Yes', 'No'}, defaultIndex = IsVehicleExtraTurnedOn(cache.vehicle, extraId) and 1 or 2, close = false}, count + 1)
+            lib.setMenuOptions(id, {label = ('Extra %s'):format(extraId), args = {extraId}, values = {'Yes', 'No'}, defaultIndex = IsVehicleExtraTurnedOn(cache.vehicle, extraId) and 1 or 2, close = false}, count + 1)
             count += 1
         end
     end
 
     if count == 0 then
-        lib.setMenuOptions(id, {label = 'No extras available, press enter or backspace to return', args = 'return'}, 1)
+        lib.setMenuOptions(id, {label = 'No extras available, press enter or backspace to return', args = {'return'}}, 1)
     end
 
     lib.showMenu(id, MenuIndexes[id])
@@ -1176,26 +1176,26 @@ local function setupDoorMenu()
     local i = 1
     for i2 = 0, 7 do
         if GetIsDoorValid(cache.vehicle, i2) then
-            lib.setMenuOptions(id, {label = vehicleDoors[i2 + 1], description = ('Open/close the %s'):format(vehicleDoors[i2 + 1]:lower()), args = i2, close = false}, i)
+            lib.setMenuOptions(id, {label = vehicleDoors[i2 + 1], description = ('Open/close the %s'):format(vehicleDoors[i2 + 1]:lower()), args = {i2}, close = false}, i)
             i += 1
         end
     end
 
     if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
-        lib.setMenuOptions(id, {label = 'Bomb Bay', description = 'Open/close the bomb bay', args = 'bomb_bay', close = false}, i)
+        lib.setMenuOptions(id, {label = 'Bomb Bay', description = 'Open/close the bomb bay', args = {'bomb_bay'}, close = false}, i)
         i += 1
     end
 
-    lib.setMenuOptions(id, {label = 'Open All Doors', args = 'open_all_doors', close = false}, i)
+    lib.setMenuOptions(id, {label = 'Open All Doors', args = {'open_all_doors'}, close = false}, i)
     i += 1
 
-    lib.setMenuOptions(id, {label = 'Close All Doors', args = 'close_all_doors', close = false}, i)
+    lib.setMenuOptions(id, {label = 'Close All Doors', args = {'close_all_doors'}, close = false}, i)
     i += 1
 
-    lib.setMenuOptions(id, {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = 'remove_doors', values = {'Yes', 'No'}, defaultIndex = vehicleRemoveDoors and 1 or 2, close = false}, i)
+    lib.setMenuOptions(id, {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = {'remove_doors'}, values = {'Yes', 'No'}, defaultIndex = vehicleRemoveDoors and 1 or 2, close = false}, i)
     i += 1
 
-    lib.setMenuOptions(id, {label = 'Remove Door', description = 'Remove the specified door from the vehicle, press enter to apply it', args = 'remove_door', values = vehicleDoors, defaultIndex = 1, close = false}, i)
+    lib.setMenuOptions(id, {label = 'Remove Door', description = 'Remove the specified door from the vehicle, press enter to apply it', args = {'remove_door'}, values = vehicleDoors, defaultIndex = 1, close = false}, i)
     i += 1
 
     lib.showMenu(id, MenuIndexes[id])
@@ -1230,135 +1230,135 @@ lib.registerMenu({
         end
 
         local val = scrollIndex == 1
-        if args == 'god_mode_enable' then
+        if args[1] == 'god_mode_enable' then
             if val == vehicleGodMode then return end
             vehicleGodMode = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false}, 1)
-        elseif args == 'keep_vehicle_clean' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = {'god_mode_enable'}, values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false}, 1)
+        elseif args[1] == 'keep_vehicle_clean' then
             if val == vehicleNeverDirty then return end
             vehicleNeverDirty = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false}, 4)
-        elseif args == 'set_dirt_level' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = {'keep_vehicle_clean'}, values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false}, 4)
+        elseif args[1] == 'set_dirt_level' then
             vehicleDirtLevelSetter = scrollIndex - 1
             SetVehicleDirtLevel(cache.vehicle, vehicleDirtLevelSetter)
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = scrollIndex, close = false}, 6)
-        elseif args == 'license_plate_type' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle', args = {'set_dirt_level'}, values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = scrollIndex, close = false}, 6)
+        elseif args[1] == 'license_plate_type' then
             SetVehicleNumberPlateTextIndex(cache.vehicle, vehicleLicensePlates[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = scrollIndex, close = false}, 13)
-        elseif args == 'bike_seatbelt' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'License Plate Type', description = 'Choose a license plate type', args = {'license_plate_type'}, values = vehicleLicensePlatesArray, defaultIndex = scrollIndex, close = false}, 13)
+        elseif args[1] == 'bike_seatbelt' then
             vehicleUseBikeSeatbelt = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 16)
-        elseif args == 'torque_multiplier_toggle' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = {'bike_seatbelt'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 16)
+        elseif args[1] == 'torque_multiplier_toggle' then
             vehicleUseTorqueMultiplier = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = 'torque_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 18)
-        elseif args == 'power_multiplier_toggle' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = {'torque_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 18)
+        elseif args[1] == 'power_multiplier_toggle' then
             vehicleUsePowerMultiplier = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = 'power_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
-        elseif args == 'torque_multiplier' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = {'power_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
+        elseif args[1] == 'torque_multiplier' then
             vehicleTorqueMultiplier = 2 ^ scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 20)
-        elseif args == 'power_multiplier' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = {'torque_multiplier'}, values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 20)
+        elseif args[1] == 'power_multiplier' then
             vehiclePowerMultiplier = 2 ^ scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 21)
-        elseif args == 'plane_turbulence' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = {'power_multiplier'}, values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 21)
+        elseif args[1] == 'plane_turbulence' then
             disablePlaneTurbulence = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 22)
-        elseif args == 'engine_always_on' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = {'plane_turbulence'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 22)
+        elseif args[1] == 'engine_always_on' then
             vehicleEngineAlwaysOn = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false}, 30)
-        elseif args == 'infinite_fuel' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = {'engine_always_on'}, values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false}, 30)
+        elseif args[1] == 'infinite_fuel' then
             vehicleInfiniteFuel = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false}, 31)
-        elseif args == 'show_health' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = {'infinite_fuel'}, values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false}, 31)
+        elseif args[1] == 'show_health' then
             vehicleShowHealth = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false}, 32)
-        elseif args == 'radio_station' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = {'show_health'}, values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false}, 32)
+        elseif args[1] == 'radio_station' then
             VehicleDefaultRadio = vehicleRadioStations[scrollIndex][1]
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = scrollIndex, close = false}, 33)
-        elseif args == 'bike_helmet' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = {'radio_station'}, values = vehicleRadioStationsArray, defaultIndex = scrollIndex, close = false}, 33)
+        elseif args[1] == 'bike_helmet' then
             canWearHelmet = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 34)
-        elseif args == 'highbeams_on_honk' then
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = {'bike_helmet'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 34)
+        elseif args[1] == 'highbeams_on_honk' then
             vehicleHighbeamsOnHonk = val
-            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = 'highbeams_on_honk', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 35)
+            lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = {'highbeams_on_honk'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 35)
         end
     end,
     options = {
-        {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = 'god_mode_enable', values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false},
-        {label = 'God Mode Options', description = 'Enable or disable specific damage types', args = 'berkie_menu_vehicle_options_god_mode_menu'},
-        {label = 'Repair Vehicle', description = 'Repair any damage present on your vehicle', args = 'repair_vehicle', close = false},
-        {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = 'keep_vehicle_clean', values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false},
-        {label = 'Wash Vehicle', description = 'Clean your vehicle', args = 'wash_vehicle', close = false},
-        {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = 'set_dirt_level', values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false},
-        {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = 'berkie_menu_vehicle_options_mod_menu'},
-        {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = 'berkie_menu_vehicle_options_colors'},
-        {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = 'berkie_menu_vehicle_options_neon_menu'},
-        {label = 'Extras', description = 'Add or remove vehicle extras', args = 'berkie_menu_vehicle_options_extras'},
-        {label = 'Toggle Engine', description = 'Turn your engine on or off', args = 'toggle_engine', close = false},
-        {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = 'set_license_plate'},
-        {label = 'License Plate Type', description = 'Choose a license plate type', args = 'license_plate_type', values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
-        {label = 'Doors', description = 'Manage your vehicles doors', args = 'berkie_menu_vehicle_options_doors'},
-        {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = 'berkie_menu_vehicle_options_windows'},
-        {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = 'bike_seatbelt', values = {'Yes', 'No'}, defaultIndex = vehicleUseBikeSeatbelt and 1 or 2, close = false},
-        {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = 1, close = false},
-        {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = 'torque_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUseTorqueMultiplier and 1 or 2, close = false},
-        {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = 'power_multiplier_toggle', values = {'Yes', 'No'}, defaultIndex = vehicleUsePowerMultiplier and 1 or 2, close = false},
-        {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = 'torque_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
-        {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = 'power_multiplier', values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
-        {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = 'plane_turbulence', values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false},
-        {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = 'flip_vehicle', close = false},
-        {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = 'vehicle_alarm', close = false},
-        {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = 'cycle_seats', close = false},
-        {label = 'Lights', description = 'Toggle your vehicle lights, press enter to apply it', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
-        {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles. Press enter to apply it', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false},
-        {label = 'Freeze', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false},
-        {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = 'toggle_visibility', close = false},
-        {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = 'engine_always_on', values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false},
-        {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = 'infinite_fuel', values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false},
-        {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = 'show_health', values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false},
-        {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = 'radio_station', values = vehicleRadioStationsArray, defaultIndex = 1, close = false},
-        {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = 'bike_helmet', values = {'Yes', 'No'}, defaultIndex = canWearHelmet and 1 or 2, close = false},
-        {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = 'highbeams_on_honk', values = {'Yes', 'No'}, defaultIndex = vehicleHighbeamsOnHonk and 1 or 2, close = false},
-        {label = 'Delete Vehicle', description = 'Delete your current vehicle, no time travel is involved in this action', args = 'delete_vehicle'}
+        {label = 'Vehicle God Mode', description = 'Makes your vehicle not take any damage. What kind of damage will be stopped is defined in the God Mode Options', args = {'god_mode_enable'}, values = {'Yes', 'No'}, defaultIndex = vehicleGodMode and 1 or 2, close = false},
+        {label = 'God Mode Options', description = 'Enable or disable specific damage types', args = {'berkie_menu_vehicle_options_god_mode_menu'}},
+        {label = 'Repair Vehicle', description = 'Repair any damage present on your vehicle', args = {'repair_vehicle'}, close = false},
+        {label = 'Keep Vehicle Clean', description = 'This will constantly clean your car if it gets dirty. Note that this only cleans dust or dirt, not mud, snow or other damage decals. Repair your vehicle to remove them', args = {'keep_vehicle_clean'}, values = {'Yes', 'No'}, defaultIndex = vehicleNeverDirty and 1 or 2, close = false},
+        {label = 'Wash Vehicle', description = 'Clean your vehicle', args = {'wash_vehicle'}, close = false},
+        {label = 'Set Dirt Level', description = 'Select how much dirt should be visible on your vehicle, press enter to apply it', args = {'set_dirt_level'}, values = {'No Dirt', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'}, defaultIndex = vehicleDirtLevelSetter + 1, close = false},
+        {label = 'Mod Menu', description = 'Tune and customize your vehicle here', args = {'berkie_menu_vehicle_options_mod_menu'}},
+        {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = {'berkie_menu_vehicle_options_colors'}},
+        {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = {'berkie_menu_vehicle_options_neon_menu'}},
+        {label = 'Extras', description = 'Add or remove vehicle extras', args = {'berkie_menu_vehicle_options_extras'}},
+        {label = 'Toggle Engine', description = 'Turn your engine on or off', args = {'toggle_engine'}, close = false},
+        {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = {'set_license_plate'}},
+        {label = 'License Plate Type', description = 'Choose a license plate type', args = {'license_plate_type'}, values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
+        {label = 'Doors', description = 'Manage your vehicles doors', args = {'berkie_menu_vehicle_options_doors'}},
+        {label = 'Windows', description = 'Roll your windows up/down or remove/restore your vehicle windows', args = {'berkie_menu_vehicle_options_windows'}},
+        {label = 'Bike Seatbelt', description = 'Prevents you from being knocked off your bike, bicyle, ATV or similar', args = {'bike_seatbelt'}, values = {'Yes', 'No'}, defaultIndex = vehicleUseBikeSeatbelt and 1 or 2, close = false},
+        {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = {'speed_limiter'}, values = {'Set', 'Reset', 'Input'}, defaultIndex = 1, close = false},
+        {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = {'torque_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = vehicleUseTorqueMultiplier and 1 or 2, close = false},
+        {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = {'power_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = vehicleUsePowerMultiplier and 1 or 2, close = false},
+        {label = 'Set Engine Torque Multiplier', description = 'Set the engine torque multiplier', args = {'torque_multiplier'}, values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
+        {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = {'power_multiplier'}, values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = 1, close = false},
+        {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = {'plane_turbulence'}, values = {'Yes', 'No'}, defaultIndex = disablePlaneTurbulence and 1 or 2, close = false},
+        {label = 'Flip Vehicle', description = 'Sets your current vehicle on all 4 wheels', args = {'flip_vehicle'}, close = false},
+        {label = 'Toggle Vehicle Alarm', description = 'Starts/stops your vehicle\'s alarm', args = {'vehicle_alarm'}, close = false},
+        {label = 'Cycle Through Vehicle Seats', description = 'Cycle through the available vehicle seats', args = {'cycle_seats'}, close = false},
+        {label = 'Lights', description = 'Toggle your vehicle lights, press enter to apply it', args = {'vehicle_lights'}, values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = 1, close = false},
+        {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles. Press enter to apply it', args = {'fix_destroy_tires'}, values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = 1, close = false},
+        {label = 'Freeze', description = 'Freeze your vehicle\'s position, press enter to apply it', args = {'freeze_vehicle'}, values = {'Yes', 'No'}, defaultIndex = vehicleFrozen and 1 or 2, close = false},
+        {label = 'Toggle Visibility', description = 'Makes your vehicle visible/invisible. Your vehicle will be made visible again as soon as you leave the vehicle. Otherwise you would not be able to get back in', args = {'toggle_visibility'}, close = false},
+        {label = 'Engine Always On', description = 'Keeps your vehicle engine on when you exit your vehicle', args = {'engine_always_on'}, values = {'Yes', 'No'}, defaultIndex = vehicleEngineAlwaysOn and 1 or 2, close = false},
+        {label = 'Infinite Fuel', description = 'Enables or disables infinite fuel for this vehicle', args = {'infinite_fuel'}, values = {'Yes', 'No'}, defaultIndex = vehicleInfiniteFuel and 1 or 2, close = false},
+        {label = 'Show Health', description = 'Shows the vehicle health on the screen', args = {'show_health'}, values = {'Yes', 'No'}, defaultIndex = vehicleShowHealth and 1 or 2, close = false},
+        {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = {'radio_station'}, values = vehicleRadioStationsArray, defaultIndex = 1, close = false},
+        {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = {'bike_helmet'}, values = {'Yes', 'No'}, defaultIndex = canWearHelmet and 1 or 2, close = false},
+        {label = 'Flash Highbeams On Honk', description = 'Turn on your highbeams on your vehicle when honking your horn. Does not work during the day when you have your lights turned off', args = {'highbeams_on_honk'}, values = {'Yes', 'No'}, defaultIndex = vehicleHighbeamsOnHonk and 1 or 2, close = false},
+        {label = 'Delete Vehicle', description = 'Delete your current vehicle, no time travel is involved in this action', args = {'delete_vehicle'}}
     }
 }, function(_, scrollIndex, args)
-    local inVeh, reason = IsInVehicle(args ~= 'cycle_seats')
+    local inVeh, reason = IsInVehicle(args[1] ~= 'cycle_seats')
     if not inVeh then
         lib.notify({
             description = reason,
             type = 'error'
         })
 
-        if args == 'berkie_menu_vehicle_options_mod_menu' or args == 'berkie_menu_vehicle_options_god_mode_menu' or args == 'delete_vehicle' then
+        if args[1] == 'berkie_menu_vehicle_options_mod_menu' or args[1] == 'berkie_menu_vehicle_options_god_mode_menu' or args[1] == 'delete_vehicle' then
             lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
         end
 
         return
     end
 
-    if args == 'berkie_menu_vehicle_options_god_mode_menu' then
-        lib.showMenu(args, MenuIndexes[args])
-    elseif args == 'repair_vehicle' then
+    if args[1] == 'berkie_menu_vehicle_options_god_mode_menu' then
+        lib.showMenu(args[1], MenuIndexes[args[1]])
+    elseif args[1] == 'repair_vehicle' then
         SetVehicleFixed(cache.vehicle)
-    elseif args == 'wash_vehicle' then
+    elseif args[1] == 'wash_vehicle' then
         SetVehicleDirtLevel(cache.vehicle, 0)
         vehicleDirtLevelSetter = 1
-    elseif args == 'berkie_menu_vehicle_options_mod_menu' then
+    elseif args[1] == 'berkie_menu_vehicle_options_mod_menu' then
         setupModMenu()
-    elseif args == 'berkie_menu_vehicle_options_colors' then
+    elseif args[1] == 'berkie_menu_vehicle_options_colors' then
         updateColorsMenu()
-    elseif args == 'berkie_menu_vehicle_options_neon_menu' then
+    elseif args[1] == 'berkie_menu_vehicle_options_neon_menu' then
         setupNeonMenu()
-    elseif args == 'berkie_menu_vehicle_options_extras' then
+    elseif args[1] == 'berkie_menu_vehicle_options_extras' then
         setupExtrasMenu()
-    elseif args == 'toggle_engine' then
+    elseif args[1] == 'toggle_engine' then
         SetVehicleEngineOn(cache.vehicle, not GetIsVehicleEngineRunning(cache.vehicle), false, true)
-    elseif args == 'set_license_plate' then
+    elseif args[1] == 'set_license_plate' then
         setCustomLicensePlate()
-    elseif args == 'berkie_menu_vehicle_options_doors' then
+    elseif args[1] == 'berkie_menu_vehicle_options_doors' then
         setupDoorMenu()
-    elseif args == 'speed_limiter' then
-        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = 'speed_limiter', values = {'Set', 'Reset', 'Input'}, defaultIndex = scrollIndex, close = false}, 17)
+    elseif args[1] == 'speed_limiter' then
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Speed Limiter', description = 'Set your vehicles max speed to your current speed. Resetting your vehicles max speed will set the max speed of your current vehicle back to default. Only your current vehicle is affected by this option. Press enter to select the option', args = {'speed_limiter'}, values = {'Set', 'Reset', 'Input'}, defaultIndex = scrollIndex, close = false}, 17)
         if scrollIndex == 1 then
             SetEntityMaxSpeed(cache.vehicle, 500.01)
             local curSpeed = GetEntitySpeed(cache.vehicle)
@@ -1405,9 +1405,9 @@ lib.registerMenu({
             Wait(200)
             lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
         end
-    elseif args == 'flip_vehicle' then
+    elseif args[1] == 'flip_vehicle' then
         SetVehicleOnGroundProperly(cache.vehicle)
-    elseif args == 'vehicle_alarm' then
+    elseif args[1] == 'vehicle_alarm' then
         if IsVehicleAlarmActivated(cache.vehicle) then
             SetVehicleAlarmTimeLeft(cache.vehicle, 0)
             SetVehicleAlarm(cache.vehicle, false)
@@ -1416,7 +1416,7 @@ lib.registerMenu({
             SetVehicleAlarmTimeLeft(cache.vehicle, math.random(8000, 45000))
             StartVehicleAlarm(cache.vehicle)
         end
-    elseif args == 'cycle_seats' then
+    elseif args[1] == 'cycle_seats' then
         if not AreAnyVehicleSeatsFree(cache.vehicle) then
             lib.notify({
                 description = 'No seats to cycle through',
@@ -1450,7 +1450,7 @@ lib.registerMenu({
             description = 'No seats to cycle through',
             type = 'error'
         })
-    elseif args == 'vehicle_lights' then
+    elseif args[1] == 'vehicle_lights' then
         -- We need to do % 4 because this seems to be some sort of flags system. For a taxi, this function returns 65, 66, etc.
         -- So % 4 takes care of that.
         local indicatorState = GetVehicleIndicatorLights(cache.vehicle) % 4 -- 0 = none, 1 = left, 2 = right, 3 = both
@@ -1483,9 +1483,9 @@ lib.registerMenu({
         elseif scrollIndex == 5 then
             SetVehicleSearchlight(cache.vehicle, not IsVehicleSearchlightOn(cache.vehicle), true)
         end
-        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Lights', description = 'Toggle your vehicle lights', args = 'vehicle_lights', values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = scrollIndex, close = false}, 26)
-    elseif args == 'fix_destroy_tires' then
-        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles', args = 'fix_destroy_tires', values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = scrollIndex, close = false}, 27)
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Lights', description = 'Toggle your vehicle lights', args = {'vehicle_lights'}, values = {'Hazard Lights', 'Left Indicator', 'Right Indicator', 'Interior Lights', 'Helicopter Spotlight'}, defaultIndex = scrollIndex, close = false}, 26)
+    elseif args[1] == 'fix_destroy_tires' then
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Fix / Destroy Tires', description = 'Fix or destroy a specific vehicle tire, or all of them at once. Note, not all indexes are valid for all vehicles, some might not do anything on certain vehicles', args = {'fix_destroy_tires'}, values = {'All Tires', 'Tire (#1)', 'Tire (#2)', 'Tire (#3)', 'Tire (#4)', 'Tire (#5)', 'Tire (#6)', 'Tire (#7)', 'Tire (#8)'}, defaultIndex = scrollIndex, close = false}, 27)
         if scrollIndex == 1 then
             if IsVehicleTyreBurst(cache.vehicle, 0, false) then
                 for i = 0, 7 do
@@ -1520,9 +1520,9 @@ lib.registerMenu({
                 })
             end
         end
-    elseif args == 'freeze_vehicle' then
+    elseif args[1] == 'freeze_vehicle' then
         vehicleFrozen = scrollIndex == 1
-        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Freeze Vehicle', description = 'Freeze your vehicle\'s position, press enter to apply it', args = 'freeze_vehicle', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 28)
+        lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Freeze Vehicle', description = 'Freeze your vehicle\'s position, press enter to apply it', args = {'freeze_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 28)
         if scrollIndex == 1 then
             vehicleFrozenSpeed = GetEntitySpeedVector(cache.vehicle, true).y
             vehicleFrozenRPM = GetVehicleCurrentRpm(cache.vehicle)
@@ -1534,7 +1534,7 @@ lib.registerMenu({
             end
             SetVehicleCurrentRpm(cache.vehicle, vehicleFrozenRPM)
         end
-    elseif args == 'toggle_visibility' then
+    elseif args[1] == 'toggle_visibility' then
         if IsEntityVisible(cache.vehicle) then
             local pedsInVeh = {}
             for i = -1, GetVehicleMaxNumberOfPassengers(cache.vehicle) - 1 do
@@ -1549,7 +1549,7 @@ lib.registerMenu({
         else
             SetEntityVisible(cache.vehicle, true, false)
         end
-    elseif args == 'delete_vehicle' then
+    elseif args[1] == 'delete_vehicle' then
         local alert = lib.alertDialog({
             header = 'Sure?',
             content = 'Are you sure you want to delete your vehicle? \n This action cannot be undone.',
@@ -1592,33 +1592,33 @@ lib.registerMenu({
         end
 
         local val = scrollIndex == 1 and vehicleGodMode
-        if args == 'invincible' then
+        if args[1] == 'invincible' then
             vehicleInvincible = val
-            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = 'invincible', values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false}, 1)
-        elseif args == 'engine_damage' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = {'invincible'}, values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false}, 1)
+        elseif args[1] == 'engine_damage' then
             vehicleEngineDamage = val
-            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = 'engine_damage', values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false}, 2)
-        elseif args == 'visual_damage' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = {'engine_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false}, 2)
+        elseif args[1] == 'visual_damage' then
             vehicleVisualDamage = val
-            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = 'visual_damage', values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false}, 3)
-        elseif args == 'strong_wheels' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = {'visual_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false}, 3)
+        elseif args[1] == 'strong_wheels' then
             vehicleStrongWheels = val
-            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = 'strong_wheels', values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false}, 4)
-        elseif args == 'ramp_damage' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = {'strong_wheels'}, values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false}, 4)
+        elseif args[1] == 'ramp_damage' then
             vehicleRampDamage = val
-            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = 'ramp_damage', values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false}, 5)
-        elseif args == 'auto_repair' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = {'ramp_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false}, 5)
+        elseif args[1] == 'auto_repair' then
             vehicleAutoRepair = val
-            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = 'auto_repair', values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}, 6)
+            lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = {'auto_repair'}, values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}, 6)
         end
     end,
     options = {
-        {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = 'invincible', values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false},
-        {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = 'engine_damage', values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false},
-        {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = 'visual_damage', values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false},
-        {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = 'strong_wheels', values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false},
-        {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = 'ramp_damage', values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false},
-        {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = 'auto_repair', values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}
+        {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = {'invincible'}, values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false},
+        {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = {'engine_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false},
+        {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = {'visual_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false},
+        {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = {'strong_wheels'}, values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false},
+        {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = {'ramp_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false},
+        {label = 'Auto Repair', description = 'Automatically repairs your vehicle when it has ANY type of damage. It\'s recommended to keep this turned off to prevent glitchyness', args = {'auto_repair'}, values = {'Yes', 'No'}, defaultIndex = vehicleAutoRepair and 1 or 2, close = false}
     }
 })
 
@@ -1647,76 +1647,76 @@ lib.registerMenu({
         local customTires = GetVehicleModVariation(cache.vehicle, 23)
         local vehClass = GetVehicleClass(cache.vehicle)
         local vehModel = GetEntityModel(cache.vehicle)
-        if type(args) == 'table' then
+        if type(args[1]) == 'table' then
             local curArg = args[scrollIndex]
             SetVehicleMod(cache.vehicle, curArg[2], curArg[1], customTires)
             vehicleModsMenuData[curArg[2]][2].defaultIndex = scrollIndex
             lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[curArg[2]][2], vehicleModsMenuData[curArg[2]][1])
         else
-            if args == 'wheel_type' then
+            if args[1] == 'wheel_type' then
                 if IsThisModelABike(vehModel) or vehClass == 22 then return end
                 SetVehicleWheelType(cache.vehicle, scrollIndex - 1)
                 SetVehicleMod(cache.vehicle, 23, -1, customTires)
                 vehicleModsMenuData[23][2].defaultIndex = 1
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
                 lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[23][2], vehicleModsMenuData[23][1])
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
                 lib.hideMenu(false)
                 lib.showMenu('berkie_menu_vehicle_options_mod_menu', MenuIndexes['berkie_menu_vehicle_options_mod_menu'])
-            elseif args == 'custom_tires' then
+            elseif args[1] == 'custom_tires' then
                 SetVehicleMod(cache.vehicle, 23, GetVehicleMod(cache.vehicle, 23), not customTires)
                 if IsThisModelABike(vehModel) then
                     SetVehicleMod(cache.vehicle, 24, GetVehicleMod(cache.vehicle, 24), not customTires)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'xenon_headlights' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'xenon_headlights' then
                 ToggleVehicleMod(cache.vehicle, 22, scrollIndex == 1)
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'turbo' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'turbo' then
                 ToggleVehicleMod(cache.vehicle, 18, scrollIndex == 1)
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'bullet_proof_tires' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'bullet_proof_tires' then
                 SetVehicleTyresCanBurst(cache.vehicle, scrollIndex == 2)
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'xenon_color_mode' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'xenon_color_mode' then
                 vehicleUseCustomXenonColor = scrollIndex == 2
                 if scrollIndex == 1 then
                     SetVehicleXenonLightsColor(cache.vehicle, vehicleModsMenuData['xenon_preset_color'][2].defaultIndex - 1)
                 else
                     SetVehicleXenonLightsCustomColor(cache.vehicle, vehicleModsMenuData['xenon_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['xenon_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['xenon_custom_color_blue'][2].defaultIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'xenon_preset_color' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'xenon_preset_color' then
                 if not vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     local newIndex = scrollIndex == -1 and 255 or scrollIndex - 1
                     SetVehicleXenonLightsColor(cache.vehicle, newIndex)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'xenon_custom_color_red' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'xenon_custom_color_red' then
                 if vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     SetVehicleXenonLightsCustomColor(cache.vehicle, scrollIndex - 1, vehicleModsMenuData['xenon_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['xenon_custom_color_blue'][2].defaultIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'xenon_custom_color_green' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'xenon_custom_color_green' then
                 if vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     SetVehicleXenonLightsCustomColor(cache.vehicle, vehicleModsMenuData['xenon_custom_color_red'][2].defaultIndex - 1, scrollIndex - 1, vehicleModsMenuData['xenon_custom_color_blue'][2].defaultIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'xenon_custom_color_blue' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'xenon_custom_color_blue' then
                 if vehicleUseCustomXenonColor and IsToggleModOn(cache.vehicle, 22) then
                     SetVehicleXenonLightsCustomColor(cache.vehicle, vehicleModsMenuData['xenon_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['xenon_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'tire_smoke' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'tire_smoke' then
                 ToggleVehicleMod(cache.vehicle, 20, scrollIndex == 1)
                 if scrollIndex == 1 then
                     local val
@@ -1734,9 +1734,9 @@ lib.registerMenu({
                     lib.hideMenu(false)
                     lib.showMenu('berkie_menu_vehicle_options_mod_menu', MenuIndexes['berkie_menu_vehicle_options_mod_menu'])
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'tire_smoke_color_mode' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'tire_smoke_color_mode' then
                 vehicleUseCustomTireSmokeColor = scrollIndex == 2
                 local val
                 if not vehicleUseCustomTireSmokeColor then
@@ -1745,37 +1745,37 @@ lib.registerMenu({
                     val = vec3(vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
                 end
                 SetVehicleTyreSmokeColor(cache.vehicle, val.x, val.y, val.z)
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'tire_smoke_preset_color' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'tire_smoke_preset_color' then
                 if not vehicleUseCustomTireSmokeColor then
                     local val = vehicleTireSmokeColors[scrollIndex][2]
                     SetVehicleTyreSmokeColor(cache.vehicle, val.x, val.y, val.z)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'tire_smoke_custom_color_red' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'tire_smoke_custom_color_red' then
                 if vehicleUseCustomTireSmokeColor then
                     SetVehicleTyreSmokeColor(cache.vehicle, scrollIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'tire_smoke_custom_color_green' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'tire_smoke_custom_color_green' then
                 if vehicleUseCustomTireSmokeColor then
                     SetVehicleTyreSmokeColor(cache.vehicle, vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, scrollIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_blue'][2].defaultIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'tire_smoke_custom_color_blue' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'tire_smoke_custom_color_blue' then
                 if vehicleUseCustomTireSmokeColor then
                     SetVehicleTyreSmokeColor(cache.vehicle, vehicleModsMenuData['tire_smoke_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['tire_smoke_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
                 end
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-            elseif args == 'window_tint' then
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+            elseif args[1] == 'window_tint' then
                 SetVehicleWindowTint(cache.vehicle, vehicleWindowTints[scrollIndex][1])
-                vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
+                vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+                lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
             end
         end
     end,
@@ -1805,27 +1805,27 @@ lib.registerMenu({
         end
 
         local pearlescentColor, wheelColor = GetVehicleExtraColours(cache.vehicle)
-        if args == 'dashboard_color' then
+        if args[1] == 'dashboard_color' then
             SetVehicleDashboardColor(cache.vehicle, vehicleClassicColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 3)
-        elseif args == 'interior_color' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Dashboard Color', args = {'dashboard_color'}, values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args[1] == 'interior_color' then
             SetVehicleInteriorColor(cache.vehicle, vehicleClassicColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 4)
-        elseif args == 'wheel_color' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Interior / Trim Color', args = {'interior_color'}, values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args[1] == 'wheel_color' then
             SetVehicleExtraColours(cache.vehicle, pearlescentColor, vehicleWheelColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = scrollIndex, close = false}, 5)
-        elseif args == 'pearlescent_color' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Wheel Color', args = {'wheel_color'}, values = vehicleWheelColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+        elseif args[1] == 'pearlescent_color' then
             SetVehicleExtraColours(cache.vehicle, vehicleClassicColors[scrollIndex][1], wheelColor)
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 6)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors', {label = 'Pearlescent Color', args = {'pearlescent_color'}, values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 6)
         end
     end,
     options = {
-        {label = 'Primary Color', args = 'berkie_menu_vehicle_options_colors_primary'},
-        {label = 'Secondary Color', args = 'berkie_menu_vehicle_options_colors_secondary'},
-        {label = 'Dashboard Color', args = 'dashboard_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
-        {label = 'Interior / Trim Color', args = 'interior_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
-        {label = 'Wheel Color', args = 'wheel_color', values = vehicleWheelColorsArray, defaultIndex = 1, close = false},
-        {label = 'Pearlescent Color', args = 'pearlescent_color', values = vehicleClassicColorsArray, defaultIndex = 1, close = false}
+        {label = 'Primary Color', args = {'berkie_menu_vehicle_options_colors_primary'}},
+        {label = 'Secondary Color', args = {'berkie_menu_vehicle_options_colors_secondary'}},
+        {label = 'Dashboard Color', args = {'dashboard_color'}, values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Interior / Trim Color', args = {'interior_color'}, values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Wheel Color', args = {'wheel_color'}, values = vehicleWheelColorsArray, defaultIndex = 1, close = false},
+        {label = 'Pearlescent Color', args = {'pearlescent_color'}, values = vehicleClassicColorsArray, defaultIndex = 1, close = false}
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = IsInVehicle(true)
@@ -1869,29 +1869,29 @@ lib.registerMenu({
         end
 
         local _, colorSecondary = GetVehicleColours(cache.vehicle)
-        if args == 'classic' then
+        if args[1] == 'classic' then
             SetVehicleColours(cache.vehicle, vehicleClassicColors[scrollIndex][1], colorSecondary)
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 1)
-        elseif args == 'matte' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Classic', args = {'classic'}, values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 1)
+        elseif args[1] == 'matte' then
             SetVehicleColours(cache.vehicle, vehicleMatteColors[scrollIndex][1], colorSecondary)
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = scrollIndex, close = false}, 2)
-        elseif args == 'metals' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Matte', args = {'matte'}, values = vehicleMatteColorsArray, defaultIndex = scrollIndex, close = false}, 2)
+        elseif args[1] == 'metals' then
             SetVehicleColours(cache.vehicle, vehicleMetalColors[scrollIndex][1], colorSecondary)
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = scrollIndex, close = false}, 3)
-        elseif args == 'util' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Metals', args = {'metals'}, values = vehicleMetalColorsArray, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args[1] == 'util' then
             SetVehicleColours(cache.vehicle, vehicleUtilColors[scrollIndex][1], colorSecondary)
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = scrollIndex, close = false}, 4)
-        elseif args == 'worn' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Util', args = {'util'}, values = vehicleUtilColorsArray, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args[1] == 'worn' then
             SetVehicleColours(cache.vehicle, vehicleWornColors[scrollIndex][1], colorSecondary)
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_primary', {label = 'Worn', args = {'worn'}, values = vehicleWornColorsArray, defaultIndex = scrollIndex, close = false}, 5)
         end
     end,
     options = {
-        {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
-        {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = 1, close = false},
-        {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = 1, close = false},
-        {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = 1, close = false},
-        {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = 1, close = false},
+        {label = 'Classic', args = {'classic'}, values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Matte', args = {'matte'}, values = vehicleMatteColorsArray, defaultIndex = 1, close = false},
+        {label = 'Metals', args = {'metals'}, values = vehicleMetalColorsArray, defaultIndex = 1, close = false},
+        {label = 'Util', args = {'util'}, values = vehicleUtilColorsArray, defaultIndex = 1, close = false},
+        {label = 'Worn', args = {'worn'}, values = vehicleWornColorsArray, defaultIndex = 1, close = false},
         {label = 'Chrome', description = 'Set your vehicle\'s primary color to chrome', close = false},
     }
 }, function(_, scrollIndex)
@@ -1936,29 +1936,29 @@ lib.registerMenu({
         end
 
         local colorPrimary = GetVehicleColours(cache.vehicle)
-        if args == 'classic' then
+        if args[1] == 'classic' then
             SetVehicleColours(cache.vehicle, colorPrimary, vehicleClassicColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 1)
-        elseif args == 'matte' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Classic', args = {'classic'}, values = vehicleClassicColorsArray, defaultIndex = scrollIndex, close = false}, 1)
+        elseif args[1] == 'matte' then
             SetVehicleColours(cache.vehicle, colorPrimary, vehicleMatteColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = scrollIndex, close = false}, 2)
-        elseif args == 'metals' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Matte', args = {'matte'}, values = vehicleMatteColorsArray, defaultIndex = scrollIndex, close = false}, 2)
+        elseif args[1] == 'metals' then
             SetVehicleColours(cache.vehicle, colorPrimary, vehicleMetalColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = scrollIndex, close = false}, 3)
-        elseif args == 'util' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Metals', args = {'metals'}, values = vehicleMetalColorsArray, defaultIndex = scrollIndex, close = false}, 3)
+        elseif args[1] == 'util' then
             SetVehicleColours(cache.vehicle, colorPrimary, vehicleUtilColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = scrollIndex, close = false}, 4)
-        elseif args == 'worn' then
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Util', args = {'util'}, values = vehicleUtilColorsArray, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args[1] == 'worn' then
             SetVehicleColours(cache.vehicle, colorPrimary, vehicleWornColors[scrollIndex][1])
-            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = scrollIndex, close = false}, 5)
+            lib.setMenuOptions('berkie_menu_vehicle_options_colors_secondary', {label = 'Worn', args = {'worn'}, values = vehicleWornColorsArray, defaultIndex = scrollIndex, close = false}, 5)
         end
     end,
     options = {
-        {label = 'Classic', args = 'classic', values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
-        {label = 'Matte', args = 'matte', values = vehicleMatteColorsArray, defaultIndex = 1, close = false},
-        {label = 'Metals', args = 'metals', values = vehicleMetalColorsArray, defaultIndex = 1, close = false},
-        {label = 'Util', args = 'util', values = vehicleUtilColorsArray, defaultIndex = 1, close = false},
-        {label = 'Worn', args = 'worn', values = vehicleWornColorsArray, defaultIndex = 1, close = false},
+        {label = 'Classic', args = {'classic'}, values = vehicleClassicColorsArray, defaultIndex = 1, close = false},
+        {label = 'Matte', args = {'matte'}, values = vehicleMatteColorsArray, defaultIndex = 1, close = false},
+        {label = 'Metals', args = {'metals'}, values = vehicleMetalColorsArray, defaultIndex = 1, close = false},
+        {label = 'Util', args = {'util'}, values = vehicleUtilColorsArray, defaultIndex = 1, close = false},
+        {label = 'Worn', args = {'worn'}, values = vehicleWornColorsArray, defaultIndex = 1, close = false},
         {label = 'Chrome', description = 'Set your vehicle\'s secondary color to chrome', close = false},
     }
 }, function(_, scrollIndex)
@@ -2002,40 +2002,39 @@ lib.registerMenu({
             return
         end
 
-        if string.find(args, 'light') then
-            local index = tonumber(string.match(args, '%d+'))
-            ---@diagnostic disable-next-line: param-type-mismatch
+        if string.find(args[1], 'light') then
+            local index = tonumber(string.match(args[1], '%d+')) --[[@as number]]
             SetVehicleNeonLightEnabled(cache.vehicle, index, scrollIndex == 1)
-        elseif args == 'neon_color_mode' then
+        elseif args[1] == 'neon_color_mode' then
             vehicleUseCustomNeonColor = scrollIndex == 2
-            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-        elseif args == 'neon_preset_color' then
+            vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+        elseif args[1] == 'neon_preset_color' then
             if not vehicleUseCustomNeonColor then
                 local color = vehicleNeonLightColors[scrollIndex][3]
                 SetVehicleNeonLightsColour(cache.vehicle, color.x, color.y, color.z)
             end
-            vehicleModsMenuData[args].defaultIndex = scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-        elseif args == 'neon_custom_color_red' then
+            vehicleModsMenuData[args[1]].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+        elseif args[1] == 'neon_custom_color_red' then
             if vehicleUseCustomNeonColor then
                 SetVehicleNeonLightsColour(cache.vehicle, scrollIndex - 1, vehicleModsMenuData['neon_custom_color_green'][2].defaultIndex - 1, vehicleModsMenuData['neon_custom_color_blue'][2].defaultIndex - 1)
             end
-            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-        elseif args == 'neon_custom_color_green' then
+            vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+        elseif args[1] == 'neon_custom_color_green' then
             if vehicleUseCustomNeonColor then
                 SetVehicleNeonLightsColour(cache.vehicle, vehicleModsMenuData['neon_custom_color_red'][2].defaultIndex - 1, scrollIndex - 1, vehicleModsMenuData['neon_custom_color_blue'][2].defaultIndex - 1)
             end
-            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-        elseif args == 'neon_custom_color_blue' then
+            vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+        elseif args[1] == 'neon_custom_color_blue' then
             if vehicleUseCustomNeonColor then
                 SetVehicleNeonLightsColour(cache.vehicle, vehicleModsMenuData['neon_custom_color_red'][2].defaultIndex - 1, vehicleModsMenuData['neon_custom_color_green'][2].defaultIndex - 1, scrollIndex - 1)
             end
-            vehicleModsMenuData[args][2].defaultIndex = scrollIndex
-            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args][2], vehicleModsMenuData[args][1])
-        elseif args == 'return' then
+            vehicleModsMenuData[args[1]][2].defaultIndex = scrollIndex
+            lib.setMenuOptions('berkie_menu_vehicle_options_neon_menu', vehicleModsMenuData[args[1]][2], vehicleModsMenuData[args[1]][1])
+        elseif args[1] == 'return' then
             lib.showMenu('berkie_menu_vehicle_options', MenuIndexes['berkie_menu_vehicle_options'])
         end
     end,
@@ -2097,7 +2096,7 @@ lib.registerMenu({
             return
         end
 
-        if args == 'remove_doors' then
+        if args[1] == 'remove_doors' then
             vehicleRemoveDoors = scrollIndex == 1
         end
     end,
@@ -2114,32 +2113,32 @@ lib.registerMenu({
         return
     end
 
-    if type(args) == 'number' then
+    if type(args[1]) == 'number' then
         local isOpen = GetVehicleDoorAngleRatio(cache.vehicle, args) > 0.1
         if isOpen then
             SetVehicleDoorShut(cache.vehicle, args, false)
         else
             SetVehicleDoorOpen(cache.vehicle, args, false, false)
         end
-    elseif args == 'bomb_bay' then
+    elseif args[1] == 'bomb_bay' then
         if AreBombBayDoorsOpen(cache.vehicle) then
             CloseBombBayDoors(cache.vehicle)
         else
             OpenBombBayDoors(cache.vehicle)
         end
-    elseif args == 'open_all_doors' then
+    elseif args[1] == 'open_all_doors' then
         for i = 0, 7 do
             SetVehicleDoorOpen(cache.vehicle, i, false, false)
         end
         if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
             OpenBombBayDoors(cache.vehicle)
         end
-    elseif args == 'close_all_doors' then
+    elseif args[1] == 'close_all_doors' then
         SetVehicleDoorsShut(cache.vehicle, false)
         if GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(cache.vehicle, 'door_hatch_r') ~= -1 then
             CloseBombBayDoors(cache.vehicle)
         end
-    elseif args == 'remove_door' then
+    elseif args[1] == 'remove_door' then
         SetVehicleDoorBroken(cache.vehicle, scrollIndex - 1, vehicleRemoveDoors)
     end
 end)
@@ -2155,10 +2154,10 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_options_windows'] = selected
     end,
     options = {
-        {label = 'Roll up window', description = 'Roll the specified window up, press enter to apply it', args = 'roll_up', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)'}, defaultIndex = 1, close = false},
-        {label = 'Roll down window', description = 'Roll the specified window down, press enter to apply it', args = 'roll_down', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)'}, defaultIndex = 1, close = false},
-        {label = 'Smash window', description = 'Smash the specified window, press enter to apply it', args = 'smash', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
-        {label = 'Restore window', description = 'Restore the specified window, press enter to apply it', args = 'restore', values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
+        {label = 'Roll up window', description = 'Roll the specified window up, press enter to apply it', args = {'roll_up'}, values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)'}, defaultIndex = 1, close = false},
+        {label = 'Roll down window', description = 'Roll the specified window down, press enter to apply it', args = {'roll_down'}, values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)'}, defaultIndex = 1, close = false},
+        {label = 'Smash window', description = 'Smash the specified window, press enter to apply it', args = {'smash'}, values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
+        {label = 'Restore window', description = 'Restore the specified window, press enter to apply it', args = {'restore'}, values = {'Left Front Window', 'Right Front Window', 'Left Rear Window', 'Right Rear Window', 'Extra (#1)', 'Extra (#2)', 'Front windscreen', 'Rear windscreen'}, defaultIndex = 1, close = false},
     }
 }, function(_, scrollIndex, args)
     local inVeh, reason = IsInVehicle(false)
@@ -2172,17 +2171,17 @@ lib.registerMenu({
         return
     end
 
-    if args == 'roll_up' then
+    if args[1] == 'roll_up' then
         if IsVehicleWindowIntact(cache.vehicle, scrollIndex - 1) then
             RollUpWindow(cache.vehicle, scrollIndex - 1)
         end
-    elseif args == 'roll_down' then
+    elseif args[1] == 'roll_down' then
         if IsVehicleWindowIntact(cache.vehicle, scrollIndex - 1) then
             RollDownWindow(cache.vehicle, scrollIndex - 1)
         end
-    elseif args == 'smash' then
+    elseif args[1] == 'smash' then
         SmashVehicleWindow(cache.vehicle, scrollIndex - 1)
-    elseif args == 'restore' then
+    elseif args[1] == 'restore' then
         FixVehicleWindow(cache.vehicle, scrollIndex - 1)
     end
 end)

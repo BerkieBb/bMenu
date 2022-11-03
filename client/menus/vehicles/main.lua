@@ -34,16 +34,16 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_related_options'] = selected
     end,
     options = {
-        {label = 'Options', icon = 'wrench', description = 'Common vehicle options including tuning and styling', args = 'berkie_menu_vehicle_options'},
-        {label = 'Spawner', icon = 'car', description = 'Spawn any vehicle that is registered in the game, including addon vehicles', args = 'berkie_menu_vehicle_spawner'},
-        {label = 'Personal Vehicle', icon = 'user-gear', description = 'Control your personal vehicle or change it', args = 'berkie_menu_vehicle_personal'}
+        {label = 'Options', icon = 'wrench', description = 'Common vehicle options including tuning and styling', args = {'berkie_menu_vehicle_options'}},
+        {label = 'Spawner', icon = 'car', description = 'Spawn any vehicle that is registered in the game, including addon vehicles', args = {'berkie_menu_vehicle_spawner'}},
+        {label = 'Personal Vehicle', icon = 'user-gear', description = 'Control your personal vehicle or change it', args = {'berkie_menu_vehicle_personal'}}
     }
 }, function(_, _, args)
-    if args == 'berkie_menu_vehicle_spawner' then
+    if args[1] == 'berkie_menu_vehicle_spawner' then
         CreateVehicleSpawnerMenu()
     end
 
-    lib.showMenu(args, MenuIndexes[args])
+    lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 --#endregion Menu Registration

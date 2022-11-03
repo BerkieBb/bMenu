@@ -70,11 +70,11 @@ lib.registerMenu({
             end
         end
 
-        if args == 'set_vehicle_lights' then
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = 'set_vehicle_lights', values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, 4)
-        elseif args == 'add_blip' then
+        if args[1] == 'set_vehicle_lights' then
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, 4)
+        elseif args[1] == 'add_blip' then
             enableVehicleBlip = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = 'add_blip', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 9)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 9)
             if enableVehicleBlip then
                 local entityState = Entity(curVeh)
                 if not entityState.state.berkie_menu_blip or not DoesBlipExist(entityState.state.berkie_menu_blip) then
@@ -92,28 +92,28 @@ lib.registerMenu({
                 end
                 entityState.state:set('berkie_menu_blip', nil)
             end
-        elseif args == 'exclusive_driver' then
+        elseif args[1] == 'exclusive_driver' then
             SetVehicleExclusiveDriver(curVeh, scrollIndex == 1)
             SetVehicleExclusiveDriver_2(curVeh, scrollIndex == 1 and cache.ped or 0, 1)
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = 'exclusive_driver', values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 10)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 10)
         end
     end,
     options = {
-        {label = 'Set Vehicle', description = 'Sets your current vehicle as your personal vehicle. If you already have a personal vehicle set then this will override your selection', args = 'set_vehicle'},
+        {label = 'Set Vehicle', description = 'Sets your current vehicle as your personal vehicle. If you already have a personal vehicle set then this will override your selection', args = {'set_vehicle'}},
         {label = 'Current Vehicle: None', close = false},
-        {label = 'Toggle Engine', description = 'Toggles the engine on or off, even when you\'re not inside of the vehicle. This does not work if someone else is currently using your vehicle', args = 'toggle_engine', close = false},
-        {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = 'set_vehicle_lights', values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = 1, close = false},
-        {label = 'Lock Vehicle Doors', description = 'This will lock all your vehicle doors for all players. Anyone already inside will always be able to leave the vehicle, even if the doors are locked', args = 'lock_doors', close = false},
-        {label = 'Unlock Vehicle Doors', description = 'This will unlock all your vehicle doors for all players', args = 'unlock_doors', close = false},
-        {label = 'Vehicle Doors', description = 'Open, close, remove and restore vehicle doors here', args = 'berkie_menu_vehicle_personal_doors', close = false},
-        {label = 'Toggle Alarm Sound', description = 'Toggles the vehicle alarm sound on or off. This does not set an alarm. It only toggles the current sounding status of the alarm', args = 'alarm_sound', close = false},
-        {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = 'add_blip', values = {'Yes', 'No'}, defaultIndex = enableVehicleBlip and 1 or 2, close = false},
-        {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = 'exclusive_driver', values = {'Yes', 'No'}, defaultIndex = 2, close = false}
+        {label = 'Toggle Engine', description = 'Toggles the engine on or off, even when you\'re not inside of the vehicle. This does not work if someone else is currently using your vehicle', args = {'toggle_engine'}, close = false},
+        {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = 1, close = false},
+        {label = 'Lock Vehicle Doors', description = 'This will lock all your vehicle doors for all players. Anyone already inside will always be able to leave the vehicle, even if the doors are locked', args = {'lock_doors'}, close = false},
+        {label = 'Unlock Vehicle Doors', description = 'This will unlock all your vehicle doors for all players', args = {'unlock_doors'}, close = false},
+        {label = 'Vehicle Doors', description = 'Open, close, remove and restore vehicle doors here', args = {'berkie_menu_vehicle_personal_doors'}, close = false},
+        {label = 'Toggle Alarm Sound', description = 'Toggles the vehicle alarm sound on or off. This does not set an alarm. It only toggles the current sounding status of the alarm', args = {'alarm_sound'}, close = false},
+        {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, values = {'Yes', 'No'}, defaultIndex = enableVehicleBlip and 1 or 2, close = false},
+        {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, values = {'Yes', 'No'}, defaultIndex = 2, close = false}
     }
 }, function(_, scrollIndex, args)
-    if not args then return end
+    if not args or not args[1] then return end
 
-    if args == 'set_vehicle' then
+    if args[1] == 'set_vehicle' then
         local inVeh, reason = IsInVehicle(true)
         if not inVeh then
             lib.notify({
@@ -151,7 +151,7 @@ lib.registerMenu({
         end
         lib.showMenu('berkie_menu_vehicle_personal', MenuIndexes['berkie_menu_vehicle_personal'])
     elseif DoesEntityExist(NetToVeh(currentVehicle)) then
-        if args == 'kick_passengers' then
+        if args[1] == 'kick_passengers' then
             local curVeh = NetToVeh(currentVehicle)
             if IsPedInVehicle(cache.ped, curVeh, false) or (GetVehicleNumberOfPassengers(curVeh) == 0 and not IsVehicleSeatFree(curVeh, -1)) then
                 lib.notify({
@@ -175,10 +175,10 @@ lib.registerMenu({
                 end
             end
 
-            if args == 'toggle_engine' then
+            if args[1] == 'toggle_engine' then
                 pressKeyFob()
                 SetVehicleEngineOn(curVeh, not GetIsVehicleEngineRunning(curVeh), true, true)
-            elseif args == 'set_vehicle_lights' then
+            elseif args[1] == 'set_vehicle_lights' then
                 pressKeyFob()
                 if scrollIndex == 1 then
                     SetVehicleLights(curVeh, 3)
@@ -187,8 +187,8 @@ lib.registerMenu({
                 else
                     SetVehicleLights(curVeh, 0)
                 end
-            elseif args == 'unlock_doors' or args == 'lock_doors' then
-                local lock = args == 'lock_doors'
+            elseif args[1] == 'unlock_doors' or args[1] == 'lock_doors' then
+                local lock = args[1] == 'lock_doors'
                 pressKeyFob()
                 for _ = 1, 2 do
                     local timer = GetGameTimer()
@@ -205,7 +205,7 @@ lib.registerMenu({
                     type = 'inform'
                 })
                 SetVehicleDoorsLockedForAllPlayers(curVeh, lock)
-            elseif args == 'alarm_sound' then
+            elseif args[1] == 'alarm_sound' then
                 pressKeyFob()
                 if IsVehicleAlarmActivated(curVeh) then
                     SetVehicleAlarmTimeLeft(curVeh, 0)
@@ -215,34 +215,34 @@ lib.registerMenu({
                     SetVehicleAlarmTimeLeft(curVeh, math.random(8000, 45000))
                     StartVehicleAlarm(curVeh)
                 end
-            elseif args == 'berkie_menu_vehicle_personal_doors' then
+            elseif args[1] == 'berkie_menu_vehicle_personal_doors' then
                 lib.hideMenu(false)
                 local i = 1
                 for i2 = 0, 7 do
                     if GetIsDoorValid(curVeh, i2) then
-                        lib.setMenuOptions(args, {label = vehicleDoors[i2 + 1], description = ('Open/close the %s'):format(vehicleDoors[i2 + 1]:lower()), args = i2, close = false}, i)
+                        lib.setMenuOptions(args[1], {label = vehicleDoors[i2 + 1], description = ('Open/close the %s'):format(vehicleDoors[i2 + 1]:lower()), args = {i2}, close = false}, i)
                         i += 1
                     end
                 end
 
                 if GetEntityBoneIndexByName(curVeh, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(curVeh, 'door_hatch_r') ~= -1 then
-                    lib.setMenuOptions(args, {label = 'Bomb Bay', description = 'Open/close the bomb bay', args = 'bomb_bay', close = false}, i)
+                    lib.setMenuOptions(args[1], {label = 'Bomb Bay', description = 'Open/close the bomb bay', args = {'bomb_bay'}, close = false}, i)
                     i += 1
                 end
 
-                lib.setMenuOptions(args, {label = 'Open All Doors', args = 'open_all_doors', close = false}, i)
+                lib.setMenuOptions(args[1], {label = 'Open All Doors', args = {'open_all_doors'}, close = false}, i)
                 i += 1
 
-                lib.setMenuOptions(args, {label = 'Close All Doors', args = 'close_all_doors', close = false}, i)
+                lib.setMenuOptions(args[1], {label = 'Close All Doors', args = {'close_all_doors'}, close = false}, i)
                 i += 1
 
-                lib.setMenuOptions(args, {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = 'remove_doors', values = {'Yes', 'No'}, defaultIndex = vehicleRemoveDoors and 1 or 2, close = false}, i)
+                lib.setMenuOptions(args[1], {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = {'remove_doors'}, values = {'Yes', 'No'}, defaultIndex = vehicleRemoveDoors and 1 or 2, close = false}, i)
                 i += 1
 
-                lib.setMenuOptions(args, {label = 'Remove Door', description = 'Remove the specified door from the vehicle, press enter to apply it', args = 'remove_door', values = vehicleDoors, defaultIndex = 1, close = false}, i)
+                lib.setMenuOptions(args[1], {label = 'Remove Door', description = 'Remove the specified door from the vehicle, press enter to apply it', args = {'remove_door'}, values = vehicleDoors, defaultIndex = 1, close = false}, i)
                 i += 1
 
-                lib.showMenu(args, MenuIndexes[args])
+                lib.showMenu(args[1], MenuIndexes[args[1]])
             end
         end
     else
@@ -264,14 +264,14 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_vehicle_personal_doors'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'remove_doors' then
+        if args[1] == 'remove_doors' then
             vehicleRemoveDoors = scrollIndex == 1
         end
     end,
     options = {}
 }, function(_, scrollIndex, args)
     local curVeh = NetToVeh(currentVehicle)
-    if type(args) == 'number' then
+    if type(args[1]) == 'number' then
         pressKeyFob()
         local isOpen = GetVehicleDoorAngleRatio(curVeh, args) > 0.1
         if isOpen then
@@ -279,14 +279,14 @@ lib.registerMenu({
         else
             SetVehicleDoorOpen(curVeh, args, false, false)
         end
-    elseif args == 'bomb_bay' then
+    elseif args[1] == 'bomb_bay' then
         pressKeyFob()
         if AreBombBayDoorsOpen(curVeh) then
             CloseBombBayDoors(curVeh)
         else
             OpenBombBayDoors(curVeh)
         end
-    elseif args == 'open_all_doors' then
+    elseif args[1] == 'open_all_doors' then
         pressKeyFob()
         for i = 0, 7 do
             SetVehicleDoorOpen(curVeh, i, false, false)
@@ -294,13 +294,13 @@ lib.registerMenu({
         if GetEntityBoneIndexByName(curVeh, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(curVeh, 'door_hatch_r') ~= -1 then
             OpenBombBayDoors(curVeh)
         end
-    elseif args == 'close_all_doors' then
+    elseif args[1] == 'close_all_doors' then
         pressKeyFob()
         SetVehicleDoorsShut(curVeh, false)
         if GetEntityBoneIndexByName(curVeh, 'door_hatch_l') ~= -1 and GetEntityBoneIndexByName(curVeh, 'door_hatch_r') ~= -1 then
             CloseBombBayDoors(curVeh)
         end
-    elseif args == 'remove_door' then
+    elseif args[1] == 'remove_door' then
         pressKeyFob()
         SetVehicleDoorBroken(curVeh, scrollIndex - 1, vehicleRemoveDoors)
     end

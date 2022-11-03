@@ -17,18 +17,18 @@ lib.registerMenu({
         MenuIndexes['berkie_menu_miscellaneous_options'] = selected
     end,
     onSideScroll = function(_, scrollIndex, args)
-        if args == 'show_effects' then
+        if args[1] == 'show_effects' then
             showEffects = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_miscellaneous_options', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}, 1)
+            lib.setMenuOptions('berkie_menu_miscellaneous_options', {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', args = {'show_effects'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 1)
         end
     end,
     options = {
-        {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', args = 'show_effects', values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}
+        {label = 'Show Effects', icon = 'hat-wizard', description = 'Show effects when going in and out of noclip or when teleporting', args = {'show_effects'}, values = {'Yes', 'No'}, defaultIndex = showEffects and 1 or 2, close = false}
     }
 }, function(_, scrollIndex, args)
     if scrollIndex then return end
 
-    lib.showMenu(args, MenuIndexes[args])
+    lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 --#endregion Menu Registration
