@@ -534,7 +534,7 @@ local vehicleHighbeamsOnHonk = false
 local function getHealthString(health)
     local color = ''
     if health <= 0 then
-        return ('~r~%s'):format(health)
+        return ('~r~%s~w~'):format(health)
     end
 
     local mappedHealth = math.floor(health * 4 / 1000)
@@ -547,7 +547,7 @@ local function getHealthString(health)
     else
         color = '~g~'
     end
-    return ('%s%s'):format(color, health)
+    return ('%s%s~w~'):format(color, health)
 end
 
 local function drawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
@@ -1253,6 +1253,7 @@ lib.registerMenu({
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = {'torque_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 18)
         elseif args[1] == 'power_multiplier_toggle' then
             vehicleUsePowerMultiplier = val
+            ModifyVehicleTopSpeed(cache.vehicle, vehicleUsePowerMultiplier and vehiclePowerMultiplier or 1)
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = {'power_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
         elseif args[1] == 'torque_multiplier' then
             vehicleTorqueMultiplier = 2 ^ scrollIndex
@@ -1262,6 +1263,9 @@ lib.registerMenu({
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = {'power_multiplier'}, values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, 21)
         elseif args[1] == 'plane_turbulence' then
             disablePlaneTurbulence = val
+            if IsThisModelAPlane(GetEntityModel(cache.vehicle)) then
+                SetPlaneTurbulenceMultiplier(cache.vehicle, disablePlaneTurbulence and 0.0 or 1.0)
+            end
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Disable Plane Turbulence', description = 'Disables the turbulence for all planes. Note only works for planes. Helicopters and other flying vehicles are not supported', args = {'plane_turbulence'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 22)
         elseif args[1] == 'engine_always_on' then
             vehicleEngineAlwaysOn = val
@@ -1277,6 +1281,9 @@ lib.registerMenu({
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = {'radio_station'}, values = vehicleRadioStationsArray, defaultIndex = scrollIndex, close = false}, 33)
         elseif args[1] == 'bike_helmet' then
             canWearHelmet = val
+            if GetVehicleClass(cache.vehicle) == 8 then
+                SetPedHelmet(cache.ped, canWearHelmet)
+            end
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Bike Helmet', description = 'Auto-equip a helmet when getting on a bike or quad', args = {'bike_helmet'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 34)
         elseif args[1] == 'highbeams_on_honk' then
             vehicleHighbeamsOnHonk = val
@@ -1523,12 +1530,12 @@ lib.registerMenu({
     elseif args[1] == 'freeze_vehicle' then
         vehicleFrozen = scrollIndex == 1
         lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Freeze Vehicle', description = 'Freeze your vehicle\'s position, press enter to apply it', args = {'freeze_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 28)
-        if scrollIndex == 1 then
+        if vehicleFrozen then
             vehicleFrozenSpeed = GetEntitySpeedVector(cache.vehicle, true).y
             vehicleFrozenRPM = GetVehicleCurrentRpm(cache.vehicle)
         end
-        FreezeEntityPosition(cache.vehicle, scrollIndex == 1)
-        if scrollIndex == 2 then
+        FreezeEntityPosition(cache.vehicle, vehicleFrozen)
+        if not vehicleFrozen then
             if not IsThisModelATrain(GetEntityModel(cache.vehicle)) then
                 SetVehicleForwardSpeed(cache.vehicle, vehicleFrozenSpeed)
             end
@@ -1594,18 +1601,45 @@ lib.registerMenu({
         local val = scrollIndex == 1 and vehicleGodMode
         if args[1] == 'invincible' then
             vehicleInvincible = val
+
+            local memoryAddress = Citizen.InvokeNative(`GET_ENTITY_ADDRESS`, cache.vehicle)
+            if memoryAddress then
+                memoryAddress += 392
+
+                local setter = vehicleInvincible and SetBit or ClearBit
+
+                setter(memoryAddress, 4) -- IsBulletProof
+                setter(memoryAddress, 5) -- IsFireProof
+                setter(memoryAddress, 6) -- IsCollisionProof
+                setter(memoryAddress, 7) -- IsMeleeProof
+                setter(memoryAddress, 11) -- IsExplosionProof
+            end
+
+            SetEntityInvincible(cache.vehicle, vehicleInvincible)
+
+            for i = 0, 5 do
+                if GetEntityBoneIndexByName(cache.vehicle, vehicleDoorBoneNames[i]) ~= -1 then
+                    SetVehicleDoorCanBreak(cache.vehicle, i, not vehicleInvincible)
+                end
+            end
+
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Invincible', description = 'Makes the car invincible, includes fire damage, explosion damage, collision damage and more', args = {'invincible'}, values = {'Yes', 'No'}, defaultIndex = vehicleInvincible and 1 or 2, close = false}, 1)
         elseif args[1] == 'engine_damage' then
             vehicleEngineDamage = val
+            SetVehicleEngineCanDegrade(cache.vehicle, not vehicleEngineDamage)
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Engine Damage', description = 'Disables your engine from taking any damage', args = {'engine_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleEngineDamage and 1 or 2, close = false}, 2)
         elseif args[1] == 'visual_damage' then
             vehicleVisualDamage = val
+            SetVehicleCanBeVisiblyDamaged(cache.vehicle, not vehicleVisualDamage)
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Visual Damage', description = 'This prevents scratches and other damage decals from being applied to your vehicle. It does not prevent (body) deformation damage', args = {'visual_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleVisualDamage and 1 or 2, close = false}, 3)
         elseif args[1] == 'strong_wheels' then
             vehicleStrongWheels = val
+            SetVehicleWheelsCanBreak(cache.vehicle, not vehicleStrongWheels)
+            SetVehicleHasStrongAxles(cache.vehicle, vehicleStrongWheels)
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Strong Wheels', description = 'Disables your wheels from being deformed and causing reduced handling. This does not make tires bulletproof', args = {'strong_wheels'}, values = {'Yes', 'No'}, defaultIndex = vehicleStrongWheels and 1 or 2, close = false}, 4)
         elseif args[1] == 'ramp_damage' then
             vehicleRampDamage = val
+            SetVehicleReceivesRampDamage(cache.vehicle, not vehicleRampDamage)
             lib.setMenuOptions('berkie_menu_vehicle_options_god_mode_menu', {label = 'Ramp Damage', description = 'Disables vehicles such as the Ramp Buggy from taking any damage when using the ramp', args = {'ramp_damage'}, values = {'Yes', 'No'}, defaultIndex = vehicleRampDamage and 1 or 2, close = false}, 5)
         elseif args[1] == 'auto_repair' then
             vehicleAutoRepair = val
@@ -2188,88 +2222,80 @@ end)
 
 --#endregion Menu Registration
 
+--#region Listeners
+
+lib.onCache('vehicle', function(value)
+    if not value then return end
+
+    SetVehicleReceivesRampDamage(value, not vehicleRampDamage)
+    SetVehicleCanBeVisiblyDamaged(value, not vehicleVisualDamage)
+    SetVehicleEngineCanDegrade(value, not vehicleEngineDamage)
+    SetVehicleWheelsCanBreak(value, not vehicleStrongWheels)
+    SetVehicleHasStrongAxles(value, vehicleStrongWheels)
+
+    local memoryAddress = Citizen.InvokeNative(`GET_ENTITY_ADDRESS`, value)
+    if memoryAddress then
+        memoryAddress += 392
+
+        local setter = vehicleInvincible and SetBit or ClearBit
+
+        setter(memoryAddress, 4) -- IsBulletProof
+        setter(memoryAddress, 5) -- IsFireProof
+        setter(memoryAddress, 6) -- IsCollisionProof
+        setter(memoryAddress, 7) -- IsMeleeProof
+        setter(memoryAddress, 11) -- IsExplosionProof
+    end
+
+    SetEntityInvincible(value, vehicleInvincible)
+
+    for i = 0, 5 do
+        if GetEntityBoneIndexByName(value, vehicleDoorBoneNames[i]) ~= -1 then
+            SetVehicleDoorCanBreak(value, i, not vehicleInvincible)
+        end
+    end
+
+    ModifyVehicleTopSpeed(value, vehicleUsePowerMultiplier and vehiclePowerMultiplier or 1)
+
+    if IsThisModelAPlane(GetEntityModel(value)) then
+        SetPlaneTurbulenceMultiplier(value, disablePlaneTurbulence and 0.0 or 1.0)
+    end
+
+    FreezeEntityPosition(value, vehicleFrozen)
+
+    if GetVehicleClass(value) == 8 then
+        SetPedHelmet(cache.ped, canWearHelmet)
+    end
+end)
+
+--#endregion Listeners
+
 --#region Threads
 
 CreateThread(function()
     while true do
         local sleep = 200
-        local ped = cache.ped
         if IsInVehicle(false) then
             sleep = 0
             local veh = cache.vehicle
-            if vehicleGodMode then
-                SetVehicleReceivesRampDamage(veh, not vehicleRampDamage)
 
-                if vehicleVisualDamage then
-                    RemoveDecalsFromVehicle(veh)
-                end
+            if vehicleVisualDamage then
+                RemoveDecalsFromVehicle(veh)
+            end
 
-                if vehicleAutoRepair then
-                    SetVehicleFixed(veh)
-                end
+            if vehicleAutoRepair then
+                SetVehicleFixed(veh)
+            end
 
-                SetVehicleCanBeVisiblyDamaged(veh, not vehicleVisualDamage)
-                SetVehicleEngineCanDegrade(veh, not vehicleEngineDamage)
+            if vehicleEngineDamage and GetVehicleEngineHealth(veh) < 1000.0 then
+                SetVehicleEngineHealth(veh, 1000.0)
+            end
 
-                if vehicleEngineDamage and GetVehicleEngineHealth(veh) < 1000.0 then
-                    SetVehicleEngineHealth(veh, 1000.0)
-                end
-
-                SetVehicleWheelsCanBreak(veh, not vehicleStrongWheels)
-                SetVehicleHasStrongAxles(veh, vehicleStrongWheels)
-
-                local memoryAddress = Citizen.InvokeNative(`GET_ENTITY_ADDRESS`, veh)
-                if not memoryAddress then
-                    goto skipAddresses
-                end
-
-                do
-                    memoryAddress += 392
-
-                    local setter = vehicleInvincible and SetBit or ClearBit
-
-                    setter(memoryAddress, 4) -- IsBulletProof
-                    setter(memoryAddress, 5) -- IsFireProof
-                    setter(memoryAddress, 6) -- IsCollisionProof
-                    setter(memoryAddress, 7) -- IsMeleeProof
-                    setter(memoryAddress, 11) -- IsExplosionProof
-                end
-
-                :: skipAddresses ::
-
-                SetEntityInvincible(vehicle, vehicleInvincible)
-
-                for i = 0, 5 do
-                    if GetEntityBoneIndexByName(veh, vehicleDoorBoneNames[i]) ~= -1 then
-                        SetVehicleDoorCanBreak(veh, i, not vehicleInvincible)
-                    end
-                end
-
-                if vehicleNeverDirty and GetVehicleDirtLevel(veh) > 0 then
-                    SetVehicleDirtLevel(veh, 0)
-                end
+            if vehicleNeverDirty and GetVehicleDirtLevel(veh) > 0 then
+                SetVehicleDirtLevel(veh, 0)
             end
 
             if vehicleUseTorqueMultiplier then
                 SetVehicleCheatPowerIncrease(veh, vehicleTorqueMultiplier)
-            end
-
-            if vehicleUsePowerMultiplier then
-                ModifyVehicleTopSpeed(veh, vehiclePowerMultiplier)
-            else
-                ModifyVehicleTopSpeed(veh, 1)
-            end
-
-            if IsThisModelAPlane(GetEntityModel(veh)) then
-                if disablePlaneTurbulence then
-                    SetPlaneTurbulenceMultiplier(veh, 0.0)
-                else
-                    SetPlaneTurbulenceMultiplier(veh, 1.0)
-                end
-            end
-
-            if vehicleFrozen then
-                FreezeEntityPosition(veh, true)
             end
 
             if vehicleInfiniteFuel and GetVehicleFuelLevel(veh) < 99.0 then
@@ -2277,13 +2303,7 @@ CreateThread(function()
             end
 
             if vehicleShowHealth then
-                drawTextOnScreen(('~n~Engine health: %s'):format(getHealthString(math.round(GetVehicleEngineHealth(veh), 0.001))), 0.5, 0.0)
-                drawTextOnScreen(('~n~~n~Body health: %s'):format(getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001))), 0.5, 0.0)
-                drawTextOnScreen(('~n~~n~~n~Tank health: %s'):format(getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
-            end
-
-            if GetVehicleClass(veh) == 8 then
-                SetPedHelmet(ped, canWearHelmet)
+                drawTextOnScreen(('~n~Engine health: %s~n~Body health: %s~n~Tank health: %s'):format(getHealthString(math.round(GetVehicleEngineHealth(veh), 0.001)), getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001)), getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
             end
 
             if vehicleHighbeamsOnHonk then
@@ -2294,8 +2314,6 @@ CreateThread(function()
                     SetVehicleFullbeam(veh, false)
                 end
             end
-        else
-
         end
         Wait(sleep)
     end
@@ -2331,9 +2349,3 @@ CreateThread(function()
 end)
 
 --#endregion Threads
-
---[[
-    TODO
-
-    optimize loops by converting them to using lib.onCache
-]]

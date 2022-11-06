@@ -10,8 +10,7 @@ lua54 'yes'
 use_experimental_fxv2_oal 'yes'
 
 shared_scripts {
-    '@ox_lib/init.lua',
-    'shared/**/*.lua'
+    '@ox_lib/init.lua'
 }
 
 client_scripts {
@@ -20,6 +19,10 @@ client_scripts {
 
 server_scripts {
     'server/**/*.lua'
+}
+
+files {
+    'config/weapons.lua'
 }
 
 dependencies {

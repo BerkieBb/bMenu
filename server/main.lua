@@ -1,11 +1,3 @@
---#region Initialization
-
-if type(MenuPermission) == 'string' and not IsPrincipalAceAllowed(MenuPermission --[[@as string]], 'command.berkiemenu') then
-    lib.addAce(MenuPermission, 'command.berkiemenu')
-end
-
---#endregion Initialization
-
 --#region Callbacks
 
 lib.callback.register('berkie_menu:server:getOnlinePlayers', function()

@@ -84,7 +84,8 @@ RegisterCommand('berkiemenu', function()
     else
         lib.hideMenu(true)
     end
-end, type(MenuPermission) == 'string')
+end, true)
+
 RegisterKeyMapping('berkiemenu', 'Open Menu', 'KEYBOARD', 'M')
 
 AddEventHandler('onResourceStop', function(resource)
@@ -98,13 +99,9 @@ end)
 --[[
     TODO
 
-        updates to add:
+        add updates that vMenu didn't have
 
-            https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-los-santos-tuners-update-patch-notes-summer-2021
+        add translations
 
-            https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-the-contract-update-december-2021-patch-notes-fixers
-
-            https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-v-title-update-1-56-1-59-patch-notes-next-gen-bug-fixes
-
-            https://www.gtabase.com/news/grand-theft-auto-v/title-updates/gta-online-summer-2022-dlc-update-patch-notes-features
+        convert all sliders with just 2 options to checkboxes
 ]]

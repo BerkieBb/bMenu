@@ -115,6 +115,9 @@ lib.registerMenu({
             SetPoliceIgnorePlayer(cache.playerId, false)
         end
     else
+        if args[1] == 'berkie_menu_player_weapon_options' then
+            SetupWeaponsMenu()
+        end
         lib.showMenu(args[1], MenuIndexes[args[1]])
     end
 end)

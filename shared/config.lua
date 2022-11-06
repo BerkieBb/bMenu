@@ -1,1 +1,0 @@
-MenuPermission = false -- false or a principal like 'group.admin'

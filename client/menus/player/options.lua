@@ -61,6 +61,9 @@ lib.registerMenu({
         elseif args[1] == 'never_wanted' then
             neverWanted = scrollIndex == 1
             SetMaxWantedLevel(neverWanted and 0 or 5)
+            if neverWanted then
+                ClearPlayerWantedLevel(cache.playerId)
+            end
         elseif args[1] == 'set_wanted_level' then
             lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Wanted Level', args = {'set_wanted_level'}, values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = scrollIndex, close = false}, 9)
             if neverWanted then return end
@@ -100,7 +103,7 @@ lib.registerMenu({
         {label = 'Clean Player Clothes', description = 'Clean your player clothes', args = {'clean_player_clothes'}, close = false},
         {label = 'Dry Player Clothes', description = 'Dry your player clothes', args = {'dry_player_clothes'}, close = false},
         {label = 'Wet Player Clothes', description = 'Wet your player clothes', args = {'wet_player_clothes'}, close = false},
-        {label = 'Commit Suicide', description = 'Kill yourself by taking the pill. Or by using a pistol if you have one', args = {'suicide'}, close = false},
+        {label = 'Commit Suicide', description = 'Kill yourself by taking the pill. Or by using a pistol if you have one', args = {'suicide'}},
         {label = 'Auto Pilot', description = 'Vehicle auto pilot options', args = {'berkie_menu_player_autopilot_options'}},
         {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, values = {'Yes', 'No'}, defaultIndex = freezePlayer and 1 or 2, close = false}
     }
@@ -141,6 +144,8 @@ lib.registerMenu({
                 SetEntityHealth(cache.ped, 0)
                 return
             end
+
+            MenuOpen = false
 
             lib.requestAnimDict('mp_suicide')
 
@@ -390,27 +395,24 @@ lib.registerMenu({
 
 --#endregion Menu Registration
 
+--#region Listeners
+
+lib.onCache('ped', function(value)
+    SetEntityInvincible(value, godmode)
+    SetEntityVisible(value, not invisible, false)
+    SetPedCanRagdoll(value, not noRagdoll)
+end)
+
+--#endregion Listeners
+
 --#region Threads
 
 CreateThread(function()
     SetRunSprintMultiplierForPlayer(cache.playerId, fastRun and 1.49 or 1)
     SetSwimMultiplierForPlayer(cache.playerId, fastSwim and 1.49 or 1)
     while true do
-        local ped = cache.ped
-        if godmode then
-            SetEntityInvincible(ped, true)
-        end
-
-        if invisible then
-            SetEntityVisible(ped, false, false)
-        end
-
         if superJump then
             SetSuperJumpThisFrame(cache.playerId)
-        end
-
-        if noRagdoll then
-            SetPedCanRagdoll(cache.ped, false)
         end
 
         if neverWanted and GetPlayerWantedLevel(cache.playerId) > 0 then
