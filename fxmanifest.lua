@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'BerkieB'
 description 'A standalone menu containing lots of useful options for FiveM'
-version 'don\'t use in live environment'
+version 'don\'t use in live environment yet'
 repository 'https://github.com/BerkieBb/berkie_menu'
 
 lua54 'yes'
@@ -22,7 +22,7 @@ server_scripts {
 }
 
 files {
-    'config/weapons.lua'
+    'config/*.lua'
 }
 
 dependencies {

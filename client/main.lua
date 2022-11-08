@@ -1,3 +1,13 @@
+--#region Startup
+
+-- I don't want you renaming this because this uses kvp and that requires the resource name to be the same across servers to work correctly
+if GetCurrentResourceName() ~= 'berkie_menu' then
+    error('Please don\'t rename this resource, change the folder name (back) to \'berkie_menu\' (case sensitive) to make sure the saved data can be saved and fetched accordingly from the cache.')
+    return
+end
+
+--#endregion Startup
+
 --#region Variables
 
 MenuOpen = false
@@ -61,6 +71,7 @@ lib.registerMenu({
         {label = 'Online Players', icon = 'user-group', args = {'berkie_menu_online_players'}},
         {label = 'Player Related Options', icon = 'user-gear', args = {'berkie_menu_player_related_options'}},
         {label = 'Vehicle Related Options', icon = 'car', args = {'berkie_menu_vehicle_related_options'}},
+        {label = 'World Related Options', icon = 'globe', args = {'berkie_menu_world_related_options'}},
         {label = 'Recording Options', icon = 'video', args = {'berkie_menu_recording_options'}},
         {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'berkie_menu_miscellaneous_options'}}
     }

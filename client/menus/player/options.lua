@@ -1,5 +1,8 @@
 --#region Variables
 
+IgnorePlayer = false
+StayInVehicle = false
+
 local godmode = false
 local invisible = false
 local unlimitedStamina = false
@@ -8,8 +11,6 @@ local fastSwim = false
 local superJump = false
 local noRagdoll = false
 local neverWanted = true
-IgnorePlayer = false
-StayInVehicle = false
 local customDrivingStyleList = {}
 local customDrivingStyle = ''
 local freezePlayer = false
@@ -415,6 +416,12 @@ CreateThread(function()
             SetSuperJumpThisFrame(cache.playerId)
         end
 
+        Wait(0)
+    end
+end)
+
+CreateThread(function()
+    while true do
         if neverWanted and GetPlayerWantedLevel(cache.playerId) > 0 then
             ClearPlayerWantedLevel(cache.playerId)
             if GetMaxWantedLevel() > 0 then
@@ -422,7 +429,7 @@ CreateThread(function()
             end
         end
 
-        Wait(0)
+        Wait(100)
     end
 end)
 

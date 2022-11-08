@@ -1253,7 +1253,6 @@ lib.registerMenu({
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Torque Multiplier', description = 'Enables the torque multiplier selected from the list below', args = {'torque_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 18)
         elseif args[1] == 'power_multiplier_toggle' then
             vehicleUsePowerMultiplier = val
-            ModifyVehicleTopSpeed(cache.vehicle, vehicleUsePowerMultiplier and vehiclePowerMultiplier or 1)
             lib.setMenuOptions('berkie_menu_vehicle_options', {label = 'Enable Power Multiplier', description = 'Enables the power multiplier selected from the list below', args = {'power_multiplier_toggle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
         elseif args[1] == 'torque_multiplier' then
             vehicleTorqueMultiplier = 2 ^ scrollIndex
@@ -1682,7 +1681,7 @@ lib.registerMenu({
         local vehClass = GetVehicleClass(cache.vehicle)
         local vehModel = GetEntityModel(cache.vehicle)
         if type(args[1]) == 'table' then
-            local curArg = args[scrollIndex]
+            local curArg = args[1][scrollIndex]
             SetVehicleMod(cache.vehicle, curArg[2], curArg[1], customTires)
             vehicleModsMenuData[curArg[2]][2].defaultIndex = scrollIndex
             lib.setMenuOptions('berkie_menu_vehicle_options_mod_menu', vehicleModsMenuData[curArg[2]][2], vehicleModsMenuData[curArg[2]][1])
@@ -2254,8 +2253,6 @@ lib.onCache('vehicle', function(value)
         end
     end
 
-    ModifyVehicleTopSpeed(value, vehicleUsePowerMultiplier and vehiclePowerMultiplier or 1)
-
     if IsThisModelAPlane(GetEntityModel(value)) then
         SetPlaneTurbulenceMultiplier(value, disablePlaneTurbulence and 0.0 or 1.0)
     end
@@ -2297,6 +2294,8 @@ CreateThread(function()
             if vehicleUseTorqueMultiplier then
                 SetVehicleCheatPowerIncrease(veh, vehicleTorqueMultiplier)
             end
+
+            ModifyVehicleTopSpeed(veh, vehicleUsePowerMultiplier and vehiclePowerMultiplier or 1)
 
             if vehicleInfiniteFuel and GetVehicleFuelLevel(veh) < 99.0 then
                 SetVehicleFuelLevel(veh, 100.0)
