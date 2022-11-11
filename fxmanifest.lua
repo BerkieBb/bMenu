@@ -22,7 +22,7 @@ server_scripts {
 }
 
 files {
-    'config/*.lua'
+    'config/**/*.lua'
 }
 
 dependencies {
