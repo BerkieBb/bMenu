@@ -722,9 +722,11 @@ function SetupWeaponsMenu()
     end
 
     for k, v in pairs(weapons) do
-        local formattedId = ('%s_%s'):format(id, v.weaponType)
-        lib.setMenuOptions(formattedId, {label = v.displayName, args = {k}, close = false}, indexes[formattedId])
-        indexes[formattedId] += 1
+        if v.name ~= 'WEAPON_UNARMED' then
+            local formattedId = ('%s_%s'):format(id, v.weaponType)
+            lib.setMenuOptions(formattedId, {label = v.displayName, args = {k}, close = false}, indexes[formattedId])
+            indexes[formattedId] += 1
+        end
     end
 end
 

@@ -31,74 +31,79 @@ lib.registerMenu({
     onSelected = function(selected)
         MenuIndexes['berkie_menu_player_options'] = selected
     end,
-    onSideScroll = function(_, scrollIndex, args)
+    onCheck = function(_, checked, args)
         if args[1] == 'godmode' then
-            godmode = scrollIndex == 1
+            godmode = checked
             SetEntityInvincible(cache.ped, godmode)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 1)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, checked = godmode, close = false}, 1)
         elseif args[1] == 'invisible' then
-            invisible = scrollIndex == 1
+            invisible = checked
             SetEntityVisible(cache.ped, not invisible, false)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, checked = invisible, close = false}, 2)
         elseif args[1] == 'unlimited_stamina' then
-            unlimitedStamina = scrollIndex == 1
+            unlimitedStamina = checked
             StatSetInt(`MP0_STAMINA`, unlimitedStamina and 100 or 0, true)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'stamina'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'stamina'}, checked = unlimitedStamina, close = false}, 3)
         elseif args[1] == 'fast_run' then
-            fastRun = scrollIndex == 1
+            fastRun = checked
             SetRunSprintMultiplierForPlayer(cache.playerId, fastRun and 1.49 or 1)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 4)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, checked = fastRun, close = false}, 4)
         elseif args[1] == 'fast_swim' then
-            fastSwim = scrollIndex == 1
+            fastSwim = checked
             SetSwimMultiplierForPlayer(cache.playerId, fastSwim and 1.49 or 1)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 5)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, checked = fastSwim, close = false}, 5)
         elseif args[1] == 'super_jump' then
-            superJump = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 6)
+            superJump = checked
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, checked = superJump, close = false}, 6)
         elseif args[1] == 'no_ragdoll' then
-            noRagdoll = scrollIndex == 1
+            noRagdoll = checked
             SetPedCanRagdoll(cache.ped, not noRagdoll)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 7)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, checked = noRagdoll, close = false}, 7)
         elseif args[1] == 'never_wanted' then
-            neverWanted = scrollIndex == 1
+            neverWanted = checked
             SetMaxWantedLevel(neverWanted and 0 or 5)
             if neverWanted then
                 ClearPlayerWantedLevel(cache.playerId)
             end
-        elseif args[1] == 'set_wanted_level' then
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Never Wanted', description = 'Disables all wanted levels', args = {'never_wanted'}, checked = neverWanted, close = false}, 8)
+        elseif args[1] == 'ignore_player' then
+            IgnorePlayer = checked
+            SetEveryoneIgnorePlayer(cache.playerId, ignorePlayer)
+            SetPoliceIgnorePlayer(cache.playerId, ignorePlayer)
+            SetPlayerCanBeHassledByGangs(cache.playerId, not ignorePlayer)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Everyone Ignore Player', description = 'Introverts love this', args = {'ignore_player'}, checked = IgnorePlayer, close = false}, 10)
+        elseif args[1] == 'stay_in_vehicle' then
+            StayInVehicle = checked
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = {'stay_in_vehicle'}, checked = StayInVehicle, close = false}, 11)
+        elseif args[1] == 'freeze' then
+            freezePlayer = checked
+            FreezeEntityPosition(cache.ped, freezePlayer)
+            lib.setMenuOptions('berkie_menu_player_options', {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, checked = freezePlayer, close = false}, 19)
+        end
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        if args[1] == 'set_wanted_level' then
             lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Wanted Level', args = {'set_wanted_level'}, values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = scrollIndex, close = false}, 9)
             if neverWanted then return end
             SetPlayerWantedLevel(cache.playerId, scrollIndex - 1, false)
             SetPlayerWantedLevelNow(cache.playerId, false)
-        elseif args[1] == 'ignore_player' then
-            IgnorePlayer = scrollIndex == 1
-            SetEveryoneIgnorePlayer(cache.playerId, ignorePlayer)
-            SetPoliceIgnorePlayer(cache.playerId, ignorePlayer)
-            SetPlayerCanBeHassledByGangs(cache.playerId, not ignorePlayer)
-        elseif args[1] == 'stay_in_vehicle' then
-            StayInVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = {'stay_in_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 11)
         elseif args[1] == 'set_armor_type' then
             SetPedArmour(cache.ped, (scrollIndex - 1) * 20)
             lib.setMenuOptions('berkie_menu_player_options', {label = 'Set Armor Type', description = 'Set the armor level/type for your player', args = {'set_armor_type'}, values = {'No Armor', GetLabelText('WT_BA_0'), GetLabelText('WT_BA_1'), GetLabelText('WT_BA_2'), GetLabelText('WT_BA_3'), GetLabelText('WT_BA_4')}, defaultIndex = 1, close = false}, 13)
-        elseif args[1] == 'freeze' then
-            freezePlayer = scrollIndex == 1
-            FreezeEntityPosition(cache.ped, freezePlayer)
-            lib.setMenuOptions('berkie_menu_player_options', {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 19)
         end
     end,
     options = {
-        {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, values = {'Yes', 'No'}, defaultIndex = godmode and 1 or 2, close = false},
-        {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, values = {'Yes', 'No'}, defaultIndex = invisible and 1 or 2, close = false},
-        {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'unlimited_stamina'}, values = {'Yes', 'No'}, defaultIndex = unlimitedStamina and 1 or 2, close = false},
-        {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, values = {'Yes', 'No'}, defaultIndex = fastRun and 1 or 2, close = false},
-        {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, values = {'Yes', 'No'}, defaultIndex = fastSwim and 1 or 2, close = false},
-        {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, values = {'Yes', 'No'}, defaultIndex = superJump and 1 or 2, close = false},
-        {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, values = {'Yes', 'No'}, defaultIndex = noRagdoll and 1 or 2, close = false},
-        {label = 'Never Wanted', description = 'Disables all wanted levels', args = {'never_wanted'}, values = {'Yes', 'No'}, defaultIndex = neverWanted and 1 or 2, close = false},
+        {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, checked = godmode, close = false},
+        {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, checked = invisible, close = false},
+        {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'stamina'}, checked = unlimitedStamina, close = false},
+        {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, checked = fastRun, close = false},
+        {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, checked = fastSwim, close = false},
+        {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, checked = superJump, close = false},
+        {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, checked = noRagdoll, close = false},
+        {label = 'Never Wanted', description = 'Disables all wanted levels', args = {'never_wanted'}, checked = neverWanted, close = false},
         {label = 'Set Wanted Level', args = {'set_wanted_level'}, values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = 1, close = false},
-        {label = 'Everyone Ignore Player', description = 'Introverts love this', args = {'ignore_player'}, values = {'Yes', 'No'}, defaultIndex = IgnorePlayer and 1 or 2, close = false},
-        {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = {'stay_in_vehicle'}, values = {'Yes', 'No'}, defaultIndex = StayInVehicle and 1 or 2, close = false},
+        {label = 'Everyone Ignore Player', description = 'Introverts love this', args = {'ignore_player'}, checked = IgnorePlayer, close = false},
+        {label = 'Stay In Vehicle', description = 'When this is enabled, NPCs will not be able to drag you out of your vehicle if they get angry at you', args = {'stay_in_vehicle'}, checked = StayInVehicle, close = false},
         {label = 'Heal Player', description = 'Give the player max health', args = {'heal_player'}, close = false},
         {label = 'Set Armor Type', description = 'Set the armor level/type for your player', args = {'set_armor_type'}, values = {'No Armor', GetLabelText('WT_BA_0'), GetLabelText('WT_BA_1'), GetLabelText('WT_BA_2'), GetLabelText('WT_BA_3'), GetLabelText('WT_BA_4')}, defaultIndex = 1, close = false},
         {label = 'Clean Player Clothes', description = 'Clean your player clothes', args = {'clean_player_clothes'}, close = false},
@@ -106,7 +111,7 @@ lib.registerMenu({
         {label = 'Wet Player Clothes', description = 'Wet your player clothes', args = {'wet_player_clothes'}, close = false},
         {label = 'Commit Suicide', description = 'Kill yourself by taking the pill. Or by using a pistol if you have one', args = {'suicide'}},
         {label = 'Auto Pilot', description = 'Vehicle auto pilot options', args = {'berkie_menu_player_autopilot_options'}},
-        {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, values = {'Yes', 'No'}, defaultIndex = freezePlayer and 1 or 2, close = false}
+        {label = 'Freeze Player', description = 'Freezes your ped at the current location', args = {'freeze'}, checked = freezePlayer, close = false}
     }
 }, function(_, _, args)
     if args[1] == 'heal_player' then

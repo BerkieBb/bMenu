@@ -215,23 +215,21 @@ lib.registerMenu({
     onSelected = function(selected)
         MenuIndexes['berkie_menu_vehicle_spawner'] = selected
     end,
-    onSideScroll = function(_, scrollIndex, args)
+    onCheck = function(_, checked, args)
         if args[1] == 'inside_vehicle' then
-            spawnInVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 2)
+            spawnInVehicle = checked
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, 2)
         elseif args[1] == 'replace_vehicle' then
-            replacePreviousVehicle = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 3)
+            replacePreviousVehicle = checked
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, 3)
         end
     end,
     options = {
         {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = {'spawn_by_model'}},
-        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, values = {'Yes', 'No'}, defaultIndex = spawnInVehicle and 1 or 2, close = false},
-        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, values = {'Yes', 'No'}, defaultIndex = replacePreviousVehicle and 1 or 2, close = false}
+        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = spawnInVehicle, close = false},
+        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = replacePreviousVehicle, close = false}
     }
-}, function(_, scrollIndex, args)
-    if scrollIndex then return end
-
+}, function(_, _, args)
     if args[1] == 'spawn_by_model' then
         local vehicle = lib.inputDialog('Spawn Vehicle', {'Vehicle Model Name'})
         if vehicle and table.type(vehicle) ~= 'empty' then
@@ -245,11 +243,11 @@ lib.registerMenu({
                 })
             end
         end
-        Wait(500)
-        args = {'berkie_menu_vehicle_spawner'}
+        Wait(200)
+        lib.showMenu('berkie_menu_vehicle_spawner', MenuIndexes['berkie_menu_vehicle_spawner'])
+    elseif args[1] ~= 'inside_vehicle' and args[1] ~= 'replace_vehicle' then
+        lib.showMenu(args[1], MenuIndexes[args[1]])
     end
-
-    lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 --#endregion Menu Registration

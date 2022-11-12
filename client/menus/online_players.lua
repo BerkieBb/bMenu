@@ -205,7 +205,7 @@ function CreatePlayerMenu()
                 type = success and 'success' or 'error'
             })
 
-            if args ~= messageArg then return end
+            if args[1] ~= messageArg then return end
 
             Wait(500)
             lib.showMenu(formattedId, MenuIndexes[formattedId])

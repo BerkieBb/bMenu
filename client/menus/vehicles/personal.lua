@@ -57,7 +57,7 @@ lib.registerMenu({
     onSelected = function(selected)
         MenuIndexes['berkie_menu_vehicle_personal'] = selected
     end,
-    onSideScroll = function(_, scrollIndex, args)
+    onCheck = function(_, checked, args)
         local curVeh = NetToVeh(currentVehicle)
 
         if not NetworkHasControlOfEntity(curVeh) then
@@ -70,11 +70,9 @@ lib.registerMenu({
             end
         end
 
-        if args[1] == 'set_vehicle_lights' then
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, 4)
-        elseif args[1] == 'add_blip' then
-            enableVehicleBlip = scrollIndex == 1
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 9)
+        if args[1] == 'add_blip' then
+            enableVehicleBlip = checked
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = checked, close = false}, 9)
             if enableVehicleBlip then
                 local entityState = Entity(curVeh)
                 if not entityState.state.berkie_menu_blip or not DoesBlipExist(entityState.state.berkie_menu_blip) then
@@ -93,9 +91,26 @@ lib.registerMenu({
                 entityState.state:set('berkie_menu_blip', nil)
             end
         elseif args[1] == 'exclusive_driver' then
-            SetVehicleExclusiveDriver(curVeh, scrollIndex == 1)
-            SetVehicleExclusiveDriver_2(curVeh, scrollIndex == 1 and cache.ped or 0, 1)
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, values = {'Yes', 'No'}, defaultIndex = scrollIndex, close = false}, 10)
+            SetVehicleExclusiveDriver(curVeh, checked)
+            SetVehicleExclusiveDriver_2(curVeh, checked and cache.ped or 0, 1)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = checked, close = false}, 10)
+        end
+    end,
+    onSideScroll = function(_, scrollIndex, args)
+        local curVeh = NetToVeh(currentVehicle)
+
+        if not NetworkHasControlOfEntity(curVeh) then
+            if not NetworkRequestControlOfEntity(curVeh) then
+                lib.notify({
+                    description = 'You currently can\'t control this vehicle. Is someone else currently driving your car? Please try again after making sure other players are not controlling your vehicle',
+                    type = 'error'
+                })
+                return
+            end
+        end
+
+        if args[1] == 'set_vehicle_lights' then
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, 4)
         end
     end,
     options = {
@@ -107,8 +122,8 @@ lib.registerMenu({
         {label = 'Unlock Vehicle Doors', description = 'This will unlock all your vehicle doors for all players', args = {'unlock_doors'}, close = false},
         {label = 'Vehicle Doors', description = 'Open, close, remove and restore vehicle doors here', args = {'berkie_menu_vehicle_personal_doors'}, close = false},
         {label = 'Toggle Alarm Sound', description = 'Toggles the vehicle alarm sound on or off. This does not set an alarm. It only toggles the current sounding status of the alarm', args = {'alarm_sound'}, close = false},
-        {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, values = {'Yes', 'No'}, defaultIndex = enableVehicleBlip and 1 or 2, close = false},
-        {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, values = {'Yes', 'No'}, defaultIndex = 2, close = false}
+        {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = enableVehicleBlip, close = false},
+        {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = false, close = false}
     }
 }, function(_, scrollIndex, args)
     if not args or not args[1] then return end
@@ -236,7 +251,7 @@ lib.registerMenu({
                 lib.setMenuOptions(args[1], {label = 'Close All Doors', args = {'close_all_doors'}, close = false}, i)
                 i += 1
 
-                lib.setMenuOptions(args[1], {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = {'remove_doors'}, values = {'Yes', 'No'}, defaultIndex = vehicleRemoveDoors and 1 or 2, close = false}, i)
+                lib.setMenuOptions(args[1], {label = 'Remove Doors', description = 'If this is enabled, the doors will be deleted when using the remove door option, otherwise they will be dropped to the ground', args = {'remove_doors'}, checked = vehicleRemoveDoors, close = false}, i)
                 i += 1
 
                 lib.setMenuOptions(args[1], {label = 'Remove Door', description = 'Remove the specified door from the vehicle, press enter to apply it', args = {'remove_door'}, values = vehicleDoors, defaultIndex = 1, close = false}, i)
@@ -263,9 +278,9 @@ lib.registerMenu({
     onSelected = function(selected)
         MenuIndexes['berkie_menu_vehicle_personal_doors'] = selected
     end,
-    onSideScroll = function(_, scrollIndex, args)
+    onCheck = function(_, checked, args)
         if args[1] == 'remove_doors' then
-            vehicleRemoveDoors = scrollIndex == 1
+            vehicleRemoveDoors = checked
         end
     end,
     options = {}

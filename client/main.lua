@@ -113,6 +113,4 @@ end)
         add updates that vMenu didn't have
 
         add translations
-
-        convert all sliders with just 2 options to checkboxes
 ]]
