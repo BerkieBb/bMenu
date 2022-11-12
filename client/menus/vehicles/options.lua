@@ -871,13 +871,16 @@ local function setupModMenu()
     lib.setMenuOptions(id, vehicleModsMenuData['tire_smoke_custom_color_blue'][2], i)
     i += 1
 
-    local defaultWindowTint = GetVehicleWindowTint(cache.vehicle)
-    defaultWindowTint = defaultWindowTint == -1 and 5 or defaultWindowTint
-
+    local currentWindowTint = GetVehicleWindowTint(cache.vehicle)
+    local defaultWindowTint
     local windowTints = {}
 
     for i2 = 1, #vehicleWindowTints do
         windowTints[i2] = vehicleWindowTints[i2][2]
+
+        if currentWindowTint == vehicleWindowTints[i2][1] then
+            defaultWindowTint = i2
+        end
     end
 
     vehicleModsMenuData['window_tint'] = {i, {label = 'Window Tint', description = 'Apply tint to your windows', args = {'window_tint'}, values = windowTints, defaultIndex = defaultWindowTint, close = false}}
