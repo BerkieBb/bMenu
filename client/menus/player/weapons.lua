@@ -878,9 +878,3 @@ if file then
 end
 
 --#endregion Initialization
-
---[[
-    TODO
-
-    add components to weapons
-]]

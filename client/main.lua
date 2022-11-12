@@ -108,9 +108,28 @@ end)
 --#endregion Commands
 
 --[[
-    TODO
+    Things I have to do before the 1.0.0 release
 
-        add updates that vMenu didn't have
+        Add updates that vMenu didn't have
 
-        add translations
+        Add translations
+
+        Extend private message functionality (under online players)
+
+        Add Player Appearance menu (under player related options)
+
+        Add MP Ped Customization menu (under player related options)
+
+        Add components to Weapon Options menu (under player related options)
+
+        Add Weapon Loadouts menu (under player related options)
+
+        Add Saved Vehicles menu (under vehicle related options)
+
+        Finish Misc menu
+
+        Add About menu
+
+        Add permissions for every option
+
 ]]
