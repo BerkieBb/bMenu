@@ -73,7 +73,7 @@ lib.registerMenu({
         {label = 'Vehicle Related Options', icon = 'car', args = {'berkie_menu_vehicle_related_options'}},
         {label = 'World Related Options', icon = 'globe', args = {'berkie_menu_world_related_options'}},
         {label = 'Recording Options', icon = 'video', args = {'berkie_menu_recording_options'}},
-        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'berkie_menu_miscellaneous_options'}}
+        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'berkie_menu_misc_options'}}
     }
 }, function(_, _, args)
     if args[1] == 'berkie_menu_online_players' then
@@ -131,5 +131,4 @@ end)
         Add About menu
 
         Add permissions for every option
-
 ]]

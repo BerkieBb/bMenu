@@ -859,22 +859,16 @@ end)
 
 --#endregion Listeners
 
---#region Initialization
+--#region Threads
 
-local file = LoadResourceFile('berkie_menu', 'config/weapons.lua')
+CreateThread(function()
+    local newWeapons = lib.callback.await('berkie_menu:server:getConfig', false, 'weapons')
 
-if file then
-    local returnVal = load(file, '@@berkie_menu/config/weapons.lua')
-
-    if returnVal then
-        local newWeapons = returnVal()
-
-        if newWeapons and type(newWeapons) == 'table' then
-            for k, v in pairs(newWeapons) do
-                weapons[k] = v
-            end
+    if newWeapons and type(newWeapons) == 'table' then
+        for k, v in pairs(newWeapons) do
+            weapons[k] = v
         end
     end
-end
+end)
 
---#endregion Initialization
+--#endregion Threads
