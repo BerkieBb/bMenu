@@ -155,7 +155,7 @@ lib.registerMenu({
 }, function(_, _, args)
     if args[1] == 'teleport_waypoint' then
         local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
-        local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0)
+        local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
         RequestCollisionAtCoord(waypointBlipPos.x, waypointBlipPos.y, 1000)
         local result, z = GetGroundZFor_3dCoord(waypointBlipPos.x, waypointBlipPos.y, 1000, false)
         if not result then

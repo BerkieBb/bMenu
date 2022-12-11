@@ -1,7 +1,7 @@
 --#region Variables
 
 local currentlySpectating = -1
-local previousPos = vec3(0)
+local previousPos = vec3(0, 0, 0)
 local playerBlips = {}
 local itemsOnYourself = {
     'kill',
@@ -165,7 +165,7 @@ function CreatePlayerMenu()
                         NetworkSetInSpectatorMode(false, 0)
 
                         SetEntityCoords(cache.ped, previousPos.x, previousPos.y, previousPos.z, true, false, false, false)
-                        previousPos = vec3(0)
+                        previousPos = vec3(0, 0, 0)
                         SetEntityVisible(cache.ped, true, false)
                         NetworkSetEntityInvisibleToNetwork(cache.ped, false)
                         SetEntityCollision(cache.ped, true, true)
