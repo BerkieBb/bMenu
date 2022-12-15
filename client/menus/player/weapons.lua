@@ -704,7 +704,7 @@ function SetupWeaponsMenu()
         lib.registerMenu({
             id = formattedId,
             title = weaponCategories[category],
-            position = 'top-right',
+            position = MenuPosition,
             onClose = function(keyPressed)
                 CloseMenu(false, keyPressed, 'berkie_menu_player_weapon_options')
             end,
@@ -737,23 +737,23 @@ end
 lib.registerMenu({
     id = 'berkie_menu_player_weapon_options',
     title = 'Weapon Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_player_related_options')
     end,
     onSelected = function(selected)
         MenuIndexes['berkie_menu_player_weapon_options'] = selected
     end,
-    onCheck =  function(_, checked, args)
+    onCheck =  function(selected, checked, args)
         if args[1] == 'unlimited_ammo' then
             unlimitedAmmo = checked
-            lib.setMenuOptions('berkie_menu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, selected)
             local hasWeapon, currentWeapon = GetCurrentPedWeapon(cache.ped, true)
             if not hasWeapon then return end
             SetPedInfiniteAmmo(cache.ped, unlimitedAmmo, currentWeapon)
         elseif args[1] == 'no_reload' then
             unlimitedClip = checked
-            lib.setMenuOptions('berkie_menu_player_weapon_options', {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = checked, close = false}, 4)
+            lib.setMenuOptions('berkie_menu_player_weapon_options', {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = checked, close = false}, selected)
             SetPedInfiniteAmmoClip(cache.ped, unlimitedClip)
         end
     end,

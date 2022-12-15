@@ -14,7 +14,7 @@ local itemsOnYourself = {
 lib.registerMenu({
     id = 'berkie_menu_online_players',
     title = 'Online Players',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_main')
     end,
@@ -48,7 +48,7 @@ function CreatePlayerMenu()
         lib.registerMenu({
             id = formattedId,
             title = data.name,
-            position = 'top-right',
+            position = MenuPosition,
             onClose = function(keyPressed)
                 CloseMenu(false, keyPressed, id)
             end,

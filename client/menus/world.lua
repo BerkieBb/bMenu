@@ -80,7 +80,7 @@ end
 lib.registerMenu({
     id = 'berkie_menu_world_related_options',
     title = 'World Related Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_main')
     end,
@@ -98,17 +98,17 @@ end)
 lib.registerMenu({
     id = 'berkie_menu_time_options',
     title = 'Time Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_world_related_options')
     end,
     onSelected = function(selected)
         MenuIndexes['berkie_menu_time_options'] = selected
     end,
-    onCheck = function(_, checked, args)
+    onCheck = function(selected, checked, args)
         if args[1] == 'show_time' then
             showTimeOnScreen = checked
-            lib.setMenuOptions('berkie_menu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, selected)
         end
     end,
     options = {
@@ -160,14 +160,14 @@ end)
 lib.registerMenu({
     id = 'berkie_menu_weather_options',
     title = 'Weather Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_world_related_options')
     end,
     onSelected = function(selected)
         MenuIndexes['berkie_menu_weather_options'] = selected
     end,
-    onCheck = function(_, checked, args)
+    onCheck = function(selected, checked, args)
         blackout = GetConvar('berkie_menu_enable_blackout', 'false') == 'true'
         snowEffects = GetConvar('berkie_menu_enable_snow_effects', 'false') == 'true'
         dynamicWeather = GetConvar('berkie_menu_dynamic_weather', 'true') == 'true'
@@ -175,15 +175,15 @@ lib.registerMenu({
         if args[1] == 'dynamic_weather' then
             checkedDynamicWeather = checked
             TriggerServerEvent('berkie_menu:server:updateWeather', currentWeather, blackout, checked, snowEffects)
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, 1)
+            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, selected)
         elseif args[1] == 'blackout' then
             checkedBlackout = checked
             TriggerServerEvent('berkie_menu:server:updateWeather', currentWeather, checked, dynamicWeather, snowEffects)
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, 2)
+            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, selected)
         elseif args[1] == 'snow_effects' then
             checkedSnowEffects = checked
             TriggerServerEvent('berkie_menu:server:updateWeather', currentWeather, blackout, dynamicWeather, checked)
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, selected)
         end
     end,
     options = {

@@ -180,7 +180,7 @@ function CreateVehicleSpawnerMenu()
         lib.registerMenu({
             id = formattedId,
             title = v,
-            position = 'top-right',
+            position = MenuPosition,
             onClose = function(keyPressed)
                 CloseMenu(false, keyPressed, id)
             end,
@@ -208,20 +208,20 @@ end
 lib.registerMenu({
     id = 'berkie_menu_vehicle_spawner',
     title = 'Vehicle Spawner',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
     end,
     onSelected = function(selected)
         MenuIndexes['berkie_menu_vehicle_spawner'] = selected
     end,
-    onCheck = function(_, checked, args)
+    onCheck = function(selected, checked, args)
         if args[1] == 'inside_vehicle' then
             spawnInVehicle = checked
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, 2)
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, selected)
         elseif args[1] == 'replace_vehicle' then
             replacePreviousVehicle = checked
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, selected)
         end
     end,
     options = {

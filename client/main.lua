@@ -11,6 +11,7 @@ end
 --#region Variables
 
 MenuOpen = false
+MenuPosition = 'top-right'
 MenuIndexes = {}
 
 --#endregion Variables
@@ -60,7 +61,7 @@ end
 lib.registerMenu({
     id = 'berkie_menu_main',
     title = 'Berkie Menu',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function()
         CloseMenu(true)
     end,

@@ -26,7 +26,7 @@ end
 lib.registerMenu({
     id = 'berkie_menu_vehicle_related_options',
     title = 'Vehicle Related Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_main')
     end,

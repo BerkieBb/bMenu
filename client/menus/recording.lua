@@ -9,17 +9,17 @@ local quitSession = true
 lib.registerMenu({
     id = 'berkie_menu_recording_options',
     title = 'Recording Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_main')
     end,
     onSelected = function(selected)
         MenuIndexes['berkie_menu_recording_options'] = selected
     end,
-    onCheck = function(_, checked, args)
+    onCheck = function(selected, checked, args)
         if args[1] == 'quit_session' then
             quitSession = checked
-            lib.setMenuOptions('berkie_menu_recording_options', {label = 'Quit Session', description = 'Quit the current session before opening the rockstar editor, this can prevent some issues with the editor', args = {'quit_session'}, checked = checked, close = false}, 3)
+            lib.setMenuOptions('berkie_menu_recording_options', {label = 'Quit Session', description = 'Quit the current session before opening the rockstar editor, this can prevent some issues with the editor', args = {'quit_session'}, checked = checked, close = false}, selected)
         end
     end,
     options = {

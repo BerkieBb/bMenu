@@ -50,14 +50,14 @@ end
 lib.registerMenu({
     id = 'berkie_menu_vehicle_personal',
     title = 'Personal Vehicle',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
     end,
     onSelected = function(selected)
         MenuIndexes['berkie_menu_vehicle_personal'] = selected
     end,
-    onCheck = function(_, checked, args)
+    onCheck = function(selected, checked, args)
         local curVeh = NetToVeh(currentVehicle)
 
         if not NetworkHasControlOfEntity(curVeh) then
@@ -72,7 +72,7 @@ lib.registerMenu({
 
         if args[1] == 'add_blip' then
             enableVehicleBlip = checked
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = checked, close = false}, 9)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = checked, close = false}, selected)
             if enableVehicleBlip then
                 local entityState = Entity(curVeh)
                 if not entityState.state.berkie_menu_blip or not DoesBlipExist(entityState.state.berkie_menu_blip) then
@@ -93,10 +93,10 @@ lib.registerMenu({
         elseif args[1] == 'exclusive_driver' then
             SetVehicleExclusiveDriver(curVeh, checked)
             SetVehicleExclusiveDriver_2(curVeh, checked and cache.ped or 0, 1)
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = checked, close = false}, 10)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = checked, close = false}, selected)
         end
     end,
-    onSideScroll = function(_, scrollIndex, args)
+    onSideScroll = function(selected, scrollIndex, args)
         local curVeh = NetToVeh(currentVehicle)
 
         if not NetworkHasControlOfEntity(curVeh) then
@@ -110,7 +110,7 @@ lib.registerMenu({
         end
 
         if args[1] == 'set_vehicle_lights' then
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, 4)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, selected)
         end
     end,
     options = {
@@ -125,7 +125,7 @@ lib.registerMenu({
         {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = enableVehicleBlip, close = false},
         {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = false, close = false}
     }
-}, function(_, scrollIndex, args)
+}, function(selected, scrollIndex, args)
     if not args or not args[1] then return end
 
     if args[1] == 'set_vehicle' then
@@ -161,7 +161,7 @@ lib.registerMenu({
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(curVeh))
             local labelText = GetLabelText(name)
             local vehicleName = labelText and labelText ~= '' and labelText ~= 'NULL' and ToProperCase(labelText) or ToProperCase(name)
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = ('Current Vehicle: %s'):format(vehicleName)}, 2)
+            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = ('Current Vehicle: %s'):format(vehicleName)}, selected)
             currentVehicle = VehToNet(curVeh)
         end
         lib.showMenu('berkie_menu_vehicle_personal', MenuIndexes['berkie_menu_vehicle_personal'])
@@ -271,7 +271,7 @@ end)
 lib.registerMenu({
     id = 'berkie_menu_vehicle_personal_doors',
     title = 'Vehicle Doors',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_vehicle_personal')
     end,

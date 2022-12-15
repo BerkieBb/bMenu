@@ -3,7 +3,7 @@
 lib.registerMenu({
     id = 'berkie_menu_misc_options',
     title = 'Miscellaneous Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_main')
     end,
@@ -12,7 +12,7 @@ lib.registerMenu({
     end,
     options = {
         {label = 'Teleport Options', args = {'berkie_menu_misc_options_teleport_options'}},
-        {label = 'Development Tools', args = {'berkie_menu_misc_options_developer_options'}},
+        {label = 'Development Tools', args = {'berkie_menu_misc_options_developer_options'}}
     }
 }, function(_, _, args)
     if string.match(args[1], 'berkie_menu') then

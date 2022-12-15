@@ -139,7 +139,7 @@ end
 lib.registerMenu({
     id = 'berkie_menu_misc_options_teleport_options',
     title = 'Teleport Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_misc_options')
     end,
@@ -231,7 +231,7 @@ end)
 lib.registerMenu({
     id = 'berkie_menu_misc_options_teleport_options_locations',
     title = 'Teleport Locations',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_misc_options_teleport_options')
     end,

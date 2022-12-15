@@ -22,7 +22,7 @@ local movingSpeeds = {
 lib.registerMenu({
     id = 'berkie_menu_player_related_options',
     title = 'Player Related Options',
-    position = 'top-right',
+    position = MenuPosition,
     onClose = function(keyPressed)
         CloseMenu(false, keyPressed, 'berkie_menu_main')
     end,
@@ -100,8 +100,8 @@ lib.registerMenu({
             SetEveryoneIgnorePlayer(cache.playerId, true)
             SetPoliceIgnorePlayer(cache.playerId, true)
         else
+            SetScaleformMovieAsNoLongerNeeded(currentScalefrom)
             currentScalefrom = -1
-            SetScaleformMovieAsNoLongerNeeded()
 
             FreezeEntityPosition(noclipEntity, false)
             SetEntityInvincible(noclipEntity, false)
