@@ -3254,7 +3254,7 @@ CreateThread(function()
                     if showEntityModels then
                         SetDrawOrigin(position.x, position.y, position.z - 0.3, 0)
                         local model = GetEntityModel(vehicle)
-                        DrawTextOnScreen(('Vehicle Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Vehicle Model: %s / %s / 0x%x'):format(GetEntityArchetypeName(vehicle), model, model), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
@@ -3288,7 +3288,7 @@ CreateThread(function()
                     if showEntityModels then
                         SetDrawOrigin(position.x, position.y, position.z - 0.3, 0)
                         local model = GetEntityModel(object)
-                        DrawTextOnScreen(('Prop Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Prop Model: %s / %s / 0x%x'):format(GetEntityArchetypeName(object), model, model), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
@@ -3322,7 +3322,7 @@ CreateThread(function()
                     if showEntityModels then
                         SetDrawOrigin(position.x, position.y, position.z - 0.3, 0)
                         local model = GetEntityModel(ped)
-                        DrawTextOnScreen(('Ped Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Ped Model: %s / %s / 0x%x'):format(GetEntityArchetypeName(ped), model, model), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
