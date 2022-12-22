@@ -12,7 +12,8 @@ lib.registerMenu({
     end,
     options = {
         {label = 'Teleport Options', args = {'berkie_menu_misc_options_teleport_options'}},
-        {label = 'Development Tools', args = {'berkie_menu_misc_options_developer_options'}}
+        {label = 'Development Tools', args = {'berkie_menu_misc_options_developer_options'}},
+        {label = 'Connection Options', args = {'berkie_menu_misc_options_connection_options'}}
     }
 }, function(_, _, args)
     if string.match(args[1], 'berkie_menu') then
