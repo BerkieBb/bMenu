@@ -29,6 +29,10 @@ lib.callback.register('berkie_menu:server:playerListAction', function(source, ac
     local ped = GetPlayerPed(source)
 
     if messageArg then
+        local canSendMessage = lib.callback.await('berkie_menu:client:canSendMessage', playerSource)
+        if not canSendMessage then
+            return false, ('%s has their PMs disabled'):format(playerName)
+        end
         TriggerClientEvent('chat:addMessage', playerSource, {
             color = { 255, 0, 0 },
             multiline = true,

@@ -2948,7 +2948,7 @@ local rotateSpeed = 20
 
 --#region Functions
 
-local function drawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
+local function DrawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
     if
     not IsHudPreferenceSwitchedOn()
     or IsHudHidden()
@@ -3232,7 +3232,7 @@ CreateThread(function()
             SetScriptGfxAlign(0, 84)
             SetScriptGfxAlignParams(0, 0, 0, 0)
             local screenWidth = GetActiveScreenResolution()
-            drawTextOnScreen(('~r~X~s~ \t\t%s\n~r~Y~s~ \t\t%s\n~r~Z~s~ \t\t%s\n~r~Heading~s~ \t%s'):format(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)), 0.5 - (30 / screenWidth), 0, 0.5, 1, 6, false)
+            DrawTextOnScreen(('~r~X~s~ \t\t%s\n~r~Y~s~ \t\t%s\n~r~Z~s~ \t\t%s\n~r~Heading~s~ \t%s'):format(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)), 0.5 - (30 / screenWidth), 0, 0.5, 1, 6, false)
             ResetScriptGfxAlign()
         end
 
@@ -3247,14 +3247,14 @@ CreateThread(function()
 
                     if showEntityHandles then
                         SetDrawOrigin(position.x, position.y, position.z, 0)
-                        drawTextOnScreen(('Vehicle Handle: %s'):format(vehicle), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Vehicle Handle: %s'):format(vehicle), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
                     if showEntityModels then
                         SetDrawOrigin(position.x, position.y, position.z - 0.3, 0)
                         local model = GetEntityModel(vehicle)
-                        drawTextOnScreen(('Vehicle Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Vehicle Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
@@ -3262,7 +3262,7 @@ CreateThread(function()
                         local networkOwner = NetworkGetEntityOwner(vehicle)
                         if networkOwner ~= 0 then
                             SetDrawOrigin(position.x, position.y, position.z + 0.3, 0)
-                            drawTextOnScreen(('Owner ID: %s | %s'):format(GetPlayerServerId(networkOwner), GetPlayerName(networkOwner)), 0, 0, 0.3, 0, 0, false)
+                            DrawTextOnScreen(('Owner ID: %s | %s'):format(GetPlayerServerId(networkOwner), GetPlayerName(networkOwner)), 0, 0, 0.3, 0, 0, false)
                             ClearDrawOrigin()
                         end
                     end
@@ -3281,14 +3281,14 @@ CreateThread(function()
 
                     if showEntityHandles then
                         SetDrawOrigin(position.x, position.y, position.z, 0)
-                        drawTextOnScreen(('Prop Handle: %s'):format(object), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Prop Handle: %s'):format(object), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
                     if showEntityModels then
                         SetDrawOrigin(position.x, position.y, position.z - 0.3, 0)
                         local model = GetEntityModel(object)
-                        drawTextOnScreen(('Prop Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Prop Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
@@ -3296,7 +3296,7 @@ CreateThread(function()
                         local networkOwner = NetworkGetEntityOwner(object)
                         if networkOwner ~= 0 then
                             SetDrawOrigin(position.x, position.y, position.z + 0.3, 0)
-                            drawTextOnScreen(('Owner ID: %s | %s'):format(GetPlayerServerId(networkOwner), GetPlayerName(networkOwner)), 0, 0, 0.3, 0, 0, false)
+                            DrawTextOnScreen(('Owner ID: %s | %s'):format(GetPlayerServerId(networkOwner), GetPlayerName(networkOwner)), 0, 0, 0.3, 0, 0, false)
                             ClearDrawOrigin()
                         end
                     end
@@ -3315,14 +3315,14 @@ CreateThread(function()
 
                     if showEntityHandles then
                         SetDrawOrigin(position.x, position.y, position.z, 0)
-                        drawTextOnScreen(('Ped Handle: %s'):format(ped), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Ped Handle: %s'):format(ped), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
                     if showEntityModels then
                         SetDrawOrigin(position.x, position.y, position.z - 0.3, 0)
                         local model = GetEntityModel(ped)
-                        drawTextOnScreen(('Ped Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
+                        DrawTextOnScreen(('Ped Model: %s / 0x%x'):format(model, model), 0, 0, 0.3, 0, 0, false)
                         ClearDrawOrigin()
                     end
 
@@ -3330,7 +3330,7 @@ CreateThread(function()
                         local networkOwner = NetworkGetEntityOwner(ped)
                         if networkOwner ~= 0 then
                             SetDrawOrigin(position.x, position.y, position.z + 0.3, 0)
-                            drawTextOnScreen(('Owner ID: %s | %s'):format(GetPlayerServerId(networkOwner), GetPlayerName(networkOwner)), 0, 0, 0.3, 0, 0, false)
+                            DrawTextOnScreen(('Owner ID: %s | %s'):format(GetPlayerServerId(networkOwner), GetPlayerName(networkOwner)), 0, 0, 0.3, 0, 0, false)
                             ClearDrawOrigin()
                         end
                     end

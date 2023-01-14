@@ -550,37 +550,6 @@ local function getHealthString(health)
     return ('%s%s~w~'):format(color, health)
 end
 
-local function drawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
-    if
-    not IsHudPreferenceSwitchedOn()
-    or IsHudHidden()
-    or IsPlayerSwitchInProgress()
-    or IsScreenFadedOut()
-    or IsPauseMenuActive()
-    or IsFrontendFading()
-    or IsPauseMenuRestarting()
-    then
-        return
-    end
-
-    size = size or 0.48
-    position = position or 1
-    font = font or 6
-
-    SetTextFont(font)
-    SetTextScale(1.0, size)
-    if position == 2 then
-        SetTextWrap(0, x)
-    end
-    SetTextJustification(position)
-    if not disableTextOutline then
-        SetTextOutline()
-    end
-    BeginTextCommandDisplayText('STRING')
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandDisplayText(x, y)
-end
-
 local function getAllPossibleMods()
     local result = {}
     for k in pairs(vehicleModTypes) do
@@ -2357,7 +2326,7 @@ CreateThread(function()
             end
 
             if vehicleShowHealth then
-                drawTextOnScreen(('~n~Engine health: %s~n~Body health: %s~n~Tank health: %s'):format(getHealthString(math.round(GetVehicleEngineHealth(veh), 0.001)), getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001)), getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
+                DrawTextOnScreen(('~n~Engine health: %s~n~Body health: %s~n~Tank health: %s'):format(getHealthString(math.round(GetVehicleEngineHealth(veh), 0.001)), getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001)), getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
             end
 
             if vehicleHighbeamsOnHonk then

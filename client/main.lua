@@ -54,6 +54,37 @@ function CloseMenu(isFullMenuClose, keyPressed, previousMenu)
     lib.showMenu(previousMenu, MenuIndexes[previousMenu])
 end
 
+function DrawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
+    if
+    not IsHudPreferenceSwitchedOn()
+    or IsHudHidden()
+    or IsPlayerSwitchInProgress()
+    or IsScreenFadedOut()
+    or IsPauseMenuActive()
+    or IsFrontendFading()
+    or IsPauseMenuRestarting()
+    then
+        return
+    end
+
+    size = size or 0.48
+    position = position or 1
+    font = font or 6
+
+    SetTextFont(font)
+    SetTextScale(1.0, size)
+    if position == 2 then
+        SetTextWrap(0, x)
+    end
+    SetTextJustification(position)
+    if not disableTextOutline then
+        SetTextOutline()
+    end
+    BeginTextCommandDisplayText('STRING')
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(x, y)
+end
+
 --#endregion Functions
 
 --#region Menu Registration

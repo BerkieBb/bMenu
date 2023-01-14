@@ -40,41 +40,6 @@ local changingWeather = false
 
 --#endregion Variables
 
---#region Functions
-
-local function drawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
-    if
-    not IsHudPreferenceSwitchedOn()
-    or IsHudHidden()
-    or IsPlayerSwitchInProgress()
-    or IsScreenFadedOut()
-    or IsPauseMenuActive()
-    or IsFrontendFading()
-    or IsPauseMenuRestarting()
-    then
-        return
-    end
-
-    size = size or 0.48
-    position = position or 1
-    font = font or 6
-
-    SetTextFont(font)
-    SetTextScale(1.0, size)
-    if position == 2 then
-        SetTextWrap(0, x)
-    end
-    SetTextJustification(position)
-    if not disableTextOutline then
-        SetTextOutline()
-    end
-    BeginTextCommandDisplayText('STRING')
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandDisplayText(x, y)
-end
-
---#endregion Functions
-
 --#region Menu Registration
 
 lib.registerMenu({
@@ -258,7 +223,7 @@ CreateThread(function()
     while true do
         if showTimeOnScreen then
             sleep = 0
-            drawTextOnScreen(('Current Time: %s:%s'):format(currentHour < 10 and '0'..currentHour or currentHour, currentMinute < 10 and '0'..currentMinute or currentMinute), 0.5, 0.0)
+            DrawTextOnScreen(('Current Time: %s:%s'):format(currentHour < 10 and '0'..currentHour or currentHour, currentMinute < 10 and '0'..currentMinute or currentMinute), 0.5, 0.0)
         end
         Wait(sleep)
     end
