@@ -1875,7 +1875,7 @@ lib.registerMenu({
 
     if scrollIndex then return end
 
-    lib.showMenu(args)
+    lib.showMenu(args[1])
 end)
 
 lib.registerMenu({
