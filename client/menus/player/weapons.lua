@@ -576,9 +576,9 @@ local weapons = {
         displayName = GetLabelText('WT_GNADE_STK'),
         weaponType = 'throwable'
     },
-    [`WEAPON_PROXIMINE`] = {
-        name = 'WEAPON_PROXIMINE',
-        hash = `WEAPON_PROXIMINE`,
+    [`WEAPON_PROXMINE`] = {
+        name = 'WEAPON_PROXMINE',
+        hash = `WEAPON_PROXMINE`,
         displayName = GetLabelText('WT_PRXMINE'),
         weaponType = 'throwable'
     },
