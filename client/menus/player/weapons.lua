@@ -110,6 +110,12 @@ local weapons = {
         displayName = GetLabelText('WT_SHATCHET'),
         weaponType = 'melee'
     },
+    [`WEAPON_CANDYCANE`] = {
+        name = 'WEAPON_CANDYCANE',
+        hash = `WEAPON_CANDYCANE`,
+        displayName = GetLabelText('WT_CANDYCANE'),
+        weaponType = 'melee'
+    },
 
     -- Handguns
     [`WEAPON_PISTOL`] = {
@@ -229,7 +235,13 @@ local weapons = {
     [`WEAPON_STUNGUN_MP`] = {
         name = 'WEAPON_STUNGUN_MP',
         hash = `WEAPON_STUNGUN_MP`,
-        displayName = GetLabelText('WT_STUN'),
+        displayName = GetLabelText('WT_STNGUNMP'),
+        weaponType = 'handgun'
+    },
+    [`WEAPON_PISTOLXM3`] = {
+        name = 'WEAPON_PISTOLXM3',
+        hash = `WEAPON_PISTOLXM3`,
+        displayName = GetLabelText('WT_PISTOLXM3'),
         weaponType = 'handgun'
     },
 
@@ -548,6 +560,12 @@ local weapons = {
         name = 'WEAPON_EMPLAUNCHER',
         hash = `WEAPON_EMPLAUNCHER`,
         displayName = GetLabelText('WT_EMPL'),
+        weaponType = 'heavy'
+    },
+    [`WEAPON_RAILGUNXM3`] = {
+        name = 'WEAPON_RAILGUNXM3',
+        hash = `WEAPON_RAILGUNXM3`,
+        displayName = GetLabelText('WT_RAILGUN'),
         weaponType = 'heavy'
     },
 
