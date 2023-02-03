@@ -9,6 +9,7 @@ local joinNotifs = GetConvarInt('chat_showJoins', 1) == 1
 local quitNotifs = GetConvarInt('chat_showQuits', 1) == 1
 local deathNotifs = false
 local nightVision = false
+local thermalVision = false
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 
 --#endregion Variables
@@ -80,7 +81,11 @@ lib.registerMenu({
         elseif args[1] == 'night_vision' then
             nightVision = checked
             SetNightvision(checked)
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = nightVision, args = {'night_vision'}, close = false}, selected)
+            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = checked, args = {'night_vision'}, close = false}, selected)
+        elseif args[1] == 'thermal_vision' then
+            thermalVision = checked
+            SetSeethrough(checked)
+            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = checked, args = {'thermal_vision'}, close = false}, selected)
         end
     end,
     options = {
@@ -95,7 +100,8 @@ lib.registerMenu({
         {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = joinNotifs, args = {'show_join_notifs'}, close = false},
         {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = quitNotifs, args = {'show_quit_notifs'}, close = false},
         {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false},
-        {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = nightVision, args = {'night_vision'}, close = false}
+        {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = nightVision, args = {'night_vision'}, close = false},
+        {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = thermalVision, args = {'thermal_vision'}, close = false}
     }
 }, function(_, _, args)
     if string.match(args[1], 'berkie_menu') then
