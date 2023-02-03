@@ -7,26 +7,12 @@ local displayLocation = false
 local showTime = false
 local joinNotifs = GetConvarInt('chat_showJoins', 1) == 1
 local quitNotifs = GetConvarInt('chat_showQuits', 1) == 1
-local deathNotifs = GetConvarInt('berkie_menu_showDeaths', 1) == 1
+local deathNotifs = false
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 
 --#endregion Variables
 
 --#region Events
-
-RegisterNetEvent('berkie_menu:client:updateConvar', function(convar, value, menuId, option, optionId)
-    if GetInvokingResource() then return end
-
-    if convar == 'chat_showJoins' then
-        joinNotifs = value == 1
-    elseif convar == 'chat_showQuits' then
-        quitNotifs = value == 1
-    elseif convar == 'berkie_menu_showDeaths' then
-        deathNotifs = value == 1
-    end
-
-    lib.setMenuOptions(menuId, option, optionId)
-end)
 
 AddEventHandler('gameEventTriggered', function(name, args)
 	if name ~= 'CEventNetworkEntityDamage' or not deathNotifs then return end
@@ -88,7 +74,7 @@ lib.registerMenu({
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
         elseif args[1] == 'show_death_notifs' then
             deathNotifs = checked
-            lib.callback.await('berkie_menu:server:setConvar', false, 'berkie_menu_showDeaths', checked and 1 or 0, true, true, 'berkie_menu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
+            lib.callback.await('berkie_menu:server:setConvar', false, 'berkie_menu_showDeaths', checked and 1 or 0)
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
         end
     end,
