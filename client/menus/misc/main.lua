@@ -8,6 +8,7 @@ local showTime = false
 local joinNotifs = GetConvarInt('chat_showJoins', 1) == 1
 local quitNotifs = GetConvarInt('chat_showQuits', 1) == 1
 local deathNotifs = false
+local nightVision = false
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 
 --#endregion Variables
@@ -76,6 +77,10 @@ lib.registerMenu({
             deathNotifs = checked
             lib.callback.await('berkie_menu:server:setConvar', false, 'berkie_menu_showDeaths', checked and 1 or 0)
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
+        elseif args[1] == 'night_vision' then
+            nightVision = checked
+            SetNightvision(checked)
+            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = nightVision, args = {'night_vision'}, close = false}, selected)
         end
     end,
     options = {
@@ -89,7 +94,8 @@ lib.registerMenu({
         {label = 'Show Time', description = 'Shows you the current time on screen', checked = showTime, args = {'show_time'}, close = false},
         {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = joinNotifs, args = {'show_join_notifs'}, close = false},
         {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = quitNotifs, args = {'show_quit_notifs'}, close = false},
-        {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}
+        {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false},
+        {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = nightVision, args = {'night_vision'}, close = false}
     }
 }, function(_, _, args)
     if string.match(args[1], 'berkie_menu') then
