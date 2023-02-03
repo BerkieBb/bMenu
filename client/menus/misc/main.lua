@@ -14,6 +14,8 @@ local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 --#region Events
 
 RegisterNetEvent('berkie_menu:client:updateConvar', function(convar, value)
+    if GetInvokingResource() then return end
+
     if convar == 'chat_showJoins' then
         joinNotifs = value == 1
     elseif convar == 'chat_showQuits' then
