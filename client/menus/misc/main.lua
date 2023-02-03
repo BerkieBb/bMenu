@@ -7,20 +7,37 @@ local displayLocation = false
 local showTime = false
 local joinNotifs = GetConvarInt('chat_showJoins', 1) == 1
 local quitNotifs = GetConvarInt('chat_showQuits', 1) == 1
+local deathNotifs = GetConvarInt('berkie_menu_showDeaths', 1) == 1
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 
 --#endregion Variables
 
 --#region Events
 
-RegisterNetEvent('berkie_menu:client:updateConvar', function(convar, value)
+RegisterNetEvent('berkie_menu:client:updateConvar', function(convar, value, menuId, option, optionId)
     if GetInvokingResource() then return end
 
     if convar == 'chat_showJoins' then
         joinNotifs = value == 1
     elseif convar == 'chat_showQuits' then
         quitNotifs = value == 1
+    elseif convar == 'berkie_menu_showDeaths' then
+        deathNotifs = value == 1
     end
+
+    lib.setMenuOptions(menuId, option, optionId)
+end)
+
+AddEventHandler('gameEventTriggered', function(name, args)
+	if name ~= 'CEventNetworkEntityDamage' or not deathNotifs then return end
+	local victim, victimDied = args[1], args[4]
+	if not victimDied or not IsPedAPlayer(victim) or (not IsPedDeadOrDying(victim, true) and not IsPedFatallyInjured(victim)) then return end
+    local player = NetworkGetPlayerIndexFromPed(victim)
+    local killerPed = GetPedSourceOfDeath(victim)
+    local killerPlayer = NetworkGetPlayerIndexFromPed(killerPed)
+    local deathCause = GetPedCauseOfDeath(victim)
+    local description = killerPed ~= cache.ped and NetworkIsPlayerActive(killerPlayer) and ('%s was killed by %s with %s'):format(GetPlayerName(player), GetPlayerName(killerPlayer), deathCause) or ('%s was killed by %s'):format(GetPlayerName(player), deathCause)
+    lib.notify({title = 'Death Notification', description = description, type = 'inform'})
 end)
 
 --#endregion Events
@@ -63,12 +80,16 @@ lib.registerMenu({
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Time', description = 'Shows you the current time on screen', checked = checked, args = {'show_time'}, close = false}, selected)
         elseif args[1] == 'show_join_notifs' then
             joinNotifs = checked
-            lib.callback.await('berkie_menu:server:setConvar', false, 'chat_showJoins', checked and 1 or 0)
+            lib.callback.await('berkie_menu:server:setConvar', false, 'chat_showJoins', checked and 1 or 0, true, true, 'berkie_menu_misc_options', {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = checked, args = {'show_join_notifs'}, close = false}, selected)
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = checked, args = {'show_join_notifs'}, close = false}, selected)
         elseif args[1] == 'show_quit_notifs' then
             quitNotifs = checked
-            lib.callback.await('berkie_menu:server:setConvar', false, 'chat_showQuits', checked and 1 or 0)
+            lib.callback.await('berkie_menu:server:setConvar', false, 'chat_showQuits', checked and 1 or 0, true, true, 'berkie_menu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
+        elseif args[1] == 'show_death_notifs' then
+            deathNotifs = checked
+            lib.callback.await('berkie_menu:server:setConvar', false, 'berkie_menu_showDeaths', checked and 1 or 0, true, true, 'berkie_menu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
+            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
         end
     end,
     options = {
@@ -81,7 +102,8 @@ lib.registerMenu({
         {label = 'Display Location', description = 'Shows your current location and heading, as well as the nearest cross road. WARNING: you should not keep this on at all times as this is a very heavy action', checked = displayLocation, args = {'display_location'}, close = false},
         {label = 'Show Time', description = 'Shows you the current time on screen', checked = showTime, args = {'show_time'}, close = false},
         {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = joinNotifs, args = {'show_join_notifs'}, close = false},
-        {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = quitNotifs, args = {'show_quit_notifs'}, close = false}
+        {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = quitNotifs, args = {'show_quit_notifs'}, close = false},
+        {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}
     }
 }, function(_, _, args)
     if string.match(args[1], 'berkie_menu') then

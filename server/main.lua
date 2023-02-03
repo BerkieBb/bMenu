@@ -7,3 +7,14 @@ if GetCurrentResourceName() ~= 'berkie_menu' then
 end
 
 --#endregion Startup
+
+--#region Callbacks
+
+lib.callback.register('berkie_menu:server:setConvar', function(_, convar, value, replicated, sendUpdate, menuId, option, optionId)
+    if sendUpdate then
+        TriggerClientEvent('berkie_menu:client:updateConvar', -1, convar, value, menuId, option, optionId)
+    end
+    return replicated and SetConvarReplicated(convar, value) or SetConvar(convar, value)
+end)
+
+--#endregion Callbacks
