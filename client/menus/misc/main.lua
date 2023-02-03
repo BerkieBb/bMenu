@@ -10,7 +10,10 @@ local quitNotifs = GetConvarInt('chat_showQuits', 1) == 1
 local deathNotifs = false
 local nightVision = false
 local thermalVision = false
+local playerNames = false
+local playerNamesDistance = 500
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
+local gamerTags = {}
 
 --#endregion Variables
 
@@ -86,6 +89,9 @@ lib.registerMenu({
             thermalVision = checked
             SetSeethrough(checked)
             lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = checked, args = {'thermal_vision'}, close = false}, selected)
+        elseif args[1] == 'show_player_names' then
+            playerNames = checked
+            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Player Names', description = 'Enables or disables players names over their head', checked = checked, args = {'show_player_names'}, close = false}, selected)
         end
     end,
     options = {
@@ -101,7 +107,8 @@ lib.registerMenu({
         {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = quitNotifs, args = {'show_quit_notifs'}, close = false},
         {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false},
         {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = nightVision, args = {'night_vision'}, close = false},
-        {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = thermalVision, args = {'thermal_vision'}, close = false}
+        {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = thermalVision, args = {'thermal_vision'}, close = false},
+        {label = 'Show Player Names', description = 'Enables or disables players names over their head', checked = playerNames, args = {'show_player_names'}, close = false}
     }
 }, function(_, _, args)
     if string.match(args[1], 'berkie_menu') then
@@ -174,6 +181,39 @@ CreateThread(function()
             SetScriptGfxAlignParams(0, 0, 0, 0)
             DrawTextOnScreen('~c~'..formattedTime, 0.208 + safeZoneSizeX, GetSafeZoneSize() - GetRenderedCharacterHeight(0.4, 1), 0.4, 0, 6, false)
             ResetScriptGfxAlign()
+        end
+
+        if playerNames then
+            local players = GetActivePlayers()
+            local coords = GetEntityCoords(cache.ped)
+            for i = 1, #players do
+                local player = players[i]
+                local ped = GetPlayerPed(player)
+                local pedCoords = GetEntityCoords(ped)
+                if #(pedCoords - coords) < playerNamesDistance then
+                    if not gamerTags[player] then
+                        gamerTags[player] = CreateFakeMpGamerTag(ped, GetPlayerName(player) .. ' [' .. GetPlayerServerId(player) .. ']', false, false, '', 0)
+                    end
+                    SetMpGamerTagVisibility(gamerTags[player], 2, true)
+                    local wantedLevel = GetPlayerWantedLevel(player)
+                    if wantedLevel > 0 then
+                        SetMpGamerTagVisibility(gamerTags[player], 7, true)
+                        SetMpGamerTagWantedLevel(gamerTags[player], wantedLevel)
+                    else
+                        SetMpGamerTagVisibility(gamerTags[player], 7, false)
+                    end
+                elseif gamerTags[player] then
+                    RemoveMpGamerTag(gamerTags[player])
+                    gamerTags[player] = nil
+                end
+            end
+        else
+            if table.type(gamerTags) ~= 'empty' then
+                for _, v in pairs(gamerTags) do
+                    RemoveMpGamerTag(v)
+                end
+                table.wipe(gamerTags)
+            end
         end
     end
 end)
