@@ -4,7 +4,7 @@ game 'gta5'
 author 'BerkieB'
 description 'A standalone menu containing lots of useful options for FiveM'
 version 'don\'t use in live environment yet'
-repository 'https://github.com/BerkieBb/berkie_menu'
+repository 'https://github.com/BerkieBb/bMenu'
 
 lua54 'yes'
 use_experimental_fxv2_oal 'yes'

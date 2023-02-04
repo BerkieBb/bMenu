@@ -1,7 +1,7 @@
 --#region Callbacks
 
 lib.callback.register('berkie_menu:server:saveTeleportLocation', function(source, teleportName)
-    local file = {string.strtrim(LoadResourceFile('berkie_menu', 'config/locations.lua'))}
+    local file = {string.strtrim(LoadResourceFile('bMenu', 'config/locations.lua'))}
 
     if file then
         file[1] = file[1]:gsub('}$', '')
@@ -21,7 +21,7 @@ lib.callback.register('berkie_menu:server:saveTeleportLocation', function(source
 
         file[3] = '}'
 
-        SaveResourceFile('berkie_menu', 'config/locations.lua', table.concat(file), -1)
+        SaveResourceFile('bMenu', 'config/locations.lua', table.concat(file), -1)
 
         return true, ('Successfully added location %s'):format(teleportName)
     end
@@ -30,10 +30,10 @@ lib.callback.register('berkie_menu:server:saveTeleportLocation', function(source
 end)
 
 lib.callback.register('berkie_menu:server:getConfig', function(_, fileName)
-    local file = LoadResourceFile('berkie_menu', ('config/%s.lua'):format(fileName))
+    local file = LoadResourceFile('bMenu', ('config/%s.lua'):format(fileName))
     if not file then return end
 
-    local returnVal = load(file, ('@@berkie_menu/config/%s.lua'):format(fileName))
+    local returnVal = load(file, ('@@bMenu/config/%s.lua'):format(fileName))
     if not returnVal then return end
 
     return returnVal()
