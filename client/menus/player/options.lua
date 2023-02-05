@@ -11,6 +11,7 @@ local fastSwim = false
 local superJump = false
 local noRagdoll = false
 local neverWanted = true
+local ghostMode = false
 local customDrivingStyleList = {}
 local customDrivingStyle = ''
 local freezePlayer = false
@@ -59,6 +60,10 @@ lib.registerMenu({
             noRagdoll = checked
             SetPedCanRagdoll(cache.ped, not noRagdoll)
             lib.setMenuOptions('bMenu_player_options', {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, checked = noRagdoll, close = false}, selected)
+        elseif args[1] == 'ghost' then
+            ghostMode = checked
+            SetLocalPlayerAsGhost(ghostMode)
+            lib.setMenuOptions('bMenu_player_options', {label = 'Ghost Mode', description = 'Be a invisible and untouchable', args = {'ghost'}, checked = ghostMode, close = false}, selected)
         elseif args[1] == 'never_wanted' then
             neverWanted = checked
             SetMaxWantedLevel(neverWanted and 0 or 5)
@@ -100,6 +105,7 @@ lib.registerMenu({
         {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, checked = fastSwim, close = false},
         {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, checked = superJump, close = false},
         {label = 'No Ragdoll', description = 'Disables player ragdoll, makes you not fall off your bike anymore', args = {'no_ragdoll'}, checked = noRagdoll, close = false},
+        {label = 'Ghost Mode', description = 'Be barely visible and untouchable', args = {'ghost'}, checked = ghostMode, close = false},
         {label = 'Never Wanted', description = 'Disables all wanted levels', args = {'never_wanted'}, checked = neverWanted, close = false},
         {label = 'Set Wanted Level', args = {'set_wanted_level'}, values = {'0', '1', '2', '3', '4', '5'}, defaultIndex = 1, close = false},
         {label = 'Everyone Ignore Player', description = 'Introverts love this', args = {'ignore_player'}, checked = IgnorePlayer, close = false},
