@@ -30,6 +30,7 @@ lib.registerMenu({
                 description = 'You cannot leave the session that you\'re the host of',
                 type = 'error'
             })
+            return
         end
 
         NetworkSessionEnd(true, true)
