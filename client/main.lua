@@ -90,25 +90,25 @@ end
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_main',
+    id = 'bMenu_main',
     title = 'Berkie Menu',
     position = MenuPosition,
     onClose = function()
         CloseMenu(true)
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_main'] = selected
+        MenuIndexes['bMenu_main'] = selected
     end,
     options = {
-        {label = 'Online Players', icon = 'user-group', args = {'berkie_menu_online_players'}},
-        {label = 'Player Related Options', icon = 'user-gear', args = {'berkie_menu_player_related_options'}},
-        {label = 'Vehicle Related Options', icon = 'car', args = {'berkie_menu_vehicle_related_options'}},
-        {label = 'World Related Options', icon = 'globe', args = {'berkie_menu_world_related_options'}},
-        {label = 'Recording Options', icon = 'video', args = {'berkie_menu_recording_options'}},
-        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'berkie_menu_misc_options'}}
+        {label = 'Online Players', icon = 'user-group', args = {'bMenu_online_players'}},
+        {label = 'Player Related Options', icon = 'user-gear', args = {'bMenu_player_related_options'}},
+        {label = 'Vehicle Related Options', icon = 'car', args = {'bMenu_vehicle_related_options'}},
+        {label = 'World Related Options', icon = 'globe', args = {'bMenu_world_related_options'}},
+        {label = 'Recording Options', icon = 'video', args = {'bMenu_recording_options'}},
+        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'bMenu_misc_options'}}
     }
 }, function(_, _, args)
-    if args[1] == 'berkie_menu_online_players' then
+    if args[1] == 'bMenu_online_players' then
         CreatePlayerMenu()
     end
 
@@ -123,7 +123,7 @@ RegisterCommand('berkiemenu', function()
     MenuOpen = not MenuOpen
 
     if MenuOpen then
-        lib.showMenu('berkie_menu_main', MenuIndexes['berkie_menu_main'])
+        lib.showMenu('bMenu_main', MenuIndexes['bMenu_main'])
     else
         lib.hideMenu(true)
     end

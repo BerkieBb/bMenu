@@ -18,23 +18,23 @@ local weatherIndexes = {
     ['HALLOWEEN'] = {18, 'Halloween'}
 }
 
-local timeSyncedWithMachine = GetConvar('berkie_menu_sync_time_to_machine_time', 'false') == 'true'
-local timeFrozen = GetConvar('berkie_menu_freeze_time', 'false') == 'true'
-local currentHour = tonumber(GetConvar('berkie_menu_current_hour', '7')) --[[@as number]]
-local currentMinute = tonumber(GetConvar('berkie_menu_current_minute', '0')) --[[@as number]]
+local timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
+local timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
+local currentHour = tonumber(GetConvar('bMenu_current_hour', '7')) --[[@as number]]
+local currentMinute = tonumber(GetConvar('bMenu_current_minute', '0')) --[[@as number]]
 currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
 currentMinute = currentMinute < 0 and 0 or currentMinute > 23 and 23 or currentMinute
 local showTimeOnScreen = false
-local dynamicWeather = GetConvar('berkie_menu_dynamic_weather', 'true') == 'true'
-local blackout = GetConvar('berkie_menu_enable_blackout', 'false') == 'true'
-local snowEffects = GetConvar('berkie_menu_enable_snow_effects', 'false') == 'true'
+local dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+local blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
+local snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
 local checkedDynamicWeather = dynamicWeather
 local checkedBlackout = blackout
 local checkedSnowEffects = snowEffects
-local currentWeather = GetConvar('berkie_menu_current_weather', 'EXTRASUNNY'):upper()
+local currentWeather = GetConvar('bMenu_current_weather', 'EXTRASUNNY'):upper()
 currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
 local currentChecked = 'EXTRASUNNY' -- Leave this so the checkmark can move itself accordingly in the loop
-local weatherChangeTime = tonumber(GetConvar('berkie_menu_weather_change_time', '5')) --[[@as number]]
+local weatherChangeTime = tonumber(GetConvar('bMenu_weather_change_time', '5')) --[[@as number]]
 weatherChangeTime = weatherChangeTime < 0 and 0 or weatherChangeTime
 local changingWeather = false
 
@@ -43,37 +43,37 @@ local changingWeather = false
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_world_related_options',
+    id = 'bMenu_world_related_options',
     title = 'World Related Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_main')
+        CloseMenu(false, keyPressed, 'bMenu_main')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_world_related_options'] = selected
+        MenuIndexes['bMenu_world_related_options'] = selected
     end,
     options = {
-        {label = 'Time Options', args = {'berkie_menu_time_options'}},
-        {label = 'Weather Options', args = {'berkie_menu_weather_options'}}
+        {label = 'Time Options', args = {'bMenu_time_options'}},
+        {label = 'Weather Options', args = {'bMenu_weather_options'}}
     }
 }, function(_, _, args)
     lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
 lib.registerMenu({
-    id = 'berkie_menu_time_options',
+    id = 'bMenu_time_options',
     title = 'Time Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_world_related_options')
+        CloseMenu(false, keyPressed, 'bMenu_world_related_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_time_options'] = selected
+        MenuIndexes['bMenu_time_options'] = selected
     end,
     onCheck = function(selected, checked, args)
         if args[1] == 'show_time' then
             showTimeOnScreen = checked
-            lib.setMenuOptions('berkie_menu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, selected)
+            lib.setMenuOptions('bMenu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, selected)
         end
     end,
     options = {
@@ -92,10 +92,10 @@ lib.registerMenu({
         {label = 'Set Custom Minute', args = {'set_time_custom', 'minutes'}, values = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59'}, close = false}
     }
 }, function(_, scrollIndex, args)
-    timeSyncedWithMachine = GetConvar('berkie_menu_sync_time_to_machine_time', 'false') == 'true'
+    timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
 
     if args[1] == 'sync_to_server' then
-        TriggerServerEvent('berkie_menu:server:updateTime', currentHour, currentMinute, timeFrozen, not timeSyncedWithMachine)
+        TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, timeFrozen, not timeSyncedWithMachine)
     end
 
     if timeSyncedWithMachine and args[1] ~= 'sync_to_server' then
@@ -106,49 +106,49 @@ lib.registerMenu({
         return
     end
 
-    timeFrozen = GetConvar('berkie_menu_freeze_time', 'false') == 'true'
+    timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
     if args[1] == 'freeze_time' then
-        TriggerServerEvent('berkie_menu:server:updateTime', currentHour, currentMinute, not timeFrozen, timeSyncedWithMachine)
+        TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, not timeFrozen, timeSyncedWithMachine)
     elseif args[1] == 'set_time_preset' then
-        TriggerServerEvent('berkie_menu:server:updateTime', args[2], 0, timeFrozen, timeSyncedWithMachine)
+        TriggerServerEvent('bMenu:server:updateTime', args[2], 0, timeFrozen, timeSyncedWithMachine)
     elseif args[1] == 'set_time_custom' then
         if args[2] == 'hours' then
             local hour = scrollIndex - 1
-            TriggerServerEvent('berkie_menu:server:updateTime', hour, currentMinute, timeFrozen, timeSyncedWithMachine)
+            TriggerServerEvent('bMenu:server:updateTime', hour, currentMinute, timeFrozen, timeSyncedWithMachine)
         elseif args[2] == 'minutes' then
             local minute = scrollIndex - 1
-            TriggerServerEvent('berkie_menu:server:updateTime', currentHour, minute, timeFrozen, timeSyncedWithMachine)
+            TriggerServerEvent('bMenu:server:updateTime', currentHour, minute, timeFrozen, timeSyncedWithMachine)
         end
     end
 end)
 
 lib.registerMenu({
-    id = 'berkie_menu_weather_options',
+    id = 'bMenu_weather_options',
     title = 'Weather Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_world_related_options')
+        CloseMenu(false, keyPressed, 'bMenu_world_related_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_weather_options'] = selected
+        MenuIndexes['bMenu_weather_options'] = selected
     end,
     onCheck = function(selected, checked, args)
-        blackout = GetConvar('berkie_menu_enable_blackout', 'false') == 'true'
-        snowEffects = GetConvar('berkie_menu_enable_snow_effects', 'false') == 'true'
-        dynamicWeather = GetConvar('berkie_menu_dynamic_weather', 'true') == 'true'
+        blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
+        snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
+        dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
 
         if args[1] == 'dynamic_weather' then
             checkedDynamicWeather = checked
-            TriggerServerEvent('berkie_menu:server:updateWeather', currentWeather, blackout, checked, snowEffects)
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, selected)
+            TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, checked, snowEffects)
+            lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, selected)
         elseif args[1] == 'blackout' then
             checkedBlackout = checked
-            TriggerServerEvent('berkie_menu:server:updateWeather', currentWeather, checked, dynamicWeather, snowEffects)
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, selected)
+            TriggerServerEvent('bMenu:server:updateWeather', currentWeather, checked, dynamicWeather, snowEffects)
+            lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, selected)
         elseif args[1] == 'snow_effects' then
             checkedSnowEffects = checked
-            TriggerServerEvent('berkie_menu:server:updateWeather', currentWeather, blackout, dynamicWeather, checked)
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, selected)
+            TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, dynamicWeather, checked)
+            lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, selected)
         end
     end,
     options = {
@@ -189,14 +189,14 @@ lib.registerMenu({
             duration = weatherChangeTime * 1000 + 2000
         })
         changingWeather = true
-        blackout = GetConvar('berkie_menu_enable_blackout', 'false') == 'true'
-        snowEffects = GetConvar('berkie_menu_enable_snow_effects', 'false') == 'true'
-        dynamicWeather = GetConvar('berkie_menu_dynamic_weather', 'true') == 'true'
-        TriggerServerEvent('berkie_menu:server:updateWeather', args[2], blackout, dynamicWeather, snowEffects)
+        blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
+        snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
+        dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+        TriggerServerEvent('bMenu:server:updateWeather', args[2], blackout, dynamicWeather, snowEffects)
     elseif args[1] == 'remove_clouds' then
-        TriggerServerEvent('berkie_menu:server:setClouds', true)
+        TriggerServerEvent('bMenu:server:setClouds', true)
     elseif args[1] == 'randomize_clouds' then
-        TriggerServerEvent('berkie_menu:server:setClouds', false)
+        TriggerServerEvent('bMenu:server:setClouds', false)
     end
 end)
 
@@ -204,7 +204,7 @@ end)
 
 --#region Events
 
-RegisterNetEvent('berkie_menu:client:setClouds', function(opacity, cloudType)
+RegisterNetEvent('bMenu:client:setClouds', function(opacity, cloudType)
     if opacity == 0 and cloudType == 'removed' then
         ClearCloudHat()
         return
@@ -231,8 +231,8 @@ end)
 
 CreateThread(function()
     while true do
-        currentHour = tonumber(GetConvar('berkie_menu_current_hour', '7')) --[[@as number]]
-        currentMinute = tonumber(GetConvar('berkie_menu_current_minute', '0')) --[[@as number]]
+        currentHour = tonumber(GetConvar('bMenu_current_hour', '7')) --[[@as number]]
+        currentMinute = tonumber(GetConvar('bMenu_current_minute', '0')) --[[@as number]]
         currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
         currentMinute = currentMinute < 0 and 0 or currentMinute > 59 and 59 or currentMinute
         NetworkOverrideClockTime(currentHour, currentMinute, 0)
@@ -243,24 +243,24 @@ end)
 CreateThread(function()
     local changedThings = false
     while true do
-        blackout = GetConvar('berkie_menu_enable_blackout', 'false') == 'true'
-        snowEffects = GetConvar('berkie_menu_enable_snow_effects', 'false') == 'true'
-        dynamicWeather = GetConvar('berkie_menu_dynamic_weather', 'true') == 'true'
+        blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
+        snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
+        dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
 
         if checkedBlackout ~= blackout then
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}, 2)
+            lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}, 2)
             checkedBlackout = blackout
             changedThings = true
         end
 
         if checkedSnowEffects ~= snowEffects then
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = snowEffects, close = false}, 3)
+            lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = snowEffects, close = false}, 3)
             checkedSnowEffects = snowEffects
             changedThings = true
         end
 
         if checkedDynamicWeather ~= dynamicWeather then
-            lib.setMenuOptions('berkie_menu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = dynamicWeather, close = false}, 1)
+            lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = dynamicWeather, close = false}, 1)
             checkedDynamicWeather = dynamicWeather
             changedThings = true
         end
@@ -278,22 +278,22 @@ CreateThread(function()
 
         SetArtificialLightsState(blackout)
 
-        currentWeather = GetConvar('berkie_menu_current_weather', 'EXTRASUNNY'):upper()
+        currentWeather = GetConvar('bMenu_current_weather', 'EXTRASUNNY'):upper()
         currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
 
         if currentChecked ~= currentWeather then
             local oldData = weatherIndexes[currentChecked]
             local newData = weatherIndexes[currentWeather]
-            lib.setMenuOptions('berkie_menu_weather_options', {label = oldData[2], args = {'set_weather', currentChecked}, close = false}, oldData[1])
-            lib.setMenuOptions('berkie_menu_weather_options', {label = newData[2], icon = 'circle-check', args = {'set_weather', currentWeather}, close = false}, newData[1])
+            lib.setMenuOptions('bMenu_weather_options', {label = oldData[2], args = {'set_weather', currentChecked}, close = false}, oldData[1])
+            lib.setMenuOptions('bMenu_weather_options', {label = newData[2], icon = 'circle-check', args = {'set_weather', currentWeather}, close = false}, newData[1])
             currentChecked = currentWeather
             changedThings = true
         end
 
-        if changedThings and lib.getOpenMenu() == 'berkie_menu_weather_options' then
+        if changedThings and lib.getOpenMenu() == 'bMenu_weather_options' then
             lib.hideMenu(false)
             Wait(100)
-            lib.showMenu('berkie_menu_weather_options', MenuIndexes['berkie_menu_weather_options'])
+            lib.showMenu('bMenu_weather_options', MenuIndexes['bMenu_weather_options'])
             changedThings = false
         elseif changedThings then
             changedThings = false
@@ -309,7 +309,7 @@ CreateThread(function()
                 })
             end
             changingWeather = false
-            TriggerEvent('berkie_menu:client:weatherChangeComplete', currentWeather)
+            TriggerEvent('bMenu:client:weatherChangeComplete', currentWeather)
         end
         Wait(1000)
     end

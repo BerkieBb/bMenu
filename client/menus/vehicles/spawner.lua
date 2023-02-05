@@ -89,7 +89,7 @@ local function spawnVehicleOnPlayer(model)
         coords = vec4(offset.x, offset.y, offset.z, coords.w)
     end
 
-    local netVeh = lib.callback.await('berkie_menu:server:spawnVehicle', false, model, coords)
+    local netVeh = lib.callback.await('bMenu:server:spawnVehicle', false, model, coords)
     while netVeh == 0 or not DoesEntityExist(NetToVeh(netVeh)) do
         Wait(0)
     end
@@ -158,7 +158,7 @@ local function createVehiclesForSpawner(vehs, id)
 end
 
 function CreateVehicleSpawnerMenu()
-    local id = 'berkie_menu_vehicle_spawner'
+    local id = 'bMenu_vehicle_spawner'
     local i = 4
     local sorted = {}
 
@@ -206,22 +206,22 @@ end
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_vehicle_spawner',
+    id = 'bMenu_vehicle_spawner',
     title = 'Vehicle Spawner',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
+        CloseMenu(false, keyPressed, 'bMenu_vehicle_related_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_vehicle_spawner'] = selected
+        MenuIndexes['bMenu_vehicle_spawner'] = selected
     end,
     onCheck = function(selected, checked, args)
         if args[1] == 'inside_vehicle' then
             spawnInVehicle = checked
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, selected)
+            lib.setMenuOptions('bMenu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, selected)
         elseif args[1] == 'replace_vehicle' then
             replacePreviousVehicle = checked
-            lib.setMenuOptions('berkie_menu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, selected)
+            lib.setMenuOptions('bMenu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, selected)
         end
     end,
     options = {
@@ -244,7 +244,7 @@ lib.registerMenu({
             end
         end
         Wait(200)
-        lib.showMenu('berkie_menu_vehicle_spawner', MenuIndexes['berkie_menu_vehicle_spawner'])
+        lib.showMenu('bMenu_vehicle_spawner', MenuIndexes['bMenu_vehicle_spawner'])
     elseif args[1] ~= 'inside_vehicle' and args[1] ~= 'replace_vehicle' then
         lib.showMenu(args[1], MenuIndexes[args[1]])
     end

@@ -1,6 +1,6 @@
 --#region Callbacks
 
-lib.callback.register('berkie_menu:server:spawnVehicle', function(_, model, coords)
+lib.callback.register('bMenu:server:spawnVehicle', function(_, model, coords)
     local tempVehicle = CreateVehicle(model, 0, 0, 0, 0, true, true)
     while not DoesEntityExist(tempVehicle) do
         Wait(0)

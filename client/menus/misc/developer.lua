@@ -3048,7 +3048,7 @@ end
 
 --#region Events
 
-RegisterNetEvent('berkie_menu:client:clearArea', function(pos)
+RegisterNetEvent('bMenu:client:clearArea', function(pos)
     -- Make sure this is only triggered from the server
     if GetInvokingResource() then return end
     ClearAreaLeaveVehicleHealth(pos.x, pos.y, pos.z, 100, false, false, false, false)
@@ -3059,37 +3059,37 @@ end)
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_misc_options_developer_options',
+    id = 'bMenu_misc_options_developer_options',
     title = 'Development Tools',
     position = MenuPosition,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_misc_options_developer_options'] = selected
+        MenuIndexes['bMenu_misc_options_developer_options'] = selected
     end,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_misc_options')
+        CloseMenu(false, keyPressed, 'bMenu_misc_options')
     end,
     onCheck = function(selected, checked, args)
         if args[1] == 'show_coords' then
             showCoords = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Coordinates', description = 'Show your current coordinates at the top of your screen', checked = checked, args = {'show_coords'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Coordinates', description = 'Show your current coordinates at the top of your screen', checked = checked, args = {'show_coords'}, close = false}, selected)
         elseif args[1] == 'show_vehicle_dimensions' then
             showVehicleDimensions = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Vehicle Dimensions', description = 'Draws the model outlines for every vehicle that\'s currently close to you', checked = checked, args = {'show_vehicle_dimensions'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Vehicle Dimensions', description = 'Draws the model outlines for every vehicle that\'s currently close to you', checked = checked, args = {'show_vehicle_dimensions'}, close = false}, selected)
         elseif args[1] == 'show_prop_dimensions' then
             showPropDimensions = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Prop Dimensions', description = 'Draws the model outlines for every prop that\'s currently close to you', checked = checked, args = {'show_prop_dimensions'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Prop Dimensions', description = 'Draws the model outlines for every prop that\'s currently close to you', checked = checked, args = {'show_prop_dimensions'}, close = false}, selected)
         elseif args[1] == 'show_ped_dimensions' then
             showPedDimensions = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Ped Dimensions', description = 'Draws the model outlines for every ped that\'s currently close to you', checked = checked, args = {'show_ped_dimensions'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Ped Dimensions', description = 'Draws the model outlines for every ped that\'s currently close to you', checked = checked, args = {'show_ped_dimensions'}, close = false}, selected)
         elseif args[1] == 'show_entity_handles' then
             showEntityHandles = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Entity Handles', description = 'Draws the the entity handles for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_handles'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Entity Handles', description = 'Draws the the entity handles for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_handles'}, close = false}, selected)
         elseif args[1] == 'show_entity_models' then
             showEntityModels = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Entity Models', description = 'Draws the the entity models for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_models'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Entity Models', description = 'Draws the the entity models for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_models'}, close = false}, selected)
         elseif args[1] == 'show_network_owners' then
             showEntityNetworkOwners = checked
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Network Owners', description = 'Draws the the entity network owner for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_network_owners'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Network Owners', description = 'Draws the the entity network owner for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_network_owners'}, close = false}, selected)
         elseif args[1] == 'enable_timecycle_modifier' then
             enableTimecycleModifier = checked
             ClearTimecycleModifier()
@@ -3097,14 +3097,14 @@ lib.registerMenu({
                 SetTimecycleModifier(timeCycle)
                 SetTimecycleModifierStrength(timeCycleStrength)
             end
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = checked, args = {'enable_timecycle_modifier'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = checked, args = {'enable_timecycle_modifier'}, close = false}, selected)
         end
     end,
     onSideScroll = function(selected, scrollIndex, args)
         if args[1] == 'show_dimensions_radius' then
             local newIndex = scrollIndex - 1
             dimensionsRadius = newIndex == 21 and 9999 or (newIndex / 20) * 2000
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Show Dimensions Radius', description = 'Show entity model/handle/dimension draw range', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', 'Infinite'}, defaultIndex = scrollIndex, args = {'show_dimensions_radius'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Dimensions Radius', description = 'Show entity model/handle/dimension draw range', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', 'Infinite'}, defaultIndex = scrollIndex, args = {'show_dimensions_radius'}, close = false}, selected)
         elseif args[1] == 'timecycle_modifier' then
             if enableTimecycleModifier then
                 local curTimeCycle = timeCycles[scrollIndex]
@@ -3113,7 +3113,7 @@ lib.registerMenu({
                 SetTimecycleModifierStrength(timeCycleStrength)
                 timeCycle = curTimeCycle
             end
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = scrollIndex, args = {'timecycle_modifier'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = scrollIndex, args = {'timecycle_modifier'}, close = false}, selected)
         elseif args[1] == 'timecycle_strength' then
             if enableTimecycleModifier then
                 local strength = (scrollIndex - 1) / 20
@@ -3122,7 +3122,7 @@ lib.registerMenu({
                 SetTimecycleModifierStrength(strength)
                 timeCycleStrength = strength
             end
-            lib.setMenuOptions('berkie_menu_misc_options_developer_options', {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = scrollIndex, args = {'timecycle_strength'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = scrollIndex, args = {'timecycle_strength'}, close = false}, selected)
         end
     end,
     options = {
@@ -3138,29 +3138,29 @@ lib.registerMenu({
         {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = enableTimecycleModifier, args = {'enable_timecycle_modifier'}, close = false},
         {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = 1, args = {'timecycle_modifier'}, close = false},
         {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = 2, args = {'timecycle_strength'}, close = false},
-        {label = 'Entity Spawner', args = {'berkie_menu_misc_options_developer_options_spawner'}}
+        {label = 'Entity Spawner', args = {'bMenu_misc_options_developer_options_spawner'}}
     }
 }, function(_, _, args)
     if args[1] == 'clear_area' then
-        TriggerServerEvent('berkie_menu:server:clearArea', GetEntityCoords(cache.ped))
-    elseif string.find(args[1], 'berkie_menu') then
+        TriggerServerEvent('bMenu:server:clearArea', GetEntityCoords(cache.ped))
+    elseif string.find(args[1], 'bMenu') then
         lib.showMenu(args[1], MenuIndexes[args[1]])
     end
 end)
 
 lib.registerMenu({
-    id = 'berkie_menu_misc_options_developer_options_spawner',
+    id = 'bMenu_misc_options_developer_options_spawner',
     title = 'Entity Spawner',
     position = MenuPosition,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_misc_options_developer_options_spawner'] = selected
+        MenuIndexes['bMenu_misc_options_developer_options_spawner'] = selected
     end,
     onClose = function(keyPressed)
         if DoesEntityExist(currentEntity) then
             DeleteEntity(currentEntity)
             currentEntity = 0
         end
-        CloseMenu(false, keyPressed, 'berkie_menu_misc_options_developer_options')
+        CloseMenu(false, keyPressed, 'bMenu_misc_options_developer_options')
     end,
     options = {
         {label = 'Spawn New Entity', description = 'Spawns entity into the world and lets you set its position and rotation', args = {'spawn_new_entity'}},

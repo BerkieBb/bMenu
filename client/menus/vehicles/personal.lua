@@ -48,14 +48,14 @@ end
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_vehicle_personal',
+    id = 'bMenu_vehicle_personal',
     title = 'Personal Vehicle',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_vehicle_related_options')
+        CloseMenu(false, keyPressed, 'bMenu_vehicle_related_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_vehicle_personal'] = selected
+        MenuIndexes['bMenu_vehicle_personal'] = selected
     end,
     onCheck = function(selected, checked, args)
         local curVeh = NetToVeh(currentVehicle)
@@ -72,28 +72,28 @@ lib.registerMenu({
 
         if args[1] == 'add_blip' then
             enableVehicleBlip = checked
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = checked, close = false}, selected)
+            lib.setMenuOptions('bMenu_vehicle_personal', {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = checked, close = false}, selected)
             if enableVehicleBlip then
                 local entityState = Entity(curVeh)
-                if not entityState.state.berkie_menu_blip or not DoesBlipExist(entityState.state.berkie_menu_blip) then
+                if not entityState.state.bMenu_blip or not DoesBlipExist(entityState.state.bMenu_blip) then
                     local blip = AddBlipForEntity(curVeh)
                     SetBlipSprite(blip, 225)
                     BeginTextCommandSetBlipName('STRING')
                     AddTextComponentSubstringPlayerName('Personal Vehicle')
                     EndTextCommandSetBlipName(blip)
-                    entityState.state:set('berkie_menu_blip', blip)
+                    entityState.state:set('bMenu_blip', blip)
                 end
             else
                 local entityState = Entity(curVeh)
-                if entityState.state.berkie_menu_blip and DoesBlipExist(entityState.state.berkie_menu_blip) then
-                    RemoveBlip(entityState.state.berkie_menu_blip)
+                if entityState.state.bMenu_blip and DoesBlipExist(entityState.state.bMenu_blip) then
+                    RemoveBlip(entityState.state.bMenu_blip)
                 end
-                entityState.state:set('berkie_menu_blip', nil)
+                entityState.state:set('bMenu_blip', nil)
             end
         elseif args[1] == 'exclusive_driver' then
             SetVehicleExclusiveDriver(curVeh, checked)
             SetVehicleExclusiveDriver_2(curVeh, checked and cache.ped or 0, 1)
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = checked, close = false}, selected)
+            lib.setMenuOptions('bMenu_vehicle_personal', {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = checked, close = false}, selected)
         end
     end,
     onSideScroll = function(selected, scrollIndex, args)
@@ -110,7 +110,7 @@ lib.registerMenu({
         end
 
         if args[1] == 'set_vehicle_lights' then
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, selected)
+            lib.setMenuOptions('bMenu_vehicle_personal', {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = scrollIndex, close = false}, selected)
         end
     end,
     options = {
@@ -120,7 +120,7 @@ lib.registerMenu({
         {label = 'Set Vehicle Lights', description = 'This will enable or disable your vehicle headlights, the engine of your vehicle needs to be running for this to work', args = {'set_vehicle_lights'}, values = {'Force On', 'Force Off', 'Reset'}, defaultIndex = 1, close = false},
         {label = 'Lock Vehicle Doors', description = 'This will lock all your vehicle doors for all players. Anyone already inside will always be able to leave the vehicle, even if the doors are locked', args = {'lock_doors'}, close = false},
         {label = 'Unlock Vehicle Doors', description = 'This will unlock all your vehicle doors for all players', args = {'unlock_doors'}, close = false},
-        {label = 'Vehicle Doors', description = 'Open, close, remove and restore vehicle doors here', args = {'berkie_menu_vehicle_personal_doors'}, close = false},
+        {label = 'Vehicle Doors', description = 'Open, close, remove and restore vehicle doors here', args = {'bMenu_vehicle_personal_doors'}, close = false},
         {label = 'Toggle Alarm Sound', description = 'Toggles the vehicle alarm sound on or off. This does not set an alarm. It only toggles the current sounding status of the alarm', args = {'alarm_sound'}, close = false},
         {label = 'Add Blip', description = 'Enables or disables the blip that gets added when you mark a vehicle as your personal vehicle', args = {'add_blip'}, checked = enableVehicleBlip, close = false},
         {label = 'Exclusive Driver', description = 'If enabled, then you will be the only one that can enter the drivers seat. Other players will not be able to drive the car. They can still be passengers', args = {'exclusive_driver'}, checked = false, close = false}
@@ -139,32 +139,32 @@ lib.registerMenu({
             local curVeh = NetToVeh(currentVehicle)
             if DoesEntityExist(curVeh) then
                 local entityState = Entity(curVeh)
-                if entityState.state.berkie_menu_blip and DoesBlipExist(entityState.state.berkie_menu_blip) then
-                    RemoveBlip(entityState.state.berkie_menu_blip)
+                if entityState.state.bMenu_blip and DoesBlipExist(entityState.state.bMenu_blip) then
+                    RemoveBlip(entityState.state.bMenu_blip)
                 end
-                entityState.state:set('berkie_menu_blip', nil)
+                entityState.state:set('bMenu_blip', nil)
             end
             curVeh = GetVehiclePedIsIn(cache.ped, false)
             SetVehicleHasBeenOwnedByPlayer(curVeh, true)
             SetEntityAsMissionEntity(curVeh, true, false)
             if enableVehicleBlip then
                 local entityState = Entity(curVeh)
-                if not entityState.state.berkie_menu_blip or not DoesBlipExist(entityState.state.berkie_menu_blip) then
+                if not entityState.state.bMenu_blip or not DoesBlipExist(entityState.state.bMenu_blip) then
                     local blip = AddBlipForEntity(curVeh)
                     SetBlipSprite(blip, 225)
                     BeginTextCommandSetBlipName('STRING')
                     AddTextComponentSubstringPlayerName('Personal Vehicle')
                     EndTextCommandSetBlipName(blip)
-                    entityState.state:set('berkie_menu_blip', blip)
+                    entityState.state:set('bMenu_blip', blip)
                 end
             end
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(curVeh))
             local labelText = GetLabelText(name)
             local vehicleName = labelText and labelText ~= '' and labelText ~= 'NULL' and ToProperCase(labelText) or ToProperCase(name)
-            lib.setMenuOptions('berkie_menu_vehicle_personal', {label = ('Current Vehicle: %s'):format(vehicleName)}, selected)
+            lib.setMenuOptions('bMenu_vehicle_personal', {label = ('Current Vehicle: %s'):format(vehicleName)}, selected)
             currentVehicle = VehToNet(curVeh)
         end
-        lib.showMenu('berkie_menu_vehicle_personal', MenuIndexes['berkie_menu_vehicle_personal'])
+        lib.showMenu('bMenu_vehicle_personal', MenuIndexes['bMenu_vehicle_personal'])
     elseif DoesEntityExist(NetToVeh(currentVehicle)) then
         if args[1] == 'kick_passengers' then
             local curVeh = NetToVeh(currentVehicle)
@@ -230,7 +230,7 @@ lib.registerMenu({
                     SetVehicleAlarmTimeLeft(curVeh, math.random(8000, 45000))
                     StartVehicleAlarm(curVeh)
                 end
-            elseif args[1] == 'berkie_menu_vehicle_personal_doors' then
+            elseif args[1] == 'bMenu_vehicle_personal_doors' then
                 lib.hideMenu(false)
                 local i = 1
                 for i2 = 0, 7 do
@@ -269,14 +269,14 @@ lib.registerMenu({
 end)
 
 lib.registerMenu({
-    id = 'berkie_menu_vehicle_personal_doors',
+    id = 'bMenu_vehicle_personal_doors',
     title = 'Vehicle Doors',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_vehicle_personal')
+        CloseMenu(false, keyPressed, 'bMenu_vehicle_personal')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_vehicle_personal_doors'] = selected
+        MenuIndexes['bMenu_vehicle_personal_doors'] = selected
     end,
     onCheck = function(_, checked, args)
         if args[1] == 'remove_doors' then

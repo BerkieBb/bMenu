@@ -1,14 +1,14 @@
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_misc_options_connection_options',
+    id = 'bMenu_misc_options_connection_options',
     title = 'Connection Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_misc_options')
+        CloseMenu(false, keyPressed, 'bMenu_misc_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_misc_options_connection_options'] = selected
+        MenuIndexes['bMenu_misc_options_connection_options'] = selected
     end,
     options = {
         {label = 'Quit Session', description = 'Leaves you connected to the server, but quits the network session. Can not be used when you are the host', args = {'quit_session'}, close = false},

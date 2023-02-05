@@ -20,18 +20,18 @@ local movingSpeeds = {
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_player_related_options',
+    id = 'bMenu_player_related_options',
     title = 'Player Related Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_main')
+        CloseMenu(false, keyPressed, 'bMenu_main')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_player_related_options'] = selected
+        MenuIndexes['bMenu_player_related_options'] = selected
     end,
     options = {
-        {label = 'Player Options', description = 'Common player options can be accessed here', args = {'berkie_menu_player_options'}},
-        {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = {'berkie_menu_player_weapon_options'}},
+        {label = 'Player Options', description = 'Common player options can be accessed here', args = {'bMenu_player_options'}},
+        {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = {'bMenu_player_weapon_options'}},
         {label = 'Toggle Noclip', description = 'Toggle NoClip on or off', args = {'toggle_noclip'}, close = false}
     }
 }, function(_, _, args)
@@ -115,7 +115,7 @@ lib.registerMenu({
             SetPoliceIgnorePlayer(cache.playerId, false)
         end
     else
-        if args[1] == 'berkie_menu_player_weapon_options' then
+        if args[1] == 'bMenu_player_weapon_options' then
             SetupWeaponsMenu()
         end
         lib.showMenu(args[1], MenuIndexes[args[1]])

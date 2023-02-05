@@ -1,6 +1,6 @@
 --#region Callbacks
 
-lib.callback.register('berkie_menu:server:saveTeleportLocation', function(source, teleportName)
+lib.callback.register('bMenu:server:saveTeleportLocation', function(source, teleportName)
     local file = {string.strtrim(LoadResourceFile('bMenu', 'config/locations.lua'))}
 
     if file then
@@ -29,7 +29,7 @@ lib.callback.register('berkie_menu:server:saveTeleportLocation', function(source
     return false, 'Something went wrong with loading the locations file'
 end)
 
-lib.callback.register('berkie_menu:server:getConfig', function(_, fileName)
+lib.callback.register('bMenu:server:getConfig', function(_, fileName)
     local file = LoadResourceFile('bMenu', ('config/%s.lua'):format(fileName))
     if not file then return end
 

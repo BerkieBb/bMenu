@@ -8,16 +8,16 @@ local locations = {}
 
 function SetupTeleportOptions()
     if table.type(locations) == 'empty' then
-        lib.setMenuOptions('berkie_menu_misc_options_teleport_options', {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}, 3)
-        lib.setMenuOptions('berkie_menu_misc_options_teleport_options', nil, 4)
+        lib.setMenuOptions('bMenu_misc_options_teleport_options', {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}, 3)
+        lib.setMenuOptions('bMenu_misc_options_teleport_options', nil, 4)
     else
-        lib.setMenuOptions('berkie_menu_misc_options_teleport_options', {label = 'Teleport Locations', description = 'Teleport to pre-configured locations', args = {'berkie_menu_misc_options_teleport_options_locations'}}, 3)
-        lib.setMenuOptions('berkie_menu_misc_options_teleport_options', {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}, 4)
+        lib.setMenuOptions('bMenu_misc_options_teleport_options', {label = 'Teleport Locations', description = 'Teleport to pre-configured locations', args = {'bMenu_misc_options_teleport_options_locations'}}, 3)
+        lib.setMenuOptions('bMenu_misc_options_teleport_options', {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}, 4)
     end
 end
 
 local function refreshLocations()
-    local newLocations = lib.callback.await('berkie_menu:server:getConfig', false, 'locations')
+    local newLocations = lib.callback.await('bMenu:server:getConfig', false, 'locations')
 
     if newLocations and type(newLocations) == 'table' then
         for i = 1, #newLocations do
@@ -137,19 +137,19 @@ end
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_misc_options_teleport_options',
+    id = 'bMenu_misc_options_teleport_options',
     title = 'Teleport Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_misc_options')
+        CloseMenu(false, keyPressed, 'bMenu_misc_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_misc_options_teleport_options'] = selected
+        MenuIndexes['bMenu_misc_options_teleport_options'] = selected
     end,
     options = {
         {label = 'Teleport To Waypoint', args = {'teleport_waypoint'}, close = false},
         {label = 'Teleport To Coords', args = {'teleport_coords'}},
-        {label = 'Teleport Locations', description = 'Teleport to pre-configured locations', args = {'berkie_menu_misc_options_teleport_options_locations'}},
+        {label = 'Teleport Locations', description = 'Teleport to pre-configured locations', args = {'bMenu_misc_options_teleport_options_locations'}},
         {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}
     }
 }, function(_, _, args)
@@ -168,7 +168,7 @@ lib.registerMenu({
 
         if not dialog or not dialog[1] or dialog[1] == '' then
             Wait(200)
-            lib.showMenu('berkie_menu_misc_options_teleport_options', MenuIndexes['berkie_menu_misc_options_teleport_options'])
+            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
             return
         end
 
@@ -186,7 +186,7 @@ lib.registerMenu({
                 type = 'error'
             })
             Wait(200)
-            lib.showMenu('berkie_menu_misc_options_teleport_options', MenuIndexes['berkie_menu_misc_options_teleport_options'])
+            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
             return
         end
 
@@ -197,11 +197,11 @@ lib.registerMenu({
         SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
 
         Wait(200)
-        lib.showMenu('berkie_menu_misc_options_teleport_options', MenuIndexes['berkie_menu_misc_options_teleport_options'])
-    elseif args[1] == 'berkie_menu_misc_options_teleport_options_locations' then
-        lib.setMenuOptions('berkie_menu_misc_options_teleport_options_locations', {[1] = true})
+        lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+    elseif args[1] == 'bMenu_misc_options_teleport_options_locations' then
+        lib.setMenuOptions('bMenu_misc_options_teleport_options_locations', {[1] = true})
         for i = 1, #locations do
-            lib.setMenuOptions('berkie_menu_misc_options_teleport_options_locations', {label = locations[i].name, args = locations[i], close = false}, i)
+            lib.setMenuOptions('bMenu_misc_options_teleport_options_locations', {label = locations[i].name, args = locations[i], close = false}, i)
         end
         lib.showMenu(args[1], MenuIndexes[args[1]])
     elseif args[1] == 'save_location' then
@@ -209,11 +209,11 @@ lib.registerMenu({
 
         if not dialog or not dialog[1] or dialog[1] == '' then
             Wait(200)
-            lib.showMenu('berkie_menu_misc_options_teleport_options', MenuIndexes['berkie_menu_misc_options_teleport_options'])
+            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
             return
         end
 
-        local result, notification = lib.callback.await('berkie_menu:server:saveTeleportLocation', false, dialog[1])
+        local result, notification = lib.callback.await('bMenu:server:saveTeleportLocation', false, dialog[1])
 
         lib.notify({
             description = notification,
@@ -224,19 +224,19 @@ lib.registerMenu({
         SetupTeleportOptions()
 
         Wait(200)
-        lib.showMenu('berkie_menu_misc_options_teleport_options', MenuIndexes['berkie_menu_misc_options_teleport_options'])
+        lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
     end
 end)
 
 lib.registerMenu({
-    id = 'berkie_menu_misc_options_teleport_options_locations',
+    id = 'bMenu_misc_options_teleport_options_locations',
     title = 'Teleport Locations',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_misc_options_teleport_options')
+        CloseMenu(false, keyPressed, 'bMenu_misc_options_teleport_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_misc_options_teleport_options_locations'] = selected
+        MenuIndexes['bMenu_misc_options_teleport_options_locations'] = selected
     end,
     options = {}
 }, function(_, _, args)

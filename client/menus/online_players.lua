@@ -12,14 +12,14 @@ local itemsOnYourself = {
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_online_players',
+    id = 'bMenu_online_players',
     title = 'Online Players',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_main')
+        CloseMenu(false, keyPressed, 'bMenu_main')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_online_players'] = selected
+        MenuIndexes['bMenu_online_players'] = selected
     end,
     options = {}
 }, function(_, _, args)
@@ -31,9 +31,9 @@ end)
 --#region Functions
 
 function CreatePlayerMenu()
-    local id = 'berkie_menu_online_players'
+    local id = 'bMenu_online_players'
     lib.setMenuOptions(id, {[1] = true})
-    local onlinePlayers = lib.callback.await('berkie_menu:server:getOnlinePlayers', false)
+    local onlinePlayers = lib.callback.await('bMenu:server:getOnlinePlayers', false)
     for i = 1, #onlinePlayers do
         local data = onlinePlayers[i]
         local formattedId = ('%s_%s'):format(id, i)
@@ -88,7 +88,7 @@ function CreatePlayerMenu()
             end
 
             ---@diagnostic disable-next-line: need-check-nil
-            local success, reason, extraArg1 = lib.callback.await('berkie_menu:server:playerListAction', false, args, data.source, canActOnSelf, message and message[1] or nil)
+            local success, reason, extraArg1 = lib.callback.await('bMenu:server:playerListAction', false, args, data.source, canActOnSelf, message and message[1] or nil)
 
             if args[1] == teleportVehicleArg then
                 local veh = NetToVeh(extraArg1)

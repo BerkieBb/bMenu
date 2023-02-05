@@ -10,9 +10,9 @@ end
 
 --#region Callbacks
 
-lib.callback.register('berkie_menu:server:setConvar', function(_, convar, value, replicated, sendUpdate, menuId, option, optionId)
+lib.callback.register('bMenu:server:setConvar', function(_, convar, value, replicated, sendUpdate, menuId, option, optionId)
     if sendUpdate then
-        TriggerClientEvent('berkie_menu:client:updateConvar', -1, convar, value, menuId, option, optionId)
+        TriggerClientEvent('bMenu:client:updateConvar', -1, convar, value, menuId, option, optionId)
     end
     return replicated and SetConvarReplicated(convar, value) or SetConvar(convar, value)
 end)

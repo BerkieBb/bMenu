@@ -714,7 +714,7 @@ local unlimitedClip = false
 --#region Functions
 
 function SetupWeaponsMenu()
-    local id = 'berkie_menu_player_weapon_options'
+    local id = 'bMenu_player_weapon_options'
     local indexes = {}
     for i = 8, 8 + #weaponCategoriesArray - 1 do
         local category = weaponCategoriesArray[i - 7]
@@ -724,7 +724,7 @@ function SetupWeaponsMenu()
             title = weaponCategories[category],
             position = MenuPosition,
             onClose = function(keyPressed)
-                CloseMenu(false, keyPressed, 'berkie_menu_player_weapon_options')
+                CloseMenu(false, keyPressed, 'bMenu_player_weapon_options')
             end,
             options = {}
         }, function(_, _, args)
@@ -753,25 +753,25 @@ end
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_player_weapon_options',
+    id = 'bMenu_player_weapon_options',
     title = 'Weapon Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_player_related_options')
+        CloseMenu(false, keyPressed, 'bMenu_player_related_options')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_player_weapon_options'] = selected
+        MenuIndexes['bMenu_player_weapon_options'] = selected
     end,
     onCheck =  function(selected, checked, args)
         if args[1] == 'unlimited_ammo' then
             unlimitedAmmo = checked
-            lib.setMenuOptions('berkie_menu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, selected)
+            lib.setMenuOptions('bMenu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, selected)
             local hasWeapon, currentWeapon = GetCurrentPedWeapon(cache.ped, true)
             if not hasWeapon then return end
             SetPedInfiniteAmmo(cache.ped, unlimitedAmmo, currentWeapon)
         elseif args[1] == 'no_reload' then
             unlimitedClip = checked
-            lib.setMenuOptions('berkie_menu_player_weapon_options', {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = checked, close = false}, selected)
+            lib.setMenuOptions('bMenu_player_weapon_options', {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = checked, close = false}, selected)
             SetPedInfiniteAmmoClip(cache.ped, unlimitedClip)
         end
     end,
@@ -805,7 +805,7 @@ lib.registerMenu({
                 })
             end
             Wait(200)
-            lib.showMenu('berkie_menu_player_weapon_options', MenuIndexes['berkie_menu_player_weapon_options'])
+            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
             return
         end
 
@@ -821,7 +821,7 @@ lib.registerMenu({
         })
 
         Wait(200)
-        lib.showMenu('berkie_menu_player_weapon_options', MenuIndexes['berkie_menu_player_weapon_options'])
+        lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
     elseif args[1] == 'max_ammo' then
         for k in pairs(weapons) do
             local _, ammo = GetMaxAmmo(cache.ped, k)
@@ -837,7 +837,7 @@ lib.registerMenu({
 
         if not dialog or not dialog[1] or dialog[1] == '' then
             Wait(200)
-            lib.showMenu('berkie_menu_player_weapon_options', MenuIndexes['berkie_menu_player_weapon_options'])
+            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
             return
         end
 
@@ -850,7 +850,7 @@ lib.registerMenu({
                 duration = 10000
             })
             Wait(200)
-            lib.showMenu('berkie_menu_player_weapon_options', MenuIndexes['berkie_menu_player_weapon_options'])
+            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
             return
         end
 
@@ -858,7 +858,7 @@ lib.registerMenu({
         GiveWeaponToPed(cache.ped, data.hash, ammo == 0 and 200 or ammo, false, dialog[2])
 
         Wait(200)
-        lib.showMenu('berkie_menu_player_weapon_options', MenuIndexes['berkie_menu_player_weapon_options'])
+        lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
     elseif args[1] == 'weapon_category' then
         lib.showMenu(args[2], MenuIndexes[args[2]])
     end
@@ -880,7 +880,7 @@ end)
 --#region Threads
 
 CreateThread(function()
-    local newWeapons = lib.callback.await('berkie_menu:server:getConfig', false, 'weapons')
+    local newWeapons = lib.callback.await('bMenu:server:getConfig', false, 'weapons')
 
     if newWeapons and type(newWeapons) == 'table' then
         for k, v in pairs(newWeapons) do

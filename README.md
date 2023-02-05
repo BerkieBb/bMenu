@@ -1,6 +1,6 @@
-# berkie_menu
+# bMenu
 
-berkie_menu is a lua version of vMenu, I came up with doing this because vMenu is basically abandoned now but it's still a great resource, I could've kept it in C# but I wanted to do it in lua because more people understand it so people can contribute more easily. This is not finished and is still a work in progress, if you want to contribute, feel free to do so by forking this repository and making a pull request. Please don't use this in a live environment yet as no permissions besides one for the command/keybind are setup and this is still unfinished.
+bMenu is a lua version of vMenu, I came up with doing this because vMenu is basically abandoned now but it's still a great resource, I could've kept it in C# but I wanted to do it in lua because more people understand it so people can contribute more easily. This is not finished and is still a work in progress, if you want to contribute, feel free to do so by forking this repository and making a pull request. Please don't use this in a live environment yet as no permissions besides one for the command/keybind are setup and this is still unfinished.
 
 Another note, please don't change the name of this resource when using this, I will be setting up kvp like done in vMenu soon and that will require the resource name to be the same in every server for the user settings to load.
 

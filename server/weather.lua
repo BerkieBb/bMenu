@@ -41,10 +41,10 @@ local weatherTypes = {
     ['HALLOWEEN'] = 'Halloween'
 }
 
-local dynamicWeather = GetConvar('berkie_menu_dynamic_weather', 'true') == 'true'
-local dynamicWeatherTimer = tonumber(GetConvar('berkie_menu_dynamic_weather_timer', '1')) --[[@as number]]
+local dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+local dynamicWeatherTimer = tonumber(GetConvar('bMenu_dynamic_weather_timer', '1')) --[[@as number]]
 dynamicWeatherTimer = dynamicWeatherTimer < 0 and 1 or dynamicWeatherTimer
-local currentWeather = GetConvar('berkie_menu_current_weather', 'EXTRASUNNY'):upper()
+local currentWeather = GetConvar('bMenu_current_weather', 'EXTRASUNNY'):upper()
 currentWeather = not weatherTypes[currentWeather] and 'EXTRASUNNY' or currentWeather
 local lastWeatherChange = 0
 
@@ -52,31 +52,31 @@ local lastWeatherChange = 0
 
 --#region Events
 
-RegisterNetEvent('berkie_menu:server:updateWeather', function(newWeather, newBlackoutState, newDynamicState, newSnowState)
+RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutState, newDynamicState, newSnowState)
     if not weatherTypes[newWeather] then return end
 
-    SetConvarReplicated('berkie_menu_current_weather', newWeather)
-    SetConvarReplicated('berkie_menu_enable_blackout', tostring(newBlackoutState))
-    SetConvarReplicated('berkie_menu_dynamic_weather', tostring(newDynamicState))
-    SetConvarReplicated('berkie_menu_enable_snow_effects', tostring(newSnowState))
+    SetConvarReplicated('bMenu_current_weather', newWeather)
+    SetConvarReplicated('bMenu_enable_blackout', tostring(newBlackoutState))
+    SetConvarReplicated('bMenu_dynamic_weather', tostring(newDynamicState))
+    SetConvarReplicated('bMenu_enable_snow_effects', tostring(newSnowState))
     currentWeather = newWeather
     dynamicWeather = newDynamicState
     lastWeatherChange = GetGameTimer()
 
     if newWeather == 'XMAS' or newWeather == 'SNOWLIGHT' or newWeather == 'SNOW' or newWeather == 'BLIZZARD' then
-        SetConvarReplicated('berkie_menu_enable_snow_effects', 'true')
-    elseif GetConvar('berkie_menu_enable_snow_effects', 'false') == 'true' then
-        SetConvarReplicated('berkie_menu_enable_snow_effects', 'false')
+        SetConvarReplicated('bMenu_enable_snow_effects', 'true')
+    elseif GetConvar('bMenu_enable_snow_effects', 'false') == 'true' then
+        SetConvarReplicated('bMenu_enable_snow_effects', 'false')
     end
 end)
 
-RegisterNetEvent('berkie_menu:server:setClouds', function(removeClouds)
+RegisterNetEvent('bMenu:server:setClouds', function(removeClouds)
     if removeClouds then
-        TriggerClientEvent('berkie_menu:client:setClouds', -1, 0, 'removed')
+        TriggerClientEvent('bMenu:client:setClouds', -1, 0, 'removed')
         return
     end
 
-    TriggerClientEvent('berkie_menu:client:setClouds', -1, math.random(), cloudTypes[math.random(#cloudTypes)])
+    TriggerClientEvent('bMenu:client:setClouds', -1, math.random(), cloudTypes[math.random(#cloudTypes)])
 end)
 
 --#endregion Events
@@ -89,7 +89,7 @@ CreateThread(function()
             Wait(dynamicWeatherTimer * 60000)
 
             if currentWeather == 'XMAS' or currentWeather == 'HALLOWEEN' or currentWeather == 'NEUTRAL' then
-                SetConvarReplicated('berkie_menu_dynamic_weather', 'false')
+                SetConvarReplicated('bMenu_dynamic_weather', 'false')
                 dynamicWeather = false
             else
                 if GetGameTimer() - lastWeatherChange > (dynamicWeatherTimer * 60000) then
@@ -113,7 +113,7 @@ CreateThread(function()
                             currentWeather = currentWeather == 'FOGGY' and 'SMOG' or 'FOGGY'
                         end
 
-                        SetConvarReplicated('berkie_menu_current_weather', currentWeather)
+                        SetConvarReplicated('bMenu_current_weather', currentWeather)
 
                         lastWeatherChange = GetGameTimer()
                     end

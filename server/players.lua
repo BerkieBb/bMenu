@@ -1,6 +1,6 @@
 --#region Callbacks
 
-lib.callback.register('berkie_menu:server:getOnlinePlayers', function()
+lib.callback.register('bMenu:server:getOnlinePlayers', function()
     local players = GetPlayers()
     local data = {}
     for i = 1, #players do
@@ -13,7 +13,7 @@ lib.callback.register('berkie_menu:server:getOnlinePlayers', function()
     return data
 end)
 
-lib.callback.register('berkie_menu:server:playerListAction', function(source, action, playerSource, canActOnSelf, message)
+lib.callback.register('bMenu:server:playerListAction', function(source, action, playerSource, canActOnSelf, message)
     if source == playerSource and not canActOnSelf then return false, 'You can\'t act on yourself' end
 
     local messageArg = action == 'message'
@@ -29,7 +29,7 @@ lib.callback.register('berkie_menu:server:playerListAction', function(source, ac
     local ped = GetPlayerPed(source)
 
     if messageArg then
-        local canSendMessage = lib.callback.await('berkie_menu:client:canSendMessage', playerSource)
+        local canSendMessage = lib.callback.await('bMenu:client:canSendMessage', playerSource)
         if not canSendMessage then
             return false, ('%s has their PMs disabled'):format(playerName)
         end

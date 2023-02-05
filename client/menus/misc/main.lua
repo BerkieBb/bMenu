@@ -35,7 +35,7 @@ end)
 
 --#region Callbacks
 
-lib.callback.register('berkie_menu:client:canSendMessage', function()
+lib.callback.register('bMenu:client:canSendMessage', function()
     return enablePMs
 end)
 
@@ -44,60 +44,60 @@ end)
 --#region Menu Registration
 
 lib.registerMenu({
-    id = 'berkie_menu_misc_options',
+    id = 'bMenu_misc_options',
     title = 'Miscellaneous Options',
     position = MenuPosition,
     onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'berkie_menu_main')
+        CloseMenu(false, keyPressed, 'bMenu_main')
     end,
     onSelected = function(selected)
-        MenuIndexes['berkie_menu_misc_options'] = selected
+        MenuIndexes['bMenu_misc_options'] = selected
     end,
     onCheck = function(selected, checked, args)
         if args[1] == 'enable_pms' then
             enablePMs = checked
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Enable Private Messages', description = 'If this is enabled, other people can send you a private message via the online players tab', checked = checked, args = {'enable_pms'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Enable Private Messages', description = 'If this is enabled, other people can send you a private message via the online players tab', checked = checked, args = {'enable_pms'}, close = false}, selected)
         elseif args[1] == 'speed_kmh' then
             speedKmh = checked
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Speed KM/H', checked = checked, args = {'speed_kmh'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Speed KM/H', checked = checked, args = {'speed_kmh'}, close = false}, selected)
         elseif args[1] == 'speed_mph' then
             speedMph = checked
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Speed MPH', checked = checked, args = {'speed_mph'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Speed MPH', checked = checked, args = {'speed_mph'}, close = false}, selected)
         elseif args[1] == 'display_location' then
             displayLocation = checked
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Display Location', description = 'Shows your current location and heading, as well as the nearest cross road', checked = checked, args = {'display_location'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Display Location', description = 'Shows your current location and heading, as well as the nearest cross road', checked = checked, args = {'display_location'}, close = false}, selected)
         elseif args[1] == 'show_time' then
             showTime = checked
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Time', description = 'Shows you the current time on screen', checked = checked, args = {'show_time'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Time', description = 'Shows you the current time on screen', checked = checked, args = {'show_time'}, close = false}, selected)
         elseif args[1] == 'show_join_notifs' then
             joinNotifs = checked
-            lib.callback.await('berkie_menu:server:setConvar', false, 'chat_showJoins', checked and 1 or 0, true, true, 'berkie_menu_misc_options', {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = checked, args = {'show_join_notifs'}, close = false}, selected)
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = checked, args = {'show_join_notifs'}, close = false}, selected)
+            lib.callback.await('bMenu:server:setConvar', false, 'chat_showJoins', checked and 1 or 0, true, true, 'bMenu_misc_options', {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = checked, args = {'show_join_notifs'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Join Notifications', description = 'Receive notifications when someone joins the server', checked = checked, args = {'show_join_notifs'}, close = false}, selected)
         elseif args[1] == 'show_quit_notifs' then
             quitNotifs = checked
-            lib.callback.await('berkie_menu:server:setConvar', false, 'chat_showQuits', checked and 1 or 0, true, true, 'berkie_menu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
+            lib.callback.await('bMenu:server:setConvar', false, 'chat_showQuits', checked and 1 or 0, true, true, 'bMenu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Quit Notifications', description = 'Receive notifications when someone leaves the server', checked = checked, args = {'show_quit_notifs'}, close = false}, selected)
         elseif args[1] == 'show_death_notifs' then
             deathNotifs = checked
-            lib.callback.await('berkie_menu:server:setConvar', false, 'berkie_menu_showDeaths', checked and 1 or 0)
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
+            lib.callback.await('bMenu:server:setConvar', false, 'bMenu_showDeaths', checked and 1 or 0)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Death Notifications', description = 'Receive notifications when someone dies or gets killed', checked = deathNotifs, args = {'show_death_notifs'}, close = false}, selected)
         elseif args[1] == 'night_vision' then
             nightVision = checked
             SetNightvision(checked)
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = checked, args = {'night_vision'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Toggle Night Vision', description = 'Enable or disable night vision', checked = checked, args = {'night_vision'}, close = false}, selected)
         elseif args[1] == 'thermal_vision' then
             thermalVision = checked
             SetSeethrough(checked)
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = checked, args = {'thermal_vision'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Toggle Thermal Vision', description = 'Enable or disable thermal vision', checked = checked, args = {'thermal_vision'}, close = false}, selected)
         elseif args[1] == 'show_player_names' then
             playerNames = checked
-            lib.setMenuOptions('berkie_menu_misc_options', {label = 'Show Player Names', description = 'Enables or disables players names over their head', checked = checked, args = {'show_player_names'}, close = false}, selected)
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Show Player Names', description = 'Enables or disables players names over their head', checked = checked, args = {'show_player_names'}, close = false}, selected)
         end
     end,
     options = {
-        {label = 'Teleport Options', args = {'berkie_menu_misc_options_teleport_options'}},
-        {label = 'Development Tools', args = {'berkie_menu_misc_options_developer_options'}},
-        {label = 'Connection Options', args = {'berkie_menu_misc_options_connection_options'}},
+        {label = 'Teleport Options', args = {'bMenu_misc_options_teleport_options'}},
+        {label = 'Development Tools', args = {'bMenu_misc_options_developer_options'}},
+        {label = 'Connection Options', args = {'bMenu_misc_options_connection_options'}},
         {label = 'Enable Private Messages', description = 'If this is enabled, other people can send you a private message via the online players tab', checked = enablePMs, args = {'enable_pms'}, close = false},
         {label = 'Show Speed KM/h', description = 'Show a speedometer on your screen indicating your speed in KM/h', checked = speedKmh, args = {'speed_kmh'}, close = false},
         {label = 'Show Speed MPH', description = 'Show a speedometer on your screen indicating your speed in MPH', checked = speedMph, args = {'speed_mph'}, close = false},
@@ -111,8 +111,8 @@ lib.registerMenu({
         {label = 'Show Player Names', description = 'Enables or disables players names over their head', checked = playerNames, args = {'show_player_names'}, close = false}
     }
 }, function(_, _, args)
-    if string.match(args[1], 'berkie_menu') then
-        if args[1] == 'berkie_menu_misc_options_teleport_options' then
+    if string.match(args[1], 'bMenu') then
+        if args[1] == 'bMenu_misc_options_teleport_options' then
             SetupTeleportOptions()
         end
         lib.showMenu(args[1], MenuIndexes[args[1]])
