@@ -88,7 +88,7 @@ function CreatePlayerMenu()
             end
 
             ---@diagnostic disable-next-line: need-check-nil
-            local success, reason, extraArg1 = lib.callback.await('bMenu:server:playerListAction', false, args, data.source, canActOnSelf, message and message[1] or nil)
+            local success, reason, extraArg1 = lib.callback.await('bMenu:server:playerListAction', false, args[1], data.source, canActOnSelf, message and message[1] or nil)
 
             if args[1] == teleportVehicleArg then
                 local veh = NetToVeh(extraArg1)
