@@ -119,7 +119,7 @@ end)
 
 --#region Commands
 
-RegisterCommand('berkiemenu', function()
+RegisterCommand('bmenu', function()
     MenuOpen = not MenuOpen
 
     if MenuOpen then
@@ -129,7 +129,7 @@ RegisterCommand('berkiemenu', function()
     end
 end, true)
 
-RegisterKeyMapping('berkiemenu', 'Open Menu', 'KEYBOARD', 'M')
+RegisterKeyMapping('bmenu', 'Open Menu', 'KEYBOARD', 'M')
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() or not MenuOpen then return end
@@ -141,6 +141,8 @@ end)
 
 --[[
     Things I have to do before the 1.0.0 release
+
+        Add permissions for every option
 
         Add updates that vMenu didn't have
 
@@ -161,6 +163,4 @@ end)
         Finish Misc menu
 
         Add About menu
-
-        Add permissions for every option
 ]]

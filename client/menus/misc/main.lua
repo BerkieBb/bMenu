@@ -14,6 +14,18 @@ local playerNames = false
 local playerNamesDistance = 500
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 local gamerTags = {}
+local menuPositionIndexes = {
+    ['top-right'] = 1,
+    ['top-left'] = 2,
+    ['bottom-left'] = 3,
+    ['bottom-right'] = 4
+}
+
+local menuPositionNames = {}
+
+for k, v in pairs(menuPositionIndexes) do
+    menuPositionNames[v] = k
+end
 
 --#endregion Variables
 
@@ -94,10 +106,19 @@ lib.registerMenu({
             lib.setMenuOptions('bMenu_misc_options', {label = 'Show Player Names', description = 'Enables or disables players names over their head', checked = checked, args = {'show_player_names'}, close = false}, selected)
         end
     end,
+    onSideScroll = function(selected, scrollIndex, args)
+        if args[1] == 'menu_position' then
+            MenuPosition = menuPositionNames[scrollIndex]
+            lib.setMenuOptions('bMenu_misc_options', {label = 'Menu Position', values = {'Top Left', 'Top Right', 'Bottom Left', 'Bottom Right'}, defaultIndex = menuPositionIndexes[MenuPosition], args = {'menu_position'}, close = false}, selected)
+            lib.hideMenu(false)
+            lib.showMenu('bMenu_misc_options', MenuIndexes['bMenu_misc_options'])
+        end
+    end,
     options = {
         {label = 'Teleport Options', args = {'bMenu_misc_options_teleport_options'}},
         {label = 'Development Tools', args = {'bMenu_misc_options_developer_options'}},
         {label = 'Connection Options', args = {'bMenu_misc_options_connection_options'}},
+        {label = 'Menu Position', values = {'Top Left', 'Top Right', 'Bottom Left', 'Bottom Right'}, defaultIndex = menuPositionIndexes[MenuPosition], args = {'menu_position'}, close = false},
         {label = 'Enable Private Messages', description = 'If this is enabled, other people can send you a private message via the online players tab', checked = enablePMs, args = {'enable_pms'}, close = false},
         {label = 'Show Speed KM/h', description = 'Show a speedometer on your screen indicating your speed in KM/h', checked = speedKmh, args = {'speed_kmh'}, close = false},
         {label = 'Show Speed MPH', description = 'Show a speedometer on your screen indicating your speed in MPH', checked = speedMph, args = {'speed_mph'}, close = false},
