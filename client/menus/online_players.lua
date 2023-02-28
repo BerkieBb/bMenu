@@ -47,7 +47,7 @@ function CreatePlayerMenu()
         local killArg = 'kill'
         lib.registerMenu({
             id = formattedId,
-            title = data.name,
+            title = ('%s (%s/%s)'):format(data.name, i, #onlinePlayers),
             position = MenuPosition,
             onClose = function(keyPressed)
                 CloseMenu(false, keyPressed, id)
