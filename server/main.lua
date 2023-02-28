@@ -36,6 +36,8 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
             for i = 1, #category do
                 categoryText = string.format('%s%s', categoryText, category[i]..'.')
             end
+        elseif categoryType == 'string' then
+            categoryText = categoryText..'.'
         end
 
         for i = 1, #convar do
@@ -52,6 +54,8 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
         for i = 1, #category do
             categoryText = string.format('%s%s', categoryText, category[i]..'.')
         end
+    elseif categoryType == 'string' then
+        categoryText = categoryText..'.'
     end
     return GetConvar('bMenu.Use_Permissions', 'false') == 'false' or IsPlayerAceAllowed(source, string.format('%s.%s%s', 'bMenu', categoryText or '', convar))
 end)
