@@ -44,7 +44,7 @@ lib.registerMenu({
         elseif args[1] == 'unlimited_stamina' then
             unlimitedStamina = checked
             StatSetInt(`MP0_STAMINA`, unlimitedStamina and 100 or 0, true)
-            lib.setMenuOptions('bMenu_player_options', {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'stamina'}, checked = unlimitedStamina, close = false}, selected)
+            lib.setMenuOptions('bMenu_player_options', {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'unlimited_stamina'}, checked = unlimitedStamina, close = false}, selected)
         elseif args[1] == 'fast_run' then
             fastRun = checked
             SetRunSprintMultiplierForPlayer(cache.playerId, fastRun and 1.49 or 1)
@@ -100,7 +100,7 @@ lib.registerMenu({
     options = {
         {label = 'Godmode', description = 'Makes you invincible', args = {'godmode'}, checked = godmode, close = false},
         {label = 'Invisible', description = 'Makes you invisible to yourself and others', args = {'invisible'}, checked = invisible, close = false},
-        {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'stamina'}, checked = unlimitedStamina, close = false},
+        {label = 'Unlimited Stamina', description = 'Allows you to run forever without slowing down or taking damage', args = {'unlimited_stamina'}, checked = unlimitedStamina, close = false},
         {label = 'Fast Run', description = 'Get Snail powers and run very fast', args = {'fast_run'}, checked = fastRun, close = false},
         {label = 'Fast Swim', description = 'Get Snail 2.0 powers and swim super fast', args = {'fast_swim'}, checked = fastSwim, close = false},
         {label = 'Super Jump', description = 'Get Snail 3.0 powers and jump like a champ', args = {'super_jump'}, checked = superJump, close = false},
