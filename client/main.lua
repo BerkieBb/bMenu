@@ -110,6 +110,8 @@ lib.registerMenu({
 }, function(_, _, args)
     if args[1] == 'bMenu_online_players' then
         CreatePlayerMenu()
+    elseif args[1] == 'none' then
+        return
     end
 
     lib.showMenu(args[1], MenuIndexes[args[1]])
@@ -123,6 +125,43 @@ RegisterCommand('bmenu', function()
     MenuOpen = not MenuOpen
 
     if MenuOpen then
+        local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'Main', {'OnlinePlayers', 'PlayerRelated', 'VehicleRelated', 'WorldRelated', 'Recording', 'Misc'})
+        lib.setMenuOptions('bMenu_main', {
+            {label = 'You don\'t have access to anything', icon = 'face-sad-tear', args = {'none'}}
+        })
+
+        local index = 1
+
+        if perms.OnlinePlayers then
+            lib.setMenuOptions('bMenu_main', {label = 'Online Players', icon = 'user-group', args = {'bMenu_online_players'}}, index)
+            index += 1
+        end
+
+        if perms.PlayerRelated then
+            lib.setMenuOptions('bMenu_main', {label = 'Player Related Options', icon = 'user-gear', args = {'bMenu_player_related_options'}}, index)
+            index += 1
+        end
+
+        if perms.VehicleRelated then
+            lib.setMenuOptions('bMenu_main', {label = 'Vehicle Related Options', icon = 'car', args = {'bMenu_vehicle_related_options'}}, index)
+            index += 1
+        end
+
+        if perms.WorldRelated then
+            lib.setMenuOptions('bMenu_main', {label = 'World Related Options', icon = 'globe', args = {'bMenu_world_related_options'}}, index)
+            index += 1
+        end
+
+        if perms.Recording then
+            lib.setMenuOptions('bMenu_main', {label = 'Recording Options', icon = 'video', args = {'bMenu_recording_options'}}, index)
+            index += 1
+        end
+
+        if perms.Misc then
+            lib.setMenuOptions('bMenu_main', {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'bMenu_misc_options'}}, index)
+            index += 1
+        end
+
         lib.showMenu('bMenu_main', MenuIndexes['bMenu_main'])
     else
         lib.hideMenu(true)
@@ -144,9 +183,7 @@ end)
 
         Add permissions for every option
 
-        Add updates that vMenu didn't have
-
-        Add translations
+        Finish Misc menu
 
         Extend private message functionality (under online players)
 
@@ -160,7 +197,7 @@ end)
 
         Add Saved Vehicles menu (under vehicle related options)
 
-        Finish Misc menu
-
         Add About menu
+
+        Add updates that vMenu didn't have
 ]]
