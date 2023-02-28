@@ -17,6 +17,91 @@ local movingSpeeds = {
 
 --#endregion Variables
 
+--#region Functions
+
+local function toggleNoClip()
+    local noclipEntity = cache.vehicle or cache.ped
+    noClipEnabled = not noClipEnabled
+    if noClipEnabled then
+        currentScalefrom = RequestScaleformMovie('INSTRUCTIONAL_BUTTONS')
+        while not HasScaleformMovieLoaded(currentScalefrom) do
+            Wait(0)
+        end
+
+        BeginScaleformMovieMethod(currentScalefrom, 'CLEAR_ALL')
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+        ScaleformMovieMethodAddParamInt(0)
+        ScaleformMovieMethodAddParamTextureNameString('~INPUT_STRING~')
+        ScaleformMovieMethodAddParamTextureNameString(('Change Speed: %s'):format(movingSpeeds[movingSpeed]))
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+        ScaleformMovieMethodAddParamInt(1)
+        ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_LR~')
+        ScaleformMovieMethodAddParamTextureNameString('Turn Left/Right')
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+        ScaleformMovieMethodAddParamInt(2)
+        ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_UD~')
+        ScaleformMovieMethodAddParamTextureNameString('Move')
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+        ScaleformMovieMethodAddParamInt(3)
+        ScaleformMovieMethodAddParamTextureNameString('~INPUT_MULTIPLAYER_INFO~')
+        ScaleformMovieMethodAddParamTextureNameString('Down')
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+        ScaleformMovieMethodAddParamInt(4)
+        ScaleformMovieMethodAddParamTextureNameString('~INPUT_COVER~')
+        ScaleformMovieMethodAddParamTextureNameString('Up')
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
+        ScaleformMovieMethodAddParamInt(5)
+        ScaleformMovieMethodAddParamTextureNameString('~INPUT_VEH_HEADLIGHT~')
+        ScaleformMovieMethodAddParamTextureNameString('Cam Mode')
+        EndScaleformMovieMethod()
+
+        BeginScaleformMovieMethod(currentScalefrom, 'DRAW_INSTRUCTIONAL_BUTTONS')
+        ScaleformMovieMethodAddParamInt(0)
+        EndScaleformMovieMethod()
+
+        DrawScaleformMovieFullscreen(currentScalefrom, 255, 255, 255, 0, 0)
+
+        FreezeEntityPosition(noclipEntity, true)
+        SetEntityInvincible(noclipEntity, true)
+
+        SetEntityVisible(noclipEntity, false, false)
+        SetEntityCollision(noclipEntity, false, false)
+        SetLocalPlayerVisibleLocally(true)
+        SetEntityAlpha(noclipEntity, 51, false)
+
+        SetEveryoneIgnorePlayer(cache.playerId, true)
+        SetPoliceIgnorePlayer(cache.playerId, true)
+    else
+        SetScaleformMovieAsNoLongerNeeded(currentScalefrom)
+        currentScalefrom = -1
+
+        FreezeEntityPosition(noclipEntity, false)
+        SetEntityInvincible(noclipEntity, false)
+
+        SetEntityVisible(noclipEntity, true, false)
+        SetEntityCollision(noclipEntity, true, true)
+        SetLocalPlayerVisibleLocally(true)
+        ResetEntityAlpha(noclipEntity)
+
+        SetEveryoneIgnorePlayer(cache.playerId, false)
+        SetPoliceIgnorePlayer(cache.playerId, false)
+    end
+end
+
+--#endregion Functions
+
 --#region Menu Registration
 
 lib.registerMenu({
@@ -32,88 +117,11 @@ lib.registerMenu({
     options = {
         {label = 'Player Options', description = 'Common player options can be accessed here', args = {'bMenu_player_options'}},
         {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = {'bMenu_player_weapon_options'}},
-        {label = 'Toggle Noclip', description = 'Toggle NoClip on or off', args = {'toggle_noclip'}, close = false}
+        {label = 'Toggle NoClip', description = 'Toggle NoClip on or off', args = {'toggle_noclip'}, close = false}
     }
 }, function(_, _, args)
     if args[1] == 'toggle_noclip' then
-        local noclipEntity = cache.vehicle or cache.ped
-        noClipEnabled = not noClipEnabled
-        if noClipEnabled then
-            currentScalefrom = RequestScaleformMovie('INSTRUCTIONAL_BUTTONS')
-            while not HasScaleformMovieLoaded(currentScalefrom) do
-                Wait(0)
-            end
-
-            BeginScaleformMovieMethod(currentScalefrom, 'CLEAR_ALL')
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-            ScaleformMovieMethodAddParamInt(0)
-            ScaleformMovieMethodAddParamTextureNameString('~INPUT_STRING~')
-            ScaleformMovieMethodAddParamTextureNameString(('Change Speed: %s'):format(movingSpeeds[movingSpeed]))
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-            ScaleformMovieMethodAddParamInt(1)
-            ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_LR~')
-            ScaleformMovieMethodAddParamTextureNameString('Turn Left/Right')
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-            ScaleformMovieMethodAddParamInt(2)
-            ScaleformMovieMethodAddParamTextureNameString('~INPUT_MOVE_UD~')
-            ScaleformMovieMethodAddParamTextureNameString('Move')
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-            ScaleformMovieMethodAddParamInt(3)
-            ScaleformMovieMethodAddParamTextureNameString('~INPUT_MULTIPLAYER_INFO~')
-            ScaleformMovieMethodAddParamTextureNameString('Down')
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-            ScaleformMovieMethodAddParamInt(4)
-            ScaleformMovieMethodAddParamTextureNameString('~INPUT_COVER~')
-            ScaleformMovieMethodAddParamTextureNameString('Up')
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'SET_DATA_SLOT')
-            ScaleformMovieMethodAddParamInt(5)
-            ScaleformMovieMethodAddParamTextureNameString('~INPUT_VEH_HEADLIGHT~')
-            ScaleformMovieMethodAddParamTextureNameString('Cam Mode')
-            EndScaleformMovieMethod()
-
-            BeginScaleformMovieMethod(currentScalefrom, 'DRAW_INSTRUCTIONAL_BUTTONS')
-            ScaleformMovieMethodAddParamInt(0)
-            EndScaleformMovieMethod()
-
-            DrawScaleformMovieFullscreen(currentScalefrom, 255, 255, 255, 0, 0)
-
-            FreezeEntityPosition(noclipEntity, true)
-            SetEntityInvincible(noclipEntity, true)
-
-            SetEntityVisible(noclipEntity, false, false)
-            SetEntityCollision(noclipEntity, false, false)
-            SetLocalPlayerVisibleLocally(true)
-            SetEntityAlpha(noclipEntity, 51, false)
-
-            SetEveryoneIgnorePlayer(cache.playerId, true)
-            SetPoliceIgnorePlayer(cache.playerId, true)
-        else
-            SetScaleformMovieAsNoLongerNeeded(currentScalefrom)
-            currentScalefrom = -1
-
-            FreezeEntityPosition(noclipEntity, false)
-            SetEntityInvincible(noclipEntity, false)
-
-            SetEntityVisible(noclipEntity, true, false)
-            SetEntityCollision(noclipEntity, true, true)
-            SetLocalPlayerVisibleLocally(true)
-            ResetEntityAlpha(noclipEntity)
-
-            SetEveryoneIgnorePlayer(cache.playerId, false)
-            SetPoliceIgnorePlayer(cache.playerId, false)
-        end
+        toggleNoClip()
     else
         if args[1] == 'bMenu_player_weapon_options' then
             SetupWeaponsMenu()
@@ -123,6 +131,16 @@ lib.registerMenu({
 end)
 
 --#endregion Menu Registration
+
+--#region Commands
+
+RegisterCommand('toggle_noclip', function()
+    toggleNoClip()
+end, true)
+
+RegisterKeyMapping('toggle_noclip', 'Toggle NoClip from bMenu', 'KEYBOARD', GetConvar('bMenu.NoClip_Keybind', 'F2'))
+
+--#endregion Commands
 
 --#region Threads
 
