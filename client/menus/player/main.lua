@@ -20,6 +20,8 @@ local movingSpeeds = {
 --#region Functions
 
 local function toggleNoClip()
+    if not lib.callback.await('bMenu:server:hasCommandPermission', false, 'toggle_noclip') then return end
+
     local noclipEntity = cache.vehicle or cache.ped
     noClipEnabled = not noClipEnabled
     if noClipEnabled then
@@ -134,9 +136,7 @@ end)
 
 --#region Commands
 
-RegisterCommand('toggle_noclip', function()
-    toggleNoClip()
-end, true)
+RegisterCommand('toggle_noclip', toggleNoClip, true)
 
 RegisterKeyMapping('toggle_noclip', 'Toggle NoClip from bMenu', 'KEYBOARD', GetConvar('bMenu.NoClip_Keybind', 'F2'))
 

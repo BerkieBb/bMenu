@@ -17,6 +17,10 @@ lib.callback.register('bMenu:server:setConvar', function(_, convar, value, repli
     return replicated and SetConvarReplicated(convar, value) or SetConvar(convar, value)
 end)
 
+lib.callback.register('bMenu:server:hasCommandPermission', function(source, command)
+    return IsPlayerAceAllowed(source, ('command.%s'):format(command))
+end)
+
 lib.callback.register('bMenu:server:hasConvarPermission', function(source, category, convar)
     if not convar then return end
     if type(convar) == 'table' then
