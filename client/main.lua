@@ -122,6 +122,12 @@ end)
 --#region Commands
 
 RegisterCommand('bmenu', function()
+    local hasPermission = lib.callback.await('bMenu:server:hasCommandPermission', false, 'bmenu')
+    if not hasPermission then
+        MenuOpen = false -- Making sure this property is set accordingly
+        return
+    end
+
     MenuOpen = not MenuOpen
 
     if MenuOpen then
