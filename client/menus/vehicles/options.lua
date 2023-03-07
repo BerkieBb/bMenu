@@ -1173,6 +1173,16 @@ local function setupDoorMenu()
     lib.showMenu(id, MenuIndexes[id])
 end
 
+-- Create a table with numbers 1 to n
+-- Used for generate liveries table number on menu
+local function shuffled_numbers(n)
+    local numbers = {}
+    for i = 1, n do
+      numbers[i] = i
+    end
+    return numbers
+end
+
 --#endregion Functions
 
 --#region Menu Registration
@@ -1269,6 +1279,9 @@ lib.registerMenu({
         elseif args[1] == 'power_multiplier' then
             vehiclePowerMultiplier = 2 ^ scrollIndex
             lib.setMenuOptions('bMenu_vehicle_options', {label = 'Set Engine Power Multiplier', description = 'Set the engine power multiplier', args = {'power_multiplier'}, values = {'2x', '4x', '8x', '16x', '32x', '64x', '128x', '256x', '512x', '1024x'}, defaultIndex = scrollIndex, close = false}, selected)
+        elseif args[1] == 'set_livery' then
+            SetVehicleLivery(cache.vehicle, scrollIndex)
+            lib.setMenuOptions('bMenu_vehicle_options', {label = 'Livery', description = 'Change vehicle livery', args = {'set_livery'}, values = shuffled_numbers(GetVehicleLiveryCount(cache.vehicle)), defaultIndex = scrollIndex, close = false}, selected)
         elseif args[1] == 'radio_station' then
             VehicleDefaultRadio = vehicleRadioStations[scrollIndex][1]
             lib.setMenuOptions('bMenu_vehicle_options', {label = 'Default Radio Station', description = 'Select a default radio station to be set when spawning new car', args = {'radio_station'}, values = vehicleRadioStationsArray, defaultIndex = scrollIndex, close = false}, selected)
@@ -1285,6 +1298,7 @@ lib.registerMenu({
         {label = 'Colors', description = 'Style your vehicle even further by giving it some Snailsome colors', args = {'bMenu_vehicle_options_colors'}},
         {label = 'Neon Kits', description = 'Make your vehicle shine with some fancy neon underglow', args = {'bMenu_vehicle_options_neon_menu'}},
         {label = 'Extras', description = 'Add or remove vehicle extras', args = {'bMenu_vehicle_options_extras'}},
+        {label = 'Livery', description = 'Change vehicle livery', args = {'set_livery'}, values = shuffled_numbers(GetVehicleLiveryCount(cache.vehicle)), defaultIndex = 1, close = false},
         {label = 'Toggle Engine', description = 'Turn your engine on or off', args = {'toggle_engine'}, close = false},
         {label = 'Set License Plate Text', description = 'Enter a custom license plate for your vehicle', args = {'set_license_plate'}},
         {label = 'License Plate Type', description = 'Choose a license plate type', args = {'license_plate_type'}, values = vehicleLicensePlatesArray, defaultIndex = 2, close = false},
