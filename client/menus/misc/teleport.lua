@@ -154,6 +154,13 @@ lib.registerMenu({
     }
 }, function(_, _, args)
     if args[1] == 'teleport_waypoint' then
+        if not DoesBlipExist(blipMarker) then
+            lib.notify({
+                description = 'No waypoint set',
+                type = 'error'
+            })
+			return 'marker'
+		end
         local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
         local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
         RequestCollisionAtCoord(waypointBlipPos.x, waypointBlipPos.y, 1000)
