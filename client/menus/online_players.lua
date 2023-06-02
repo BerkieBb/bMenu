@@ -21,8 +21,14 @@ lib.registerMenu({
     onSelected = function(selected)
         MenuIndexes['bMenu_online_players'] = selected
     end,
-    options = {}
+    options = {
+        {label = 'No Players Online', icon = 'face-sad-tear', args = {'return'}, close = false}
+    }
 }, function(_, _, args)
+    if args[1] == 'return' then
+        lib.hideMenu(true)
+        return
+    end
     lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
@@ -32,19 +38,65 @@ end)
 
 function CreatePlayerMenu()
     local id = 'bMenu_online_players'
-    lib.setMenuOptions(id, {[1] = true})
+    lib.setMenuOptions(id, {{label = 'No Players Online', icon = 'face-sad-tear', args = {'none'}}})
     local onlinePlayers = lib.callback.await('bMenu:server:getOnlinePlayers', false)
+    local messageArg = 'message'
+    local teleportArg = 'teleport'
+    local teleportVehicleArg = 'teleport_vehicle'
+    local summonArg = 'summon'
+    local spectateArg = 'spectate'
+    local waypointArg = 'waypoint'
+    local blipArg = 'blip'
+    local killArg = 'kill'
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'OnlinePlayers', {'Message', 'Teleport_To', 'Teleport_In_Vehicle', 'Summon', 'Spectate', 'Waypoint', 'Blip', 'Kill'})
+    local menuOptions = {
+        {label = 'You don\'t have access to any options', icon = 'face-sad-tear', args = {'return'}, close = false}
+    }
+
+    local index = 1
+    if perms.Message then
+        menuOptions[index] = {label = 'Send Message', icon = 'comment-dots', description = 'Send a message to this player, note that staff can see these', args = {messageArg}, close = true}
+        index += 1
+    end
+
+    if perms.Teleport_To then
+        menuOptions[index] = {label = 'Teleport To Player', icon = 'hat-wizard', description = 'Teleport to the player', args = {teleportArg}, close = false}
+        index += 1
+    end
+
+    if perms.Teleport_In_Vehicle then
+        menuOptions[index] = {label = 'Teleport Into Vehicle', icon = 'car-side', description = 'Teleport into the vehicle of the player', args = {teleportVehicleArg}, close = false}
+        index += 1
+    end
+
+    if perms.Summon then
+        menuOptions[index] = {label = 'Summon Player', icon = 'hat-wizard', description = 'Summon the player to your location', args = {summonArg}, close = false}
+        index += 1
+    end
+
+    if perms.Spectate then
+        menuOptions[index] = {label = 'Spectate Player', icon = 'glasses', description = 'Spectate the player', args = {spectateArg}, close = false}
+        index += 1
+    end
+
+    if perms.Waypoint then
+        menuOptions[index] = {label = 'Set Waypoint', icon = 'location-dot', description = 'Set your waypoint on the player', args = {waypointArg}, close = false}
+        index += 1
+    end
+
+    if perms.Blip then
+        menuOptions[index] = {label = 'Toggle Blip', icon = 'magnifying-glass-location', description = 'Toggle a blip on the map following the player', args = {blipArg}, close = false}
+        index += 1
+    end
+
+    if perms.Kill then
+        menuOptions[index] = {label = 'Kill Player', icon = 'bullseye', description = 'Kill the player, just because you can', args = {killArg}, close = false}
+        index += 1
+    end
+
     for i = 1, #onlinePlayers do
         local data = onlinePlayers[i]
         local formattedId = ('%s_%s'):format(id, i)
-        local messageArg = 'message'
-        local teleportArg = 'teleport'
-        local teleportVehicleArg = 'teleport_vehicle'
-        local summonArg = 'summon'
-        local spectateArg = 'spectate'
-        local waypointArg = 'waypoint'
-        local blipArg = 'blip'
-        local killArg = 'kill'
         lib.registerMenu({
             id = formattedId,
             title = ('%s (%s/%s)'):format(data.name, i, #onlinePlayers),
@@ -55,17 +107,13 @@ function CreatePlayerMenu()
             onSelected = function(selected)
                 MenuIndexes[formattedId] = selected
             end,
-            options = {
-                {label = 'Send Message', icon = 'comment-dots', description = 'Send a message to this player, note that staff can see these', args = {messageArg}, close = true},
-                {label = 'Teleport To Player', icon = 'hat-wizard', description = 'Teleport to the player', args = {teleportArg}, close = false},
-                {label = 'Teleport Into Vehicle', icon = 'car-side', description = 'Teleport into the vehicle of the player', args = {teleportVehicleArg}, close = false},
-                {label = 'Summon Player', icon = 'hat-wizard', description = 'Summon the player to your location', args = {summonArg}, close = false},
-                {label = 'Spectate Player', icon = 'glasses', description = 'Spectate the player', args = {spectateArg}, close = false},
-                {label = 'Set Waypoint', icon = 'location-dot', description = 'Set your waypoint on the player', args = {waypointArg}, close = false},
-                {label = 'Toggle Blip', icon = 'magnifying-glass-location', description = 'Toggle a blip on the map following the player', args = {blipArg}, close = false},
-                {label = 'Kill Player', icon = 'bullseye', description = 'Kill the player, just because you can', args = {killArg}, close = false}
-            }
+            options = menuOptions
         }, function(_, _, args)
+            if args[1] == 'return' then
+                lib.hideMenu(true)
+                return
+            end
+
             local canActOnSelf = ArrayIncludes(args[1], itemsOnYourself)
             if data.source == ServerId and not canActOnSelf then
                 lib.notify({
