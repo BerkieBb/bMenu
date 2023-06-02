@@ -644,7 +644,7 @@ local function getModLocalizedName(modType, mod)
 
         if mod >= modCount / 2 then
             local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
-            return ('%s %s'):format((DoesTextLabelExist('CHROME') and GetLabelText('CHROME') or ''), (DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or ''))
+            return ('%s %s'):format(DoesTextLabelExist('CHROME') and GetLabelText('CHROME') or '', DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or '')
         else
             local modLabel = GetModTextLabel(cache.vehicle, modType, mod)
             return DoesTextLabelExist(modLabel) and GetLabelText(modLabel) or nil
