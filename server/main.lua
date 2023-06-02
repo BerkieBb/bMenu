@@ -38,15 +38,22 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
         if categoryType == 'table' then
             categoryText = ''
             for i = 1, #category do
-                categoryText = string.format('%s%s', categoryText, category[i]..'.')
+                local text = category[i]
+                local length = #text
+                local endStr = text:sub(length, length)
+                text = endStr == '.' and text or text..'.'
+                categoryText = string.format('%s%s', categoryText, text)
             end
         elseif categoryType == 'string' then
-            categoryText = categoryText..'.'
+            local length = #categoryText
+            local endStr = categoryText:sub(length, length)
+            categoryText = endStr == '.' and categoryText or categoryText..'.'
         end
 
+        local hasAllPermission = IsPlayerAceAllowed(source, string.format('%sAll', categoryText))
         for i = 1, #convar do
             local c = convar[i]
-            allowed[c] = IsPlayerAceAllowed(source, string.format('%s.%s%s', 'bMenu', categoryText or '', c))
+            allowed[c] = hasAllPermission or IsPlayerAceAllowed(source, string.format('bMenu.%s%s', categoryText or '', c))
         end
         return allowed
     end
@@ -56,12 +63,18 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
     if categoryType == 'table' then
         categoryText = ''
         for i = 1, #category do
-            categoryText = string.format('%s%s', categoryText, category[i]..'.')
+            local text = category[i]
+            local length = #text
+            local endStr = text:sub(length, length)
+            text = endStr == '.' and text or text..'.'
+            categoryText = string.format('%s%s', categoryText, text)
         end
     elseif categoryType == 'string' then
-        categoryText = categoryText..'.'
+        local length = #categoryText
+        local endStr = categoryText:sub(length, length)
+        categoryText = endStr == '.' and categoryText or categoryText..'.'
     end
-    return GetConvar('bMenu.Use_Permissions', 'false') == 'false' or IsPlayerAceAllowed(source, string.format('%s.%s%s', 'bMenu', categoryText or '', convar))
+    return GetConvar('bMenu.Use_Permissions', 'false') == 'false' or IsPlayerAceAllowed(source, string.format('%sAll', categoryText)) or IsPlayerAceAllowed(source, string.format('bMenu.%s%s', categoryText or '', convar))
 end)
 
 --#endregion Callbacks
