@@ -169,10 +169,11 @@ RegisterCommand('bmenu', function()
         end
 
         lib.showMenu('bMenu_main', MenuIndexes['bMenu_main'])
-    else
-        lib.hideMenu(true)
+        return
     end
-end, true)
+
+    lib.hideMenu(true)
+end, false)
 
 RegisterKeyMapping('bmenu', 'Open Menu', 'KEYBOARD', 'M')
 
