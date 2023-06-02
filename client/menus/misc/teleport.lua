@@ -160,7 +160,7 @@ lib.registerMenu({
                 description = 'No waypoint set',
                 type = 'error'
             })
-            return 'marker'
+            return
 	end
         local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
         local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
