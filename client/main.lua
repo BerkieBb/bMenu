@@ -110,6 +110,8 @@ lib.registerMenu({
 }, function(_, _, args)
     if args[1] == 'bMenu_online_players' then
         CreatePlayerMenu()
+    elseif args[1] == 'bMenu_recording_options' then
+        CreateRecordingMenu()
     elseif args[1] == 'none' then
         return
     end
