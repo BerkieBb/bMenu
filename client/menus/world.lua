@@ -1,21 +1,21 @@
 --#region Variables
 
 local weatherIndexes = {
-    ['EXTRASUNNY'] = {4, 'Extra Sunny'},
-    ['CLEAR'] = {5, 'Clear'},
-    ['NEUTRAL'] = {6, 'Neutral'},
-    ['SMOG'] = {7, 'Smog'},
-    ['FOGGY'] = {8, 'Foggy'},
-    ['CLOUDS'] = {9, 'Cloudy'},
-    ['OVERCAST'] = {10, 'Overcast'},
-    ['CLEARING'] = {11, 'Clearing'},
-    ['RAIN'] = {12, 'Rainy'},
-    ['THUNDER'] = {13, 'Thunder'},
-    ['BLIZZARD'] = {14, 'Blizzard'},
-    ['SNOW'] = {15, 'Snow'},
-    ['SNOWLIGHT'] = {16, 'Light Snow'},
-    ['XMAS'] = {17, 'X-MAS Snow'},
-    ['HALLOWEEN'] = {18, 'Halloween'}
+    EXTRASUNNY = {4, 'Extra Sunny'},
+    CLEAR = {5, 'Clear'},
+    NEUTRAL = {6, 'Neutral'},
+    SMOG = {7, 'Smog'},
+    FOGGY = {8, 'Foggy'},
+    CLOUDS = {9, 'Cloudy'},
+    OVERCAST = {10, 'Overcast'},
+    CLEARING = {11, 'Clearing'},
+    RAIN = {12, 'Rainy'},
+    THUNDER = {13, 'Thunder'},
+    BLIZZARD = {14, 'Blizzard'},
+    SNOW = {15, 'Snow'},
+    SNOWLIGHT = {16, 'Light Snow'},
+    XMAS = {17, 'X-MAS Snow'},
+    HALLOWEEN = {18, 'Halloween'}
 }
 
 local timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
@@ -40,87 +40,155 @@ local changingWeather = false
 
 --#endregion Variables
 
+--#region Functions
+
+local function createTimeOptions()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'WorldRelated', 'TimeOptions'}, {'Freeze_Unfreeze_Time', 'Sync_Time', 'Show_Time', 'Presets', 'Set_Hour', 'Set_Minute'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_main'}}
+    }
+    local index = 1
+
+    if perms.Freeze_Unfreeze_Time then
+        menuOptions[index] = {label = 'Freeze/Unfreeze Time', args = {'freeze_time'}, close = false}
+        index += 1
+    end
+
+    if perms.Sync_Time then
+        menuOptions[index] = {label = 'Sync Time To Server', args = {'sync_to_server'}, close = false}
+        index += 1
+    end
+
+    if perms.Show_Time then
+        menuOptions[index] = {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}
+        index += 1
+    end
+
+    if perms.Presets then
+        menuOptions[index] = {label = 'Early Morning (06:00, 6 AM)', args = {'set_time_preset', 6}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Morning (09:00, 9 AM)', args = {'set_time_preset', 9}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Noon (12:00, 12 PM)', args = {'set_time_preset', 12}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Early Afternoon (15:00, 3 PM)', args = {'set_time_preset', 15}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Afternoon (18:00, 6 PM)', args = {'set_time_preset', 18}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Evening (21:00, 9 PM)', args = {'set_time_preset', 21}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Midnight (00:00, 12 AM)', args = {'set_time_preset', 0}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Night (03:00, 3 AM)', args = {'set_time_preset', 3}, close = false}
+        index += 1
+    end
+
+    if perms.Set_Hour then
+        menuOptions[index] = {label = 'Set Custom Hour', args = {'set_time_custom', 'hours'}, values = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'}, defaultIndex = 1, close = false}
+        index += 1
+    end
+
+    if perms.Set_Minute then
+        menuOptions[index] = {label = 'Set Custom Minute', args = {'set_time_custom', 'minutes'}, values = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59'}, defaultIndex = 1, close = false}
+        index += 1
+    end
+
+    lib.registerMenu({
+        id = 'bMenu_time_options',
+        title = 'Time Options',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_world_related_options')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_time_options'] = selected
+        end,
+        onCheck = function(selected, checked, args)
+            if args[1] == 'show_time' then
+                showTimeOnScreen = checked
+                lib.setMenuOptions('bMenu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, selected)
+            end
+        end,
+        options = menuOptions
+    }, function(_, scrollIndex, args)
+        timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
+
+        if args[1] == 'sync_to_server' then
+            TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, timeFrozen, not timeSyncedWithMachine)
+        end
+
+        if timeSyncedWithMachine and args[1] ~= 'sync_to_server' then
+            lib.notify({
+                description = 'Can\'t change the time when the time is synced to the server',
+                type = 'error'
+            })
+            return
+        end
+
+        timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
+        if args[1] == 'freeze_time' then
+            TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, not timeFrozen, timeSyncedWithMachine)
+        elseif args[1] == 'set_time_preset' then
+            TriggerServerEvent('bMenu:server:updateTime', args[2], 0, timeFrozen, timeSyncedWithMachine)
+        elseif args[1] == 'set_time_custom' then
+            if args[2] == 'hours' then
+                local hour = scrollIndex - 1
+                TriggerServerEvent('bMenu:server:updateTime', hour, currentMinute, timeFrozen, timeSyncedWithMachine)
+            elseif args[2] == 'minutes' then
+                local minute = scrollIndex - 1
+                TriggerServerEvent('bMenu:server:updateTime', currentHour, minute, timeFrozen, timeSyncedWithMachine)
+            end
+        end
+    end)
+end
+
+function CreateWorldMenu()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'WorldRelated', {'TimeOptions', 'WeatherOptions'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_main'}}
+    }
+    local index = 1
+
+    if perms.TimeOptions then
+        menuOptions[index] = {label = 'Time Options', args = {'bMenu_time_options'}}
+        index += 1
+    end
+
+    if perms.WeatherOptions then
+        menuOptions[index] = {label = 'Weather Options', args = {'bMenu_weather_options'}}
+        index += 1
+    end
+
+    lib.registerMenu({
+        id = 'bMenu_world_related_options',
+        title = 'World Related Options',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_main')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_world_related_options'] = selected
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'bMenu_time_options' then
+            createTimeOptions()
+        end
+
+        lib.showMenu(args[1], MenuIndexes[args[1]])
+    end)
+end
+
+--#endregion Functions
+
 --#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_world_related_options',
-    title = 'World Related Options',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_main')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_world_related_options'] = selected
-    end,
-    options = {
-        {label = 'Time Options', args = {'bMenu_time_options'}},
-        {label = 'Weather Options', args = {'bMenu_weather_options'}}
-    }
-}, function(_, _, args)
-    lib.showMenu(args[1], MenuIndexes[args[1]])
-end)
-
-lib.registerMenu({
-    id = 'bMenu_time_options',
-    title = 'Time Options',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_world_related_options')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_time_options'] = selected
-    end,
-    onCheck = function(selected, checked, args)
-        if args[1] == 'show_time' then
-            showTimeOnScreen = checked
-            lib.setMenuOptions('bMenu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, selected)
-        end
-    end,
-    options = {
-        {label = 'Freeze/Unfreeze Time', args = {'freeze_time'}, close = false},
-        {label = 'Sync Time To Server', args = {'sync_to_server'}, close = false},
-        {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false},
-        {label = 'Early Morning (06:00, 6 AM)', args = {'set_time_preset', 6}, close = false},
-        {label = 'Morning (09:00, 9 AM)', args = {'set_time_preset', 9}, close = false},
-        {label = 'Noon (12:00, 12 PM)', args = {'set_time_preset', 12}, close = false},
-        {label = 'Early Afternoon (15:00, 3 PM)', args = {'set_time_preset', 15}, close = false},
-        {label = 'Afternoon (18:00, 6 PM)', args = {'set_time_preset', 18}, close = false},
-        {label = 'Evening (21:00, 9 PM)', args = {'set_time_preset', 21}, close = false},
-        {label = 'Midnight (00:00, 12 AM)', args = {'set_time_preset', 0}, close = false},
-        {label = 'Night (03:00, 3 AM)', args = {'set_time_preset', 3}, close = false},
-        {label = 'Set Custom Hour', args = {'set_time_custom', 'hours'}, values = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'}, defaultIndex = 1, close = false},
-        {label = 'Set Custom Minute', args = {'set_time_custom', 'minutes'}, values = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59'}, defaultIndex = 1, close = false}
-    }
-}, function(_, scrollIndex, args)
-    timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
-
-    if args[1] == 'sync_to_server' then
-        TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, timeFrozen, not timeSyncedWithMachine)
-    end
-
-    if timeSyncedWithMachine and args[1] ~= 'sync_to_server' then
-        lib.notify({
-            description = 'Can\'t change the time when the time is synced to the server',
-            type = 'error'
-        })
-        return
-    end
-
-    timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
-    if args[1] == 'freeze_time' then
-        TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, not timeFrozen, timeSyncedWithMachine)
-    elseif args[1] == 'set_time_preset' then
-        TriggerServerEvent('bMenu:server:updateTime', args[2], 0, timeFrozen, timeSyncedWithMachine)
-    elseif args[1] == 'set_time_custom' then
-        if args[2] == 'hours' then
-            local hour = scrollIndex - 1
-            TriggerServerEvent('bMenu:server:updateTime', hour, currentMinute, timeFrozen, timeSyncedWithMachine)
-        elseif args[2] == 'minutes' then
-            local minute = scrollIndex - 1
-            TriggerServerEvent('bMenu:server:updateTime', currentHour, minute, timeFrozen, timeSyncedWithMachine)
-        end
-    end
-end)
 
 lib.registerMenu({
     id = 'bMenu_weather_options',

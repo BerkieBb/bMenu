@@ -112,6 +112,8 @@ lib.registerMenu({
         CreatePlayerMenu()
     elseif args[1] == 'bMenu_recording_options' then
         CreateRecordingMenu()
+    elseif args[1] == 'bMenu_world_related_options' then
+        CreateWorldMenu()
     elseif args[1] == 'none' then
         return
     end
