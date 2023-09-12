@@ -87,42 +87,6 @@ end
 
 --#endregion Functions
 
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_main',
-    title = 'Berkie Menu',
-    position = MenuPosition,
-    onClose = function()
-        CloseMenu(true)
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_main'] = selected
-    end,
-    options = {
-        {label = 'Online Players', icon = 'user-group', args = {'bMenu_online_players'}},
-        {label = 'Player Related Options', icon = 'user-gear', args = {'bMenu_player_related_options'}},
-        {label = 'Vehicle Related Options', icon = 'car', args = {'bMenu_vehicle_related_options'}},
-        {label = 'World Related Options', icon = 'globe', args = {'bMenu_world_related_options'}},
-        {label = 'Recording Options', icon = 'video', args = {'bMenu_recording_options'}},
-        {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'bMenu_misc_options'}}
-    }
-}, function(_, _, args)
-    if args[1] == 'bMenu_online_players' then
-        CreatePlayerMenu()
-    elseif args[1] == 'bMenu_recording_options' then
-        CreateRecordingMenu()
-    elseif args[1] == 'bMenu_world_related_options' then
-        CreateWorldMenu()
-    elseif args[1] == 'none' then
-        return
-    end
-
-    lib.showMenu(args[1], MenuIndexes[args[1]])
-end)
-
---#endregion Menu Registration
-
 --#region Commands
 
 RegisterCommand('bmenu', function()
@@ -136,41 +100,66 @@ RegisterCommand('bmenu', function()
 
     if MenuOpen then
         local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'Main', {'OnlinePlayers', 'PlayerRelated', 'VehicleRelated', 'WorldRelated', 'Recording', 'Misc'})
-        lib.setMenuOptions('bMenu_main', {
+        local menuOptions = {
             {label = 'You don\'t have access to anything', icon = 'face-sad-tear', args = {'none'}}
-        })
+        }
 
         local index = 1
 
         if perms.OnlinePlayers then
-            lib.setMenuOptions('bMenu_main', {label = 'Online Players', icon = 'user-group', args = {'bMenu_online_players'}}, index)
+            menuOptions[index] = {label = 'Online Players', icon = 'user-group', args = {'bMenu_online_players'}}
             index += 1
         end
 
         if perms.PlayerRelated then
-            lib.setMenuOptions('bMenu_main', {label = 'Player Related Options', icon = 'user-gear', args = {'bMenu_player_related_options'}}, index)
+            menuOptions[index] = {label = 'Player Related Options', icon = 'user-gear', args = {'bMenu_player_related_options'}}
             index += 1
         end
 
         if perms.VehicleRelated then
-            lib.setMenuOptions('bMenu_main', {label = 'Vehicle Related Options', icon = 'car', args = {'bMenu_vehicle_related_options'}}, index)
+            menuOptions[index] = {label = 'Vehicle Related Options', icon = 'car', args = {'bMenu_vehicle_related_options'}}
             index += 1
         end
 
         if perms.WorldRelated then
-            lib.setMenuOptions('bMenu_main', {label = 'World Related Options', icon = 'globe', args = {'bMenu_world_related_options'}}, index)
+            menuOptions[index] = {label = 'World Related Options', icon = 'globe', args = {'bMenu_world_related_options'}}
             index += 1
         end
 
         if perms.Recording then
-            lib.setMenuOptions('bMenu_main', {label = 'Recording Options', icon = 'video', args = {'bMenu_recording_options'}}, index)
+            menuOptions[index] = {label = 'Recording Options', icon = 'video', args = {'bMenu_recording_options'}}
             index += 1
         end
 
         if perms.Misc then
-            lib.setMenuOptions('bMenu_main', {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'bMenu_misc_options'}}, index)
+            menuOptions[index] = {label = 'Miscellaneous Options', icon = 'gear', description = 'Show all options that don\'t fit in the other categories', args = {'bMenu_misc_options'}}
             index += 1
         end
+
+        lib.registerMenu({
+            id = 'bMenu_main',
+            title = 'Berkie Menu',
+            position = MenuPosition,
+            onClose = function()
+                CloseMenu(true)
+            end,
+            onSelected = function(selected)
+                MenuIndexes['bMenu_main'] = selected
+            end,
+            options = menuOptions
+        }, function(_, _, args)
+            if args[1] == 'none' then return end
+
+            if args[1] == 'bMenu_online_players' then
+                CreatePlayerMenu()
+            elseif args[1] == 'bMenu_recording_options' then
+                CreateRecordingMenu()
+            elseif args[1] == 'bMenu_world_related_options' then
+                CreateWorldMenu()
+            end
+
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+        end)
 
         lib.showMenu('bMenu_main', MenuIndexes['bMenu_main'])
         return
