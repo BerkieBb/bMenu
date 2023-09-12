@@ -163,7 +163,8 @@ CreateThread(function()
 
         if displayLocation then
             local currentPos = GetEntityCoords(cache.ped, true)
-            local nodePos = GetNthClosestVehicleNode(currentPos.x, currentPos.y, currentPos.z, 0, 0, 0, 0) or currentPos
+            local _, nodePos = GetNthClosestVehicleNode(currentPos.x, currentPos.y, currentPos.z, 0, 0, 0, 0)
+            nodePos = nodePos or currentPos
             local heading = GetEntityHeading(cache.ped)
             local safeZoneSize = GetSafeZoneSize()
             safeZoneSizeX = (1 / safeZoneSize / 3) - 0.358
