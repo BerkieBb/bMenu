@@ -45,7 +45,7 @@ local changingWeather = false
 local function createTimeOptions()
     local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'WorldRelated', 'TimeOptions'}, {'Freeze_Unfreeze_Time', 'Sync_Time', 'Show_Time', 'Presets', 'Set_Hour', 'Set_Minute'})
     local menuOptions = {
-        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_main'}}
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_world_related_options'}}
     }
     local index = 1
 
@@ -118,6 +118,11 @@ local function createTimeOptions()
         end,
         options = menuOptions
     }, function(_, scrollIndex, args)
+        if args[1] == 'bMenu_world_related_options' then
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+            return
+        end
+
         timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
 
         if args[1] == 'sync_to_server' then
@@ -145,6 +150,146 @@ local function createTimeOptions()
                 local minute = scrollIndex - 1
                 TriggerServerEvent('bMenu:server:updateTime', currentHour, minute, timeFrozen, timeSyncedWithMachine)
             end
+        end
+    end)
+end
+
+local function createWeatherOptions()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'WorldRelated', 'WeatherOptions'}, {'Toggle_Dynamic_Weather', 'Toggle_Blackout', 'Toggle_Snow_Effects', 'Change_Weather_Type', 'Set_Clouds'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_world_related_options'}}
+    }
+    local index = 1
+
+    if perms.Toggle_Dynamic_Weather then
+        menuOptions[index] = {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checkedDynamicWeather, close = false}
+        index += 1
+    end
+
+    if perms.Toggle_Blackout then
+        menuOptions[index] = {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checkedBlackout, close = false}
+        index += 1
+    end
+
+    if perms.Toggle_Snow_Effects then
+        menuOptions[index] = {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checkedSnowEffects, close = false}
+        index += 1
+    end
+
+    if perms.Change_Weather_Type then
+        menuOptions[index] = {label = 'Extra Sunny', icon = 'circle-check', args = {'set_weather', 'EXTRASUNNY'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Clear', args = {'set_weather', 'CLEAR'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Neutral', args = {'set_weather', 'NEUTRAL'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Smog', args = {'set_weather', 'SMOG'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Foggy', args = {'set_weather', 'FOGGY'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Cloudy', args = {'set_weather', 'CLOUDS'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Overcast', args = {'set_weather', 'OVERCAST'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Clearing', args = {'set_weather', 'CLEARING'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Rainy', args = {'set_weather', 'RAIN'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Thunder', args = {'set_weather', 'THUNDER'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Blizzard', args = {'set_weather', 'BLIZZARD'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Snow', args = {'set_weather', 'SNOW'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Light Snow', args = {'set_weather', 'SNOWLIGHT'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'X-MAS Snow', args = {'set_weather', 'XMAS'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Halloween', args = {'set_weather', 'HALLOWEEN'}, close = false}
+        index += 1
+    end
+
+    if perms.Set_Clouds then
+        menuOptions[index] = {label = 'Remove All Clouds', args = {'remove_clouds'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Randomize Clouds', args = {'randomize_clouds'}, close = false}
+        index += 1
+    end
+
+    lib.registerMenu({
+        id = 'bMenu_weather_options',
+        title = 'Weather Options',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_world_related_options')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_weather_options'] = selected
+        end,
+        onCheck = function(selected, checked, args)
+            blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
+            snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
+            dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+
+            if args[1] == 'dynamic_weather' then
+                checkedDynamicWeather = checked
+                TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, checked, snowEffects)
+                lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, selected)
+            elseif args[1] == 'blackout' then
+                checkedBlackout = checked
+                TriggerServerEvent('bMenu:server:updateWeather', currentWeather, checked, dynamicWeather, snowEffects)
+                lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, selected)
+            elseif args[1] == 'snow_effects' then
+                checkedSnowEffects = checked
+                TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, dynamicWeather, checked)
+                lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, selected)
+            end
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'bMenu_world_related_options' then
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+            return
+        end
+
+        if args[1] == 'set_weather' then
+            if changingWeather then
+                lib.notify({
+                    description = 'Already changing weather, please wait',
+                    type = 'error'
+                })
+                return
+            end
+
+            lib.notify({
+                description = ('Changing weather to %s'):format(weatherIndexes[args[2]][2]),
+                type = 'inform',
+                duration = weatherChangeTime * 1000 + 2000
+            })
+            changingWeather = true
+            blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
+            snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
+            dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+            TriggerServerEvent('bMenu:server:updateWeather', args[2], blackout, dynamicWeather, snowEffects)
+        elseif args[1] == 'remove_clouds' then
+            TriggerServerEvent('bMenu:server:setClouds', true)
+        elseif args[1] == 'randomize_clouds' then
+            TriggerServerEvent('bMenu:server:setClouds', false)
         end
     end)
 end
@@ -180,6 +325,8 @@ function CreateWorldMenu()
     }, function(_, _, args)
         if args[1] == 'bMenu_time_options' then
             createTimeOptions()
+        elseif args[1] == 'bMenu_weather_options' then
+            createWeatherOptions()
         end
 
         lib.showMenu(args[1], MenuIndexes[args[1]])
@@ -187,88 +334,6 @@ function CreateWorldMenu()
 end
 
 --#endregion Functions
-
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_weather_options',
-    title = 'Weather Options',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_world_related_options')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_weather_options'] = selected
-    end,
-    onCheck = function(selected, checked, args)
-        blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
-        snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
-        dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
-
-        if args[1] == 'dynamic_weather' then
-            checkedDynamicWeather = checked
-            TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, checked, snowEffects)
-            lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, selected)
-        elseif args[1] == 'blackout' then
-            checkedBlackout = checked
-            TriggerServerEvent('bMenu:server:updateWeather', currentWeather, checked, dynamicWeather, snowEffects)
-            lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, selected)
-        elseif args[1] == 'snow_effects' then
-            checkedSnowEffects = checked
-            TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, dynamicWeather, checked)
-            lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, selected)
-        end
-    end,
-    options = {
-        {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checkedDynamicWeather, close = false},
-        {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checkedBlackout, close = false},
-        {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checkedSnowEffects, close = false},
-        {label = 'Extra Sunny', icon = 'circle-check', args = {'set_weather', 'EXTRASUNNY'}, close = false},
-        {label = 'Clear', args = {'set_weather', 'CLEAR'}, close = false},
-        {label = 'Neutral', args = {'set_weather', 'NEUTRAL'}, close = false},
-        {label = 'Smog', args = {'set_weather', 'SMOG'}, close = false},
-        {label = 'Foggy', args = {'set_weather', 'FOGGY'}, close = false},
-        {label = 'Cloudy', args = {'set_weather', 'CLOUDS'}, close = false},
-        {label = 'Overcast', args = {'set_weather', 'OVERCAST'}, close = false},
-        {label = 'Clearing', args = {'set_weather', 'CLEARING'}, close = false},
-        {label = 'Rainy', args = {'set_weather', 'RAIN'}, close = false},
-        {label = 'Thunder', args = {'set_weather', 'THUNDER'}, close = false},
-        {label = 'Blizzard', args = {'set_weather', 'BLIZZARD'}, close = false},
-        {label = 'Snow', args = {'set_weather', 'SNOW'}, close = false},
-        {label = 'Light Snow', args = {'set_weather', 'SNOWLIGHT'}, close = false},
-        {label = 'X-MAS Snow', args = {'set_weather', 'XMAS'}, close = false},
-        {label = 'Halloween', args = {'set_weather', 'HALLOWEEN'}, close = false},
-        {label = 'Remove All Clouds', args = {'remove_clouds'}, close = false},
-        {label = 'Randomize Clouds', args = {'randomize_clouds'}, close = false}
-    }
-}, function(_, _, args)
-    if args[1] == 'set_weather' then
-        if changingWeather then
-            lib.notify({
-                description = 'Already changing weather, please wait',
-                type = 'error'
-            })
-            return
-        end
-
-        lib.notify({
-            description = ('Changing weather to %s'):format(weatherIndexes[args[2]][2]),
-            type = 'inform',
-            duration = weatherChangeTime * 1000 + 2000
-        })
-        changingWeather = true
-        blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
-        snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
-        dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
-        TriggerServerEvent('bMenu:server:updateWeather', args[2], blackout, dynamicWeather, snowEffects)
-    elseif args[1] == 'remove_clouds' then
-        TriggerServerEvent('bMenu:server:setClouds', true)
-    elseif args[1] == 'randomize_clouds' then
-        TriggerServerEvent('bMenu:server:setClouds', false)
-    end
-end)
-
---#endregion Menu Registration
 
 --#region Events
 
