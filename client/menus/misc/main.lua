@@ -175,7 +175,10 @@ function CreateMiscMenu()
         if string.match(args[1], 'bMenu') then
             if args[1] == 'bMenu_misc_options_teleport_options' then
                 SetupTeleportOptions()
+            elseif args[1] == 'bMenu_misc_options_connection_options' then
+                SetupConnectionOptions()
             end
+
             lib.showMenu(args[1], MenuIndexes[args[1]])
         end
     end)
