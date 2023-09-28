@@ -2108,7 +2108,7 @@ lib.registerMenu({
             lib.hideMenu(true)
             return
         end
-        SetVehicleExtra(cache.vehicle, args.extra, not checked)
+        SetVehicleExtra(cache.vehicle, args[1], not checked)
     end,
     options = {}
 }, function(_, _, args)
