@@ -6,16 +6,6 @@ local locations = {}
 
 --#region Functions
 
-function SetupTeleportOptions()
-    if table.type(locations) == 'empty' then
-        lib.setMenuOptions('bMenu_misc_options_teleport_options', {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}, 3)
-        lib.setMenuOptions('bMenu_misc_options_teleport_options', nil, 4)
-    else
-        lib.setMenuOptions('bMenu_misc_options_teleport_options', {label = 'Teleport Locations', description = 'Teleport to pre-configured locations', args = {'bMenu_misc_options_teleport_options_locations'}}, 3)
-        lib.setMenuOptions('bMenu_misc_options_teleport_options', {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}, 4)
-    end
-end
-
 local function refreshLocations()
     local newLocations = lib.callback.await('bMenu:server:getConfig', false, 'locations')
 
@@ -132,131 +122,160 @@ local function teleportToCoords(pos)
     SetGameplayCamRelativePitch(0.0, 1.0)
 end
 
---#endregion Functions
-
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_misc_options_teleport_options',
-    title = 'Teleport Options',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_misc_options')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_misc_options_teleport_options'] = selected
-    end,
-    options = {
-        {label = 'Teleport To Waypoint', args = {'teleport_waypoint'}, close = false},
-        {label = 'Teleport To Coords', args = {'teleport_coords'}},
-        {label = 'Teleport Locations', description = 'Teleport to pre-configured locations', args = {'bMenu_misc_options_teleport_options_locations'}},
-        {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}
-    }
-}, function(_, _, args)
-    if args[1] == 'teleport_waypoint' then
-        local blipMarker = GetFirstBlipInfoId(8)
-        if not DoesBlipExist(blipMarker) then
-            lib.notify({
-                description = 'No waypoint set',
-                type = 'error'
-            })
-            return
-	end
-        local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
-        local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
-        RequestCollisionAtCoord(waypointBlipPos.x, waypointBlipPos.y, 1000)
-        local result, z = GetGroundZFor_3dCoord(waypointBlipPos.x, waypointBlipPos.y, 1000, false)
-        if not result then
-            z = 0
-        end
-        waypointBlipPos = vec3(waypointBlipPos.x, waypointBlipPos.y, z)
-        teleportToCoords(waypointBlipPos)
-    elseif args[1] == 'teleport_coords' then
-        local dialog = lib.inputDialog('Teleport To Coords', {'Coords'})
-
-        if not dialog or not dialog[1] or dialog[1] == '' then
-            Wait(200)
-            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
-            return
-        end
-
-        local actualValues = {}
-        for word in dialog[1]:gmatch('[^,]*') do
-            local val = tonumber(word)
-            if val then
-                actualValues[#actualValues + 1] = val
-            end
-        end
-
-        if #actualValues < 3 then
-            lib.notify({
-                description = 'Wrong format used, the format is `x, y, z`',
-                type = 'error'
-            })
-            Wait(200)
-            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
-            return
-        end
-
-        for i = 4, #actualValues do
-            actualValues[i] = nil
-        end
-
-        SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
-
-        Wait(200)
-        lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
-    elseif args[1] == 'bMenu_misc_options_teleport_options_locations' then
-        lib.setMenuOptions('bMenu_misc_options_teleport_options_locations', {[1] = true})
-        for i = 1, #locations do
-            lib.setMenuOptions('bMenu_misc_options_teleport_options_locations', {label = locations[i].name, args = locations[i], close = false}, i)
-        end
-        lib.showMenu(args[1], MenuIndexes[args[1]])
-    elseif args[1] == 'save_location' then
-        local dialog = lib.inputDialog('Save Location', {'Location Name'})
-
-        if not dialog or not dialog[1] or dialog[1] == '' then
-            Wait(200)
-            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
-            return
-        end
-
-        local result, notification = lib.callback.await('bMenu:server:saveTeleportLocation', false, dialog[1])
-
-        lib.notify({
-            description = notification,
-            type = result and 'success' or 'error'
-        })
-
-        refreshLocations()
-        SetupTeleportOptions()
-
-        Wait(200)
-        lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+local function createLocationsMenu()
+    local menuOptions = {}
+    for i = 1, #locations do
+        menuOptions[i] = {label = locations[i].name, args = locations[i], close = false}
     end
-end)
 
-lib.registerMenu({
-    id = 'bMenu_misc_options_teleport_options_locations',
-    title = 'Teleport Locations',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_misc_options_teleport_options')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_misc_options_teleport_options_locations'] = selected
-    end,
-    options = {}
-}, function(_, _, args)
-    SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
-    SetEntityHeading(cache.ped, args.heading)
-    lib.notify({
-        description = ('Successfully teleport to %s'):format(args.name),
-        type = 'success'
-    })
-end)
+    lib.registerMenu({
+        id = 'bMenu_misc_options_teleport_options_locations',
+        title = 'Teleport Locations',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_misc_options_teleport_options')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_misc_options_teleport_options_locations'] = selected
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
+        SetEntityHeading(cache.ped, args.heading)
+        lib.notify({
+            description = ('Successfully teleport to %s'):format(args.name),
+            type = 'success'
+        })
+    end)
+end
 
---#endregion Menu Registration
+function SetupTeleportOptions()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'Misc', 'TeleportOptions'}, {'To_Waypoint', 'To_Coords', 'Locations'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_misc_options'}}
+    }
+    local index = 1
+
+    if perms.To_Waypoint then
+        menuOptions[index] = {label = 'Teleport To Waypoint', args = {'teleport_waypoint'}, close = false}
+        index += 1
+    end
+
+    if perms.To_Coords then
+        menuOptions[index] = {label = 'Teleport To Coords', args = {'teleport_coords'}}
+        index += 1
+    end
+
+    if perms.Locations then
+        if table.type(locations) ~= 'empty' then
+            menuOptions[index] = {label = 'Teleport To Location', description = 'Teleport to pre-configured locations', args = {'bMenu_misc_options_teleport_options_locations'}}
+            index += 1
+        end
+
+        menuOptions[index] = {label = 'Save Teleport Location', description = 'Adds your current location to the teleport locations menu', args = {'save_location'}}
+        index += 1
+    end
+
+    lib.registerMenu({
+        id = 'bMenu_misc_options_teleport_options',
+        title = 'Teleport Options',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_misc_options')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_misc_options_teleport_options'] = selected
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'bMenu_misc_options' then
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+            return
+        end
+
+        if args[1] == 'teleport_waypoint' then
+            local blipMarker = GetFirstBlipInfoId(8)
+            if not DoesBlipExist(blipMarker) then
+                lib.notify({
+                    description = 'No waypoint set',
+                    type = 'error'
+                })
+                return
+            end
+
+            local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
+            local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
+            RequestCollisionAtCoord(waypointBlipPos.x, waypointBlipPos.y, 1000)
+            local result, z = GetGroundZFor_3dCoord(waypointBlipPos.x, waypointBlipPos.y, 1000, false)
+            if not result then
+                z = 0
+            end
+            waypointBlipPos = vec3(waypointBlipPos.x, waypointBlipPos.y, z)
+            teleportToCoords(waypointBlipPos)
+        elseif args[1] == 'teleport_coords' then
+            local dialog = lib.inputDialog('Teleport To Coords', {'Coords'})
+
+            if not dialog or not dialog[1] or dialog[1] == '' then
+                Wait(200)
+                lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+                return
+            end
+
+            local actualValues = {}
+            for word in dialog[1]:gmatch('[^,]*') do
+                local val = tonumber(word)
+                if val then
+                    actualValues[#actualValues + 1] = val
+                end
+            end
+
+            if #actualValues < 3 then
+                lib.notify({
+                    description = 'Wrong format used, the format is `x, y, z`',
+                    type = 'error'
+                })
+                Wait(200)
+                lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+                return
+            end
+
+            for i = 4, #actualValues do
+                actualValues[i] = nil
+            end
+
+            SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
+
+            Wait(200)
+            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+        elseif args[1] == 'bMenu_misc_options_teleport_options_locations' then
+            createLocationsMenu()
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+        elseif args[1] == 'save_location' then
+            local dialog = lib.inputDialog('Save Location', {'Location Name'})
+
+            if not dialog or not dialog[1] or dialog[1] == '' then
+                Wait(200)
+                lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+                return
+            end
+
+            local result, notification = lib.callback.await('bMenu:server:saveTeleportLocation', false, dialog[1])
+
+            lib.notify({
+                description = notification,
+                type = result and 'success' or 'error'
+            })
+
+            refreshLocations()
+            SetupTeleportOptions()
+
+            Wait(200)
+            lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
+        end
+    end)
+end
+
+--#endregion Functions
 
 --#region Threads
 
