@@ -18,23 +18,23 @@ local weatherIndexes = {
     HALLOWEEN = {18, 'Halloween'}
 }
 
-local timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
-local timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
-local currentHour = tonumber(GetConvar('bMenu_current_hour', '7')) --[[@as number]]
-local currentMinute = tonumber(GetConvar('bMenu_current_minute', '0')) --[[@as number]]
+local timeSyncedWithMachine = GetConvar('bMenu.Sync_Time_To_Machine_Time', 'false') == 'true'
+local timeFrozen = GetConvar('bMenu.Freeze_Time', 'false') == 'true'
+local currentHour = tonumber(GetConvar('bMenu.Current_Hour', '7')) --[[@as number]]
+local currentMinute = tonumber(GetConvar('bMenu.Current_Minute', '0')) --[[@as number]]
 currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
 currentMinute = currentMinute < 0 and 0 or currentMinute > 23 and 23 or currentMinute
 local showTimeOnScreen = false
-local dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
-local blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
-local snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
+local dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
+local blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
+local snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
 local checkedDynamicWeather = dynamicWeather
 local checkedBlackout = blackout
 local checkedSnowEffects = snowEffects
-local currentWeather = GetConvar('bMenu_current_weather', 'EXTRASUNNY'):upper()
+local currentWeather = GetConvar('bMenu.Current_Weather', 'EXTRASUNNY'):upper()
 currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
 local currentChecked = 'EXTRASUNNY' -- Leave this so the checkmark can move itself accordingly in the loop
-local weatherChangeTime = tonumber(GetConvar('bMenu_weather_change_time', '5')) --[[@as number]]
+local weatherChangeTime = tonumber(GetConvar('bMenu.Weather_Change_Time', '5')) --[[@as number]]
 weatherChangeTime = weatherChangeTime < 0 and 0 or weatherChangeTime
 local changingWeather = false
 
@@ -123,7 +123,7 @@ local function createTimeOptions()
             return
         end
 
-        timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
+        timeSyncedWithMachine = GetConvar('bMenu.Sync_Time_To_Machine_Time', 'false') == 'true'
 
         if args[1] == 'sync_to_server' then
             TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, timeFrozen, not timeSyncedWithMachine)
@@ -137,7 +137,7 @@ local function createTimeOptions()
             return
         end
 
-        timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
+        timeFrozen = GetConvar('bMenu.Freeze_Time', 'false') == 'true'
         if args[1] == 'freeze_time' then
             TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, not timeFrozen, timeSyncedWithMachine)
         elseif args[1] == 'set_time_preset' then
@@ -242,9 +242,9 @@ local function createWeatherOptions()
             MenuIndexes['bMenu_weather_options'] = selected
         end,
         onCheck = function(selected, checked, args)
-            blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
-            snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
-            dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+            blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
+            snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
+            dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
 
             if args[1] == 'dynamic_weather' then
                 checkedDynamicWeather = checked
@@ -282,9 +282,9 @@ local function createWeatherOptions()
                 duration = weatherChangeTime * 1000 + 2000
             })
             changingWeather = true
-            blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
-            snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
-            dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+            blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
+            snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
+            dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
             TriggerServerEvent('bMenu:server:updateWeather', args[2], blackout, dynamicWeather, snowEffects)
         elseif args[1] == 'remove_clouds' then
             TriggerServerEvent('bMenu:server:setClouds', true)
@@ -364,8 +364,8 @@ end)
 
 CreateThread(function()
     while true do
-        currentHour = tonumber(GetConvar('bMenu_current_hour', '7')) --[[@as number]]
-        currentMinute = tonumber(GetConvar('bMenu_current_minute', '0')) --[[@as number]]
+        currentHour = tonumber(GetConvar('bMenu.Current_Hour', '7')) --[[@as number]]
+        currentMinute = tonumber(GetConvar('bMenu.Current_Minute', '0')) --[[@as number]]
         currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
         currentMinute = currentMinute < 0 and 0 or currentMinute > 59 and 59 or currentMinute
         NetworkOverrideClockTime(currentHour, currentMinute, 0)
@@ -376,9 +376,9 @@ end)
 CreateThread(function()
     local changedThings = false
     while true do
-        blackout = GetConvar('bMenu_enable_blackout', 'false') == 'true'
-        snowEffects = GetConvar('bMenu_enable_snow_effects', 'false') == 'true'
-        dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
+        blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
+        snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
+        dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
 
         if checkedBlackout ~= blackout then
             lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}, 2)
@@ -411,7 +411,7 @@ CreateThread(function()
 
         SetArtificialLightsState(blackout)
 
-        currentWeather = GetConvar('bMenu_current_weather', 'EXTRASUNNY'):upper()
+        currentWeather = GetConvar('bMenu.Current_Weather', 'EXTRASUNNY'):upper()
         currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
 
         if currentChecked ~= currentWeather then

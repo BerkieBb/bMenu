@@ -1,9 +1,9 @@
 --#region Variables
 
-local currentHour = tonumber(GetConvar('bMenu_current_hour', '7')) --[[@as number]]
-local currentMinute = tonumber(GetConvar('bMenu_current_minute', '0')) --[[@as number]]
-local timeFrozen = GetConvar('bMenu_freeze_time', 'false') == 'true'
-local timeSyncedWithMachine = GetConvar('bMenu_sync_time_to_machine_time', 'false') == 'true'
+local currentHour = tonumber(GetConvar('bMenu.Current_Hour', '7')) --[[@as number]]
+local currentMinute = tonumber(GetConvar('bMenu.Current_Minute', '0')) --[[@as number]]
+local timeFrozen = GetConvar('bMenu.Freeze_Time', 'false') == 'true'
+local timeSyncedWithMachine = GetConvar('bMenu.Sync_Time_To_Machine_Time', 'false') == 'true'
 currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
 currentMinute = currentMinute < 0 and 0 or currentMinute > 59 and 59 or currentMinute
 
@@ -14,10 +14,10 @@ currentMinute = currentMinute < 0 and 0 or currentMinute > 59 and 59 or currentM
 RegisterNetEvent('bMenu:server:updateTime', function(newHour, newMinute, newFreezeState, newSyncState)
     newHour = newHour < 0 and 0 or newHour > 23 and 23 or newHour
     newMinute = newMinute < 0 and 0 or newMinute > 23 and 23 or newMinute
-    SetConvarReplicated('bMenu_current_hour', tostring(newHour))
-    SetConvarReplicated('bMenu_current_minute', tostring(newMinute))
-    SetConvarReplicated('bMenu_freeze_time', tostring(newFreezeState))
-    SetConvarReplicated('bMenu_sync_time_to_machine_time', tostring(newSyncState))
+    SetConvarReplicated('bMenu.Current_Hour', tostring(newHour))
+    SetConvarReplicated('bMenu.Current_Minute', tostring(newMinute))
+    SetConvarReplicated('bMenu.Freeze_Time', tostring(newFreezeState))
+    SetConvarReplicated('bMenu.Sync_Time_To_Machine_Time', tostring(newSyncState))
     timeSyncedWithMachine = newSyncState
     timeFrozen = newFreezeState
     currentHour = newHour
@@ -37,8 +37,8 @@ CreateThread(function()
             local minute = os.date('%M')
             currentHour = tonumber(hour) --[[@as number]]
             currentMinute = tonumber(minute) --[[@as number]]
-            SetConvarReplicated('bMenu_current_hour', hour --[[@as string]])
-            SetConvarReplicated('bMenu_current_minute', minute --[[@as string]])
+            SetConvarReplicated('bMenu.Current_Hour', hour --[[@as string]])
+            SetConvarReplicated('bMenu.Current_Minute', minute --[[@as string]])
             Wait(10000)
         else
             if not timeFrozen then
@@ -52,8 +52,8 @@ CreateThread(function()
                 else
                     currentMinute += 1
                 end
-                SetConvarReplicated('bMenu_current_hour', tostring(currentHour))
-                SetConvarReplicated('bMenu_current_minute', tostring(currentMinute))
+                SetConvarReplicated('bMenu.Current_Hour', tostring(currentHour))
+                SetConvarReplicated('bMenu.Current_Minute', tostring(currentMinute))
             end
             Wait(sleep)
         end

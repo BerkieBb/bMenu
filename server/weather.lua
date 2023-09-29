@@ -41,10 +41,10 @@ local weatherTypes = {
     ['HALLOWEEN'] = 'Halloween'
 }
 
-local dynamicWeather = GetConvar('bMenu_dynamic_weather', 'true') == 'true'
-local dynamicWeatherTimer = tonumber(GetConvar('bMenu_dynamic_weather_timer', '1')) --[[@as number]]
+local dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
+local dynamicWeatherTimer = tonumber(GetConvar('bMenu.Dynamic_Weather_timer', '1')) --[[@as number]]
 dynamicWeatherTimer = dynamicWeatherTimer < 0 and 1 or dynamicWeatherTimer
-local currentWeather = GetConvar('bMenu_current_weather', 'EXTRASUNNY'):upper()
+local currentWeather = GetConvar('bMenu.Current_Weather', 'EXTRASUNNY'):upper()
 currentWeather = not weatherTypes[currentWeather] and 'EXTRASUNNY' or currentWeather
 local lastWeatherChange = 0
 
@@ -55,18 +55,18 @@ local lastWeatherChange = 0
 RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutState, newDynamicState, newSnowState)
     if not weatherTypes[newWeather] then return end
 
-    SetConvarReplicated('bMenu_current_weather', newWeather)
-    SetConvarReplicated('bMenu_enable_blackout', tostring(newBlackoutState))
-    SetConvarReplicated('bMenu_dynamic_weather', tostring(newDynamicState))
-    SetConvarReplicated('bMenu_enable_snow_effects', tostring(newSnowState))
+    SetConvarReplicated('bMenu.Current_Weather', newWeather)
+    SetConvarReplicated('bMenu.Enable_Blackout', tostring(newBlackoutState))
+    SetConvarReplicated('bMenu.Dynamic_Weather', tostring(newDynamicState))
+    SetConvarReplicated('bMenu.Enable_Snow_Effects', tostring(newSnowState))
     currentWeather = newWeather
     dynamicWeather = newDynamicState
     lastWeatherChange = GetGameTimer()
 
     if newWeather == 'XMAS' or newWeather == 'SNOWLIGHT' or newWeather == 'SNOW' or newWeather == 'BLIZZARD' then
-        SetConvarReplicated('bMenu_enable_snow_effects', 'true')
-    elseif GetConvar('bMenu_enable_snow_effects', 'false') == 'true' then
-        SetConvarReplicated('bMenu_enable_snow_effects', 'false')
+        SetConvarReplicated('bMenu.Enable_Snow_Effects', 'true')
+    elseif GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true' then
+        SetConvarReplicated('bMenu.Enable_Snow_Effects', 'false')
     end
 end)
 
@@ -89,7 +89,7 @@ CreateThread(function()
             Wait(dynamicWeatherTimer * 60000)
 
             if currentWeather == 'XMAS' or currentWeather == 'HALLOWEEN' or currentWeather == 'NEUTRAL' then
-                SetConvarReplicated('bMenu_dynamic_weather', 'false')
+                SetConvarReplicated('bMenu.Dynamic_Weather', 'false')
                 dynamicWeather = false
             else
                 if GetGameTimer() - lastWeatherChange > (dynamicWeatherTimer * 60000) then
@@ -113,7 +113,7 @@ CreateThread(function()
                             currentWeather = currentWeather == 'FOGGY' and 'SMOG' or 'FOGGY'
                         end
 
-                        SetConvarReplicated('bMenu_current_weather', currentWeather)
+                        SetConvarReplicated('bMenu.Current_Weather', currentWeather)
 
                         lastWeatherChange = GetGameTimer()
                     end
