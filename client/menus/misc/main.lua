@@ -177,6 +177,8 @@ function CreateMiscMenu()
                 SetupTeleportOptions()
             elseif args[1] == 'bMenu_misc_options_connection_options' then
                 SetupConnectionOptions()
+            elseif args[1] == 'bMenu_misc_options_developer_options' then
+                SetupDeveloperOptions()
             end
 
             lib.showMenu(args[1], MenuIndexes[args[1]])

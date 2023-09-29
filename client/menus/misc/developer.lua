@@ -2938,7 +2938,8 @@ local showEntityNetworkOwners = false
 local enableTimecycleModifier = false
 local dimensionsRadius = 2000
 local timeCycleStrength = 0.05
-local timeCycle = timeCycles[1]
+local timeCycleIndex = 1
+local timeCycle = timeCycles[timeCycleIndex]
 local currentEntity = 0
 local spawningActive = false
 local curScaleform = -1
@@ -3044,6 +3045,216 @@ local function drawEntityBoundingBox(entity, r, g, b, alpha)
     end
 end
 
+local function createSpawnerMenu()
+    lib.registerMenu({
+        id = 'bMenu_misc_options_developer_options_spawner',
+        title = 'Entity Spawner',
+        position = MenuPosition,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_misc_options_developer_options_spawner'] = selected
+        end,
+        onClose = function(keyPressed)
+            if DoesEntityExist(currentEntity) then
+                DeleteEntity(currentEntity)
+                currentEntity = 0
+            end
+            CloseMenu(false, keyPressed, 'bMenu_misc_options_developer_options')
+        end,
+        options = {
+            {label = 'Spawn New Entity', description = 'Spawns entity into the world and lets you set its position and rotation', args = {'spawn_new_entity'}},
+            {label = 'Confirm Entity Position', description = 'Stops placing entity and sets it at it current location', args = {'confirm_entity_position'}, close = false},
+            {label = 'Confirm Entity Position And Duplicate', description = 'Stops placing entity and sets it at it current location and creates new one to place', args = {'confirm_duplicate'}, close = false},
+            {label = 'Cancel', description = 'Deletes current entity and cancels its placement', args = {'cancel'}, close = false}
+        }
+    }, function(_, _, args)
+        if args[1] == 'spawn_new_entity' then
+            if DoesEntityExist(currentEntity) then
+                lib.notify({
+                    description = 'You\'re already spawning an entity, cancel it or confirm it first',
+                    type = 'error'
+                })
+                return
+            end
+
+            local dialog = lib.inputDialog('Spawn New Entity', {'Entity Name'})
+
+            if not dialog or not dialog[1] or dialog[1] == '' then
+                return
+            end
+
+            local model = joaat(dialog[1])
+
+            if not IsModelValid(model) then
+                lib.notify({
+                    description = ('Model %s doesn\'t exist'):format(dialog[1]),
+                    type = 'error'
+                })
+                return
+            end
+
+            lib.requestModel(model)
+
+            local coords = GetEntityCoords(cache.ped)
+            currentEntity = CreatePed(4, model, coords.x, coords.y, coords.z, GetEntityHeading(cache.ped), true, true)
+            SetEntityAsMissionEntity(currentEntity, true, true)
+            spawningActive = true
+        elseif args[1] == 'confirm_entity_position' or args[1] == 'confirm_duplicate' then
+            local duplicate = args[1] == 'confirm_duplicate'
+            if duplicate and DoesEntityExist(currentEntity) then
+                local coords = GetEntityCoords(currentEntity)
+                local heading = GetEntityHeading(currentEntity)
+                local model = GetEntityModel(currentEntity)
+                spawningActive = false
+                Wait(1)
+                currentEntity = CreatePed(4, model, coords.x, coords.y, coords.z, heading, true, true)
+                SetEntityAsMissionEntity(currentEntity, true, true)
+                spawningActive = true
+            else
+                spawningActive = false
+                Wait(1)
+                currentEntity = 0
+            end
+        end
+    end)
+end
+
+function SetupDeveloperOptions()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'Misc', 'DevTools'}, {'Clear_Area', 'Show_Coords', 'Show_Entity_Data', 'Modify_Timecycle', 'EntitySpawner'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_misc_options'}}
+    }
+    local index = 1
+
+    if perms.Clear_Area then
+        menuOptions[index] = {label = 'Clear Area', description = 'Clears the area around your player (100 meters). Damage, dirt, peds, props, vehicles, etc. Everything gets cleaned up, fixed and reset to the default world state', args = {'clear_area'}, close = false}
+        index += 1
+    end
+
+    if perms.Show_Coords then
+        menuOptions[index] = {label = 'Show Coordinates', description = 'Show your current coordinates at the top of your screen', checked = showCoords, args = {'show_coords'}, close = false}
+        index += 1
+    end
+
+    if perms.Show_Entity_Data then
+        menuOptions[index] = {label = 'Show Vehicle Dimensions', description = 'Draws the model outlines for every vehicle that\'s currently close to you', checked = showVehicleDimensions, args = {'show_vehicle_dimensions'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Show Prop Dimensions', description = 'Draws the model outlines for every prop that\'s currently close to you', checked = showPropDimensions, args = {'show_prop_dimensions'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Show Ped Dimensions', description = 'Draws the model outlines for every ped that\'s currently close to you', checked = showPedDimensions, args = {'show_ped_dimensions'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Show Entity Handles', description = 'Draws the the entity handles for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = showEntityHandles, args = {'show_entity_handles'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Show Entity Models', description = 'Draws the the entity models for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = showEntityModels, args = {'show_entity_models'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Show Network Owners', description = 'Draws the the entity network owner for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = showEntityNetworkOwners, args = {'show_network_owners'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Show Dimensions Radius', description = 'Show entity model/handle/dimension draw range', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', 'Infinite'}, defaultIndex = 1, args = {'show_dimensions_radius'}, close = false}
+        index += 1
+    end
+
+    if perms.Modify_Timecycle then
+        menuOptions[index] = {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = enableTimecycleModifier, args = {'enable_timecycle_modifier'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = timeCycleIndex, args = {'timecycle_modifier'}, close = false}
+        index += 1
+
+        menuOptions[index] = {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = 2, args = {'timecycle_strength'}, close = false}
+        index += 1
+    end
+
+    if perms.EntitySpawner then
+        menuOptions[index] = {label = 'Entity Spawner', args = {'bMenu_misc_options_developer_options_spawner'}}
+        index += 1
+    end
+
+    lib.registerMenu({
+        id = 'bMenu_misc_options_developer_options',
+        title = 'Development Tools',
+        position = MenuPosition,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_misc_options_developer_options'] = selected
+        end,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_misc_options')
+        end,
+        onCheck = function(selected, checked, args)
+            if args[1] == 'show_coords' then
+                showCoords = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Coordinates', description = 'Show your current coordinates at the top of your screen', checked = checked, args = {'show_coords'}, close = false}, selected)
+            elseif args[1] == 'show_vehicle_dimensions' then
+                showVehicleDimensions = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Vehicle Dimensions', description = 'Draws the model outlines for every vehicle that\'s currently close to you', checked = checked, args = {'show_vehicle_dimensions'}, close = false}, selected)
+            elseif args[1] == 'show_prop_dimensions' then
+                showPropDimensions = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Prop Dimensions', description = 'Draws the model outlines for every prop that\'s currently close to you', checked = checked, args = {'show_prop_dimensions'}, close = false}, selected)
+            elseif args[1] == 'show_ped_dimensions' then
+                showPedDimensions = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Ped Dimensions', description = 'Draws the model outlines for every ped that\'s currently close to you', checked = checked, args = {'show_ped_dimensions'}, close = false}, selected)
+            elseif args[1] == 'show_entity_handles' then
+                showEntityHandles = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Entity Handles', description = 'Draws the the entity handles for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_handles'}, close = false}, selected)
+            elseif args[1] == 'show_entity_models' then
+                showEntityModels = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Entity Models', description = 'Draws the the entity models for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_models'}, close = false}, selected)
+            elseif args[1] == 'show_network_owners' then
+                showEntityNetworkOwners = checked
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Network Owners', description = 'Draws the the entity network owner for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_network_owners'}, close = false}, selected)
+            elseif args[1] == 'enable_timecycle_modifier' then
+                enableTimecycleModifier = checked
+                ClearTimecycleModifier()
+                if enableTimecycleModifier then
+                    SetTimecycleModifier(timeCycle)
+                    SetTimecycleModifierStrength(timeCycleStrength)
+                end
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = checked, args = {'enable_timecycle_modifier'}, close = false}, selected)
+            end
+        end,
+        onSideScroll = function(selected, scrollIndex, args)
+            if args[1] == 'show_dimensions_radius' then
+                local newIndex = scrollIndex - 1
+                dimensionsRadius = newIndex == 21 and 9999 or (newIndex / 20) * 2000
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Dimensions Radius', description = 'Show entity model/handle/dimension draw range', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', 'Infinite'}, defaultIndex = scrollIndex, args = {'show_dimensions_radius'}, close = false}, selected)
+            elseif args[1] == 'timecycle_modifier' then
+                if enableTimecycleModifier then
+                    local curTimeCycle = timeCycles[scrollIndex]
+                    ClearTimecycleModifier()
+                    SetTimecycleModifier(curTimeCycle)
+                    SetTimecycleModifierStrength(timeCycleStrength)
+                    timeCycle = curTimeCycle
+                end
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = scrollIndex, args = {'timecycle_modifier'}, close = false}, selected)
+            elseif args[1] == 'timecycle_strength' then
+                if enableTimecycleModifier then
+                    local strength = (scrollIndex - 1) / 20
+                    ClearTimecycleModifier()
+                    SetTimecycleModifier(timeCycle)
+                    SetTimecycleModifierStrength(strength)
+                    timeCycleStrength = strength
+                end
+                lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = scrollIndex, args = {'timecycle_strength'}, close = false}, selected)
+            end
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'clear_area' then
+            TriggerServerEvent('bMenu:server:clearArea', GetEntityCoords(cache.ped))
+        elseif string.find(args[1], 'bMenu') then
+            if args[1] == 'bMenu_misc_options_developer_options_spawner' then
+                createSpawnerMenu()
+            end
+
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+        end
+    end)
+end
+
 --#endregion Functions
 
 --#region Events
@@ -3055,171 +3266,6 @@ RegisterNetEvent('bMenu:client:clearArea', function(pos)
 end)
 
 --#endregion Events
-
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_misc_options_developer_options',
-    title = 'Development Tools',
-    position = MenuPosition,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_misc_options_developer_options'] = selected
-    end,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_misc_options')
-    end,
-    onCheck = function(selected, checked, args)
-        if args[1] == 'show_coords' then
-            showCoords = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Coordinates', description = 'Show your current coordinates at the top of your screen', checked = checked, args = {'show_coords'}, close = false}, selected)
-        elseif args[1] == 'show_vehicle_dimensions' then
-            showVehicleDimensions = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Vehicle Dimensions', description = 'Draws the model outlines for every vehicle that\'s currently close to you', checked = checked, args = {'show_vehicle_dimensions'}, close = false}, selected)
-        elseif args[1] == 'show_prop_dimensions' then
-            showPropDimensions = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Prop Dimensions', description = 'Draws the model outlines for every prop that\'s currently close to you', checked = checked, args = {'show_prop_dimensions'}, close = false}, selected)
-        elseif args[1] == 'show_ped_dimensions' then
-            showPedDimensions = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Ped Dimensions', description = 'Draws the model outlines for every ped that\'s currently close to you', checked = checked, args = {'show_ped_dimensions'}, close = false}, selected)
-        elseif args[1] == 'show_entity_handles' then
-            showEntityHandles = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Entity Handles', description = 'Draws the the entity handles for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_handles'}, close = false}, selected)
-        elseif args[1] == 'show_entity_models' then
-            showEntityModels = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Entity Models', description = 'Draws the the entity models for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_entity_models'}, close = false}, selected)
-        elseif args[1] == 'show_network_owners' then
-            showEntityNetworkOwners = checked
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Network Owners', description = 'Draws the the entity network owner for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = checked, args = {'show_network_owners'}, close = false}, selected)
-        elseif args[1] == 'enable_timecycle_modifier' then
-            enableTimecycleModifier = checked
-            ClearTimecycleModifier()
-            if enableTimecycleModifier then
-                SetTimecycleModifier(timeCycle)
-                SetTimecycleModifierStrength(timeCycleStrength)
-            end
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = checked, args = {'enable_timecycle_modifier'}, close = false}, selected)
-        end
-    end,
-    onSideScroll = function(selected, scrollIndex, args)
-        if args[1] == 'show_dimensions_radius' then
-            local newIndex = scrollIndex - 1
-            dimensionsRadius = newIndex == 21 and 9999 or (newIndex / 20) * 2000
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Show Dimensions Radius', description = 'Show entity model/handle/dimension draw range', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', 'Infinite'}, defaultIndex = scrollIndex, args = {'show_dimensions_radius'}, close = false}, selected)
-        elseif args[1] == 'timecycle_modifier' then
-            if enableTimecycleModifier then
-                local curTimeCycle = timeCycles[scrollIndex]
-                ClearTimecycleModifier()
-                SetTimecycleModifier(curTimeCycle)
-                SetTimecycleModifierStrength(timeCycleStrength)
-                timeCycle = curTimeCycle
-            end
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = scrollIndex, args = {'timecycle_modifier'}, close = false}, selected)
-        elseif args[1] == 'timecycle_strength' then
-            if enableTimecycleModifier then
-                local strength = (scrollIndex - 1) / 20
-                ClearTimecycleModifier()
-                SetTimecycleModifier(timeCycle)
-                SetTimecycleModifierStrength(strength)
-                timeCycleStrength = strength
-            end
-            lib.setMenuOptions('bMenu_misc_options_developer_options', {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = scrollIndex, args = {'timecycle_strength'}, close = false}, selected)
-        end
-    end,
-    options = {
-        {label = 'Clear Area', description = 'Clears the area around your player (100 meters). Damage, dirt, peds, props, vehicles, etc. Everything gets cleaned up, fixed and reset to the default world state', args = {'clear_area'}, close = false},
-        {label = 'Show Coordinates', description = 'Show your current coordinates at the top of your screen', checked = showCoords, args = {'show_coords'}, close = false},
-        {label = 'Show Vehicle Dimensions', description = 'Draws the model outlines for every vehicle that\'s currently close to you', checked = showVehicleDimensions, args = {'show_vehicle_dimensions'}, close = false},
-        {label = 'Show Prop Dimensions', description = 'Draws the model outlines for every prop that\'s currently close to you', checked = showPropDimensions, args = {'show_prop_dimensions'}, close = false},
-        {label = 'Show Ped Dimensions', description = 'Draws the model outlines for every ped that\'s currently close to you', checked = showPedDimensions, args = {'show_ped_dimensions'}, close = false},
-        {label = 'Show Entity Handles', description = 'Draws the the entity handles for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = showEntityHandles, args = {'show_entity_handles'}, close = false},
-        {label = 'Show Entity Models', description = 'Draws the the entity models for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = showEntityModels, args = {'show_entity_models'}, close = false},
-        {label = 'Show Network Owners', description = 'Draws the the entity network owner for all close entities (you must enable atleast one of the dimension options above for this to work)', checked = showEntityNetworkOwners, args = {'show_network_owners'}, close = false},
-        {label = 'Show Dimensions Radius', description = 'Show entity model/handle/dimension draw range', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', 'Infinite'}, defaultIndex = 1, args = {'show_dimensions_radius'}, close = false},
-        {label = 'Enable Timecycle Modifier', description = 'Enable or disable the timecycle modifier from the list below', checked = enableTimecycleModifier, args = {'enable_timecycle_modifier'}, close = false},
-        {label = 'Timecycle Modifier', description = 'Select a timecycle modifier and enable the checkbox above', values = timeCycles, defaultIndex = 1, args = {'timecycle_modifier'}, close = false},
-        {label = 'Timecycle Modifier Intensity', description = 'Set the timecycle modifier intensity', values = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'}, defaultIndex = 2, args = {'timecycle_strength'}, close = false},
-        {label = 'Entity Spawner', args = {'bMenu_misc_options_developer_options_spawner'}}
-    }
-}, function(_, _, args)
-    if args[1] == 'clear_area' then
-        TriggerServerEvent('bMenu:server:clearArea', GetEntityCoords(cache.ped))
-    elseif string.find(args[1], 'bMenu') then
-        lib.showMenu(args[1], MenuIndexes[args[1]])
-    end
-end)
-
-lib.registerMenu({
-    id = 'bMenu_misc_options_developer_options_spawner',
-    title = 'Entity Spawner',
-    position = MenuPosition,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_misc_options_developer_options_spawner'] = selected
-    end,
-    onClose = function(keyPressed)
-        if DoesEntityExist(currentEntity) then
-            DeleteEntity(currentEntity)
-            currentEntity = 0
-        end
-        CloseMenu(false, keyPressed, 'bMenu_misc_options_developer_options')
-    end,
-    options = {
-        {label = 'Spawn New Entity', description = 'Spawns entity into the world and lets you set its position and rotation', args = {'spawn_new_entity'}},
-        {label = 'Confirm Entity Position', description = 'Stops placing entity and sets it at it current location', args = {'confirm_entity_position'}, close = false},
-        {label = 'Confirm Entity Position And Duplicate', description = 'Stops placing entity and sets it at it current location and creates new one to place', args = {'confirm_duplicate'}, close = false},
-        {label = 'Cancel', description = 'Deletes current entity and cancels its placement', args = {'cancel'}, close = false}
-    }
-}, function(_, _, args)
-    if args[1] == 'spawn_new_entity' then
-        if DoesEntityExist(currentEntity) then
-            lib.notify({
-                description = 'You\'re already spawning an entity, cancel it or confirm it first',
-                type = 'error'
-            })
-            return
-        end
-
-        local dialog = lib.inputDialog('Spawn New Entity', {'Entity Name'})
-
-        if not dialog or not dialog[1] or dialog[1] == '' then
-            return
-        end
-
-        local model = joaat(dialog[1])
-
-        if not IsModelValid(model) then
-            lib.notify({
-                description = ('Model %s doesn\'t exist'):format(dialog[1]),
-                type = 'error'
-            })
-            return
-        end
-
-        lib.requestModel(model)
-
-        local coords = GetEntityCoords(cache.ped)
-        currentEntity = CreatePed(4, model, coords.x, coords.y, coords.z, GetEntityHeading(cache.ped), true, true)
-        SetEntityAsMissionEntity(currentEntity, true, true)
-        spawningActive = true
-    elseif args[1] == 'confirm_entity_position' or args[1] == 'confirm_duplicate' then
-        local duplicate = args[1] == 'confirm_duplicate'
-        if duplicate and DoesEntityExist(currentEntity) then
-            local coords = GetEntityCoords(currentEntity)
-            local heading = GetEntityHeading(currentEntity)
-            local model = GetEntityModel(currentEntity)
-            spawningActive = false
-            Wait(1)
-            currentEntity = CreatePed(4, model, coords.x, coords.y, coords.z, heading, true, true)
-            SetEntityAsMissionEntity(currentEntity, true, true)
-            spawningActive = true
-        else
-            spawningActive = false
-            Wait(1)
-            currentEntity = 0
-        end
-    end
-end)
-
---#endregion Menu Registration
 
 --#region Threads
 
