@@ -139,9 +139,12 @@ function CreatePlayerOptionsMenu()
         if args[1] == 'toggle_noclip' then
             toggleNoClip()
         else
-            if args[1] == 'bMenu_player_weapon_options' then
+            if args[1] == 'bMenu_player_options' then
+                SetupPlayerOptions()
+            elseif args[1] == 'bMenu_player_weapon_options' then
                 SetupWeaponsMenu()
             end
+
             lib.showMenu(args[1], MenuIndexes[args[1]])
         end
     end)
