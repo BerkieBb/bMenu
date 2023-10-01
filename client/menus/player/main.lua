@@ -102,37 +102,52 @@ local function toggleNoClip()
     end
 end
 
---#endregion Functions
-
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_player_related_options',
-    title = 'Player Related Options',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_main')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_player_related_options'] = selected
-    end,
-    options = {
-        {label = 'Player Options', description = 'Common player options can be accessed here', args = {'bMenu_player_options'}},
-        {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = {'bMenu_player_weapon_options'}},
-        {label = 'Toggle NoClip', description = 'Toggle NoClip on or off', args = {'toggle_noclip'}, close = false}
+function CreatePlayerOptionsMenu()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'PlayerRelated', {'PlayerOptions', 'WeaponOptions', 'Toggle_NoClip'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_main'}}
     }
-}, function(_, _, args)
-    if args[1] == 'toggle_noclip' then
-        toggleNoClip()
-    else
-        if args[1] == 'bMenu_player_weapon_options' then
-            SetupWeaponsMenu()
-        end
-        lib.showMenu(args[1], MenuIndexes[args[1]])
-    end
-end)
+    local index = 1
 
---#endregion Menu Registration
+    if perms.PlayerOptions then
+        menuOptions[index] = {label = 'Player Options', description = 'Common player options can be accessed here', args = {'bMenu_player_options'}}
+        index += 1
+    end
+
+    if perms.WeaponOptions then
+        menuOptions[index] = {label = 'Weapon Options', description = 'Add/remove weapons, modify weapons and set ammo options', args = {'bMenu_player_weapon_options'}}
+        index += 1
+    end
+
+    if perms.Toggle_NoClip then
+        menuOptions[index] = {label = 'Toggle NoClip', description = 'Toggle NoClip on or off', args = {'toggle_noclip'}, close = false}
+        index += 1
+    end
+
+    lib.registerMenu({
+        id = 'bMenu_player_related_options',
+        title = 'Player Related Options',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_main')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_player_related_options'] = selected
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'toggle_noclip' then
+            toggleNoClip()
+        else
+            if args[1] == 'bMenu_player_weapon_options' then
+                SetupWeaponsMenu()
+            end
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+        end
+    end)
+end
+
+--#endregion Functions
 
 --#region Commands
 

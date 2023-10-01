@@ -152,10 +152,14 @@ RegisterCommand('bmenu', function()
 
             if args[1] == 'bMenu_online_players' then
                 CreatePlayerMenu()
-            elseif args[1] == 'bMenu_recording_options' then
-                CreateRecordingMenu()
+            elseif args[1] == 'bMenu_player_related_options' then
+                CreatePlayerOptionsMenu()
             elseif args[1] == 'bMenu_world_related_options' then
                 CreateWorldMenu()
+            elseif args[1] == 'bMenu_recording_options' then
+                CreateRecordingMenu()
+            elseif args[1] == 'bMenu_misc_options' then
+                CreateMiscMenu()
             end
 
             lib.showMenu(args[1], MenuIndexes[args[1]])
