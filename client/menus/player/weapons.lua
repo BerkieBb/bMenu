@@ -683,15 +683,15 @@ local weapons = {
 }
 
 local weaponCategories = {
-    ['handgun'] = 'Handguns',
-    ['rifle'] = 'Assault Rifles',
-    ['shotgun'] = 'Shotguns',
-    ['slmg'] = 'Sub/Light Machine Guns',
-    ['throwable'] = 'Throwables',
-    ['melee'] = 'Melee',
-    ['heavy'] = 'Heavy Weapons',
-    ['sniper'] = 'Snipers',
-    ['misc'] = 'Miscellaneous'
+    handgun = 'Handguns',
+    rifle = 'Assault Rifles',
+    shotgun = 'Shotguns',
+    slmg = 'Sub/Light Machine Guns',
+    throwable = 'Throwables',
+    melee = 'Melee',
+    heavy = 'Heavy Weapons',
+    sniper = 'Snipers',
+    misc = 'Miscellaneous'
 }
 
 local weaponCategoriesArray = {
@@ -714,157 +714,192 @@ local unlimitedClip = false
 --#region Functions
 
 function SetupWeaponsMenu()
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'PlayerRelated', 'WeaponOptions'}, {'Get_All_Weapons', 'Remove_All_Weapons', 'Unlimited_Ammo', 'No_Reload', 'Set_All_Ammo_Count', 'Set_Max_Ammo', 'Spawn_Weapon_By_Name'})
+    local categoryPerms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'PlayerRelated', 'WeaponOptions', 'Category'}, weaponCategoriesArray)
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_player_related_options'}}
+    }
+    local index = 1
     local id = 'bMenu_player_weapon_options'
     local indexes = {}
-    for i = 8, 8 + #weaponCategoriesArray - 1 do
-        local category = weaponCategoriesArray[i - 7]
-        local formattedId = ('%s_%s'):format(id, category)
-        lib.registerMenu({
-            id = formattedId,
-            title = weaponCategories[category],
-            position = MenuPosition,
-            onClose = function(keyPressed)
-                CloseMenu(false, keyPressed, 'bMenu_player_weapon_options')
-            end,
-            options = {}
-        }, function(_, _, args)
-            if HasPedGotWeapon(cache.ped, args[1], false) then return end
 
-            local _, ammo = GetMaxAmmo(cache.ped, args[1])
-            GiveWeaponToPed(cache.ped, args[1], ammo == 0 and 200 or ammo, false, false)
-        end)
+    if perms.Get_All_Weapons then
+        menuOptions[index] = {label = 'Get All Weapons', args = {'get_all_weapons'}, close = false}
+        index += 1
+    end
 
-        indexes[formattedId] = 1
+    if perms.Remove_All_Weapons then
+        menuOptions[index] = {label = 'Remove All Weapons', args = {'remove_all_weapons'}, close = false}
+        index += 1
+    end
 
-        lib.setMenuOptions(id, {label = weaponCategories[category], args = {'weapon_category', formattedId}}, i)
+    if perms.Unlimited_Ammo then
+        menuOptions[index] = {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = unlimitedAmmo, close = false}
+        index += 1
+    end
+
+    if perms.No_Reload then
+        menuOptions[index] = {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = unlimitedClip, close = false}
+        index += 1
+    end
+
+    if perms.Set_All_Ammo_Count then
+        menuOptions[index] = {label = 'Set All Ammo Count', description = 'Set the amount of ammo in all your weapons', args = {'set_all_ammo'}}
+        index += 1
+    end
+
+    if perms.Set_Max_Ammo then
+        menuOptions[index] = {label = 'Set Max Ammo', description = 'Give all your weapons max ammo', args = {'max_ammo'}, close = false}
+        index += 1
+    end
+
+    if perms.Spawn_Weapon_By_Name then
+        menuOptions[index] = {label = 'Spawn Weapon By Name', description = 'Enter a weapon name to spawn', args = {'weapon_name'}}
+        index += 1
+    end
+
+    for i = 1, #weaponCategoriesArray do
+        local category = weaponCategoriesArray[i]
+        if categoryPerms[category] then
+            local formattedId = ('%s_%s'):format(id, category)
+            lib.registerMenu({
+                id = formattedId,
+                title = weaponCategories[category],
+                position = MenuPosition,
+                onClose = function(keyPressed)
+                    CloseMenu(false, keyPressed, 'bMenu_player_weapon_options')
+                end,
+                options = {}
+            }, function(_, _, args)
+                if HasPedGotWeapon(cache.ped, args[1], false) then return end
+
+                local _, ammo = GetMaxAmmo(cache.ped, args[1])
+                GiveWeaponToPed(cache.ped, args[1], ammo == 0 and 200 or ammo, false, false)
+            end)
+
+            indexes[formattedId] = 1
+
+            menuOptions[index] = {label = weaponCategories[category], args = {'weapon_category', formattedId}}
+            index += 1
+        end
     end
 
     for k, v in pairs(weapons) do
-        if v.name ~= 'WEAPON_UNARMED' then
-            local formattedId = ('%s_%s'):format(id, v.weaponType)
+        local formattedId = ('%s_%s'):format(id, v.weaponType)
+        if v.name ~= 'WEAPON_UNARMED' and indexes[formattedId] then
             lib.setMenuOptions(formattedId, {label = v.displayName, args = {k}, close = false}, indexes[formattedId])
             indexes[formattedId] += 1
         end
     end
+
+    lib.registerMenu({
+        id = 'bMenu_player_weapon_options',
+        title = 'Weapon Options',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_player_related_options')
+        end,
+        onSelected = function(selected)
+            MenuIndexes['bMenu_player_weapon_options'] = selected
+        end,
+        onCheck =  function(selected, checked, args)
+            if args[1] == 'unlimited_ammo' then
+                unlimitedAmmo = checked
+                lib.setMenuOptions('bMenu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, selected)
+                local hasWeapon, currentWeapon = GetCurrentPedWeapon(cache.ped, true)
+                if not hasWeapon then return end
+                SetPedInfiniteAmmo(cache.ped, unlimitedAmmo, currentWeapon)
+            elseif args[1] == 'no_reload' then
+                unlimitedClip = checked
+                lib.setMenuOptions('bMenu_player_weapon_options', {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = checked, close = false}, selected)
+                SetPedInfiniteAmmoClip(cache.ped, unlimitedClip)
+            end
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'get_all_weapons' then
+            for k in pairs(weapons) do
+                local _, ammo = GetMaxAmmo(cache.ped, k)
+                GiveWeaponToPed(cache.ped, k, ammo == 0 and 200 or ammo, false, false)
+            end
+        elseif args[1] == 'remove_all_weapons' then
+            RemoveAllPedWeapons(cache.ped, false)
+        elseif args[1] == 'set_all_ammo' then
+            local dialog = lib.inputDialog('Set All Ammo Count', {
+                { type = 'number', label = 'Ammo Count', default = 1 }
+            })
+
+            if not dialog or not dialog[1] or dialog[1] < 0 then
+                if dialog[1] < 0 then
+                    lib.notify({
+                        description = 'The amount of ammo has to be 0 or above',
+                        type = 'error'
+                    })
+                end
+                Wait(200)
+                lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
+                return
+            end
+
+            for k in pairs(weapons) do
+                if HasPedGotWeapon(cache.ped, k, false) then
+                    SetPedAmmo(cache.ped, k, dialog[1])
+                end
+            end
+
+            lib.notify({
+                description = ('All your weapons now have %s ammo'):format(dialog[1]),
+                type = 'success'
+            })
+
+            Wait(200)
+            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
+        elseif args[1] == 'max_ammo' then
+            for k in pairs(weapons) do
+                local _, ammo = GetMaxAmmo(cache.ped, k)
+                if HasPedGotWeapon(cache.ped, k, false) then
+                    SetPedAmmo(cache.ped, k, ammo == 0 and 200 or ammo)
+                end
+            end
+        elseif args[1] == 'weapon_name' then
+            local dialog = lib.inputDialog('Spawn Weapon By Name', {
+                { type = 'input', label = 'Weapon Name', placeholder = 'weapon_unarmed' },
+                { type = 'checkbox', label = 'Force In Hand', description = 'Force the weapon to be in your hand when it spawns', checked = false }
+            })
+
+            if not dialog or not dialog[1] or dialog[1] == '' then
+                Wait(200)
+                lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
+                return
+            end
+
+            local data = weapons[joaat(dialog[1])]
+
+            if not data then
+                lib.notify({
+                    description = ('Weapon %s doesn\'t exist, if this is an existing weapon, add it to the weapons.lua file in the config folder. If this weapon is a weapon from the game, make an issue on github about it and it will be added very soon.'):format(dialog[1]),
+                    type = 'error',
+                    duration = 10000
+                })
+                Wait(200)
+                lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
+                return
+            end
+
+            local _, ammo = GetMaxAmmo(cache.ped, data.hash)
+            GiveWeaponToPed(cache.ped, data.hash, ammo == 0 and 200 or ammo, false, dialog[2])
+
+            Wait(200)
+            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
+        elseif args[1] == 'weapon_category' then
+            lib.showMenu(args[2], MenuIndexes[args[2]])
+        elseif args[1] == 'bMenu_player_related_options' then
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+        end
+    end)
 end
 
 --#endregion Functions
-
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_player_weapon_options',
-    title = 'Weapon Options',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_player_related_options')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_player_weapon_options'] = selected
-    end,
-    onCheck =  function(selected, checked, args)
-        if args[1] == 'unlimited_ammo' then
-            unlimitedAmmo = checked
-            lib.setMenuOptions('bMenu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, selected)
-            local hasWeapon, currentWeapon = GetCurrentPedWeapon(cache.ped, true)
-            if not hasWeapon then return end
-            SetPedInfiniteAmmo(cache.ped, unlimitedAmmo, currentWeapon)
-        elseif args[1] == 'no_reload' then
-            unlimitedClip = checked
-            lib.setMenuOptions('bMenu_player_weapon_options', {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = checked, close = false}, selected)
-            SetPedInfiniteAmmoClip(cache.ped, unlimitedClip)
-        end
-    end,
-    options = {
-        {label = 'Get All Weapons', args = {'get_all_weapons'}, close = false},
-        {label = 'Remove All Weapons', args = {'remove_all_weapons'}, close = false},
-        {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = unlimitedAmmo, close = false},
-        {label = 'No Reload', description = 'Never have to reload your weapon anymore', args = {'no_reload'}, checked = unlimitedClip, close = false},
-        {label = 'Set All Ammo Count', description = 'Set the amount of ammo in all your weapons', args = {'set_all_ammo'}},
-        {label = 'Set Max Ammo', description = 'Give all your weapons max ammo', args = {'max_ammo'}, close = false},
-        {label = 'Spawn Weapon By Name', description = 'Enter a weapon name to spawn', args = {'weapon_name'}}
-    }
-}, function(_, _, args)
-    if args[1] == 'get_all_weapons' then
-        for k in pairs(weapons) do
-            local _, ammo = GetMaxAmmo(cache.ped, k)
-            GiveWeaponToPed(cache.ped, k, ammo == 0 and 200 or ammo, false, false)
-        end
-    elseif args[1] == 'remove_all_weapons' then
-        RemoveAllPedWeapons(cache.ped, false)
-    elseif args[1] == 'set_all_ammo' then
-        local dialog = lib.inputDialog('Set All Ammo Count', {
-            { type = 'number', label = 'Ammo Count', default = 1 }
-        })
-
-        if not dialog or not dialog[1] or dialog[1] < 0 then
-            if dialog[1] < 0 then
-                lib.notify({
-                    description = 'The amount of ammo has to be 0 or above',
-                    type = 'error'
-                })
-            end
-            Wait(200)
-            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
-            return
-        end
-
-        for k in pairs(weapons) do
-            if HasPedGotWeapon(cache.ped, k, false) then
-                SetPedAmmo(cache.ped, k, dialog[1])
-            end
-        end
-
-        lib.notify({
-            description = ('All your weapons now have %s ammo'):format(dialog[1]),
-            type = 'success'
-        })
-
-        Wait(200)
-        lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
-    elseif args[1] == 'max_ammo' then
-        for k in pairs(weapons) do
-            local _, ammo = GetMaxAmmo(cache.ped, k)
-            if HasPedGotWeapon(cache.ped, k, false) then
-                SetPedAmmo(cache.ped, k, ammo == 0 and 200 or ammo)
-            end
-        end
-    elseif args[1] == 'weapon_name' then
-        local dialog = lib.inputDialog('Spawn Weapon By Name', {
-            { type = 'input', label = 'Weapon Name', placeholder = 'weapon_unarmed' },
-            { type = 'checkbox', label = 'Force In Hand', description = 'Force the weapon to be in your hand when it spawns', checked = false }
-        })
-
-        if not dialog or not dialog[1] or dialog[1] == '' then
-            Wait(200)
-            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
-            return
-        end
-
-        local data = weapons[joaat(dialog[1])]
-
-        if not data then
-            lib.notify({
-                description = ('Weapon %s doesn\'t exist, if this is an existing weapon, add it to the weapons.lua file in the config folder. If this weapon is a weapon from the game, make an issue on github about it and it will be added very soon.'):format(dialog[1]),
-                type = 'error',
-                duration = 10000
-            })
-            Wait(200)
-            lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
-            return
-        end
-
-        local _, ammo = GetMaxAmmo(cache.ped, data.hash)
-        GiveWeaponToPed(cache.ped, data.hash, ammo == 0 and 200 or ammo, false, dialog[2])
-
-        Wait(200)
-        lib.showMenu('bMenu_player_weapon_options', MenuIndexes['bMenu_player_weapon_options'])
-    elseif args[1] == 'weapon_category' then
-        lib.showMenu(args[2], MenuIndexes[args[2]])
-    end
-end)
-
---#endregion Menu Registration
 
 --#region Listeners
 
