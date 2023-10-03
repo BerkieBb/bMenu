@@ -177,49 +177,49 @@ local function createWeatherOptions()
     end
 
     if perms.Change_Weather_Type then
-        menuOptions[index] = {label = 'Extra Sunny', icon = 'circle-check', args = {'set_weather', 'EXTRASUNNY'}, close = false}
+        menuOptions[index] = {label = 'Extra Sunny', icon = currentWeather == 'EXTRASUNNY' and 'circle-check', args = {'set_weather', 'EXTRASUNNY'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Clear', args = {'set_weather', 'CLEAR'}, close = false}
+        menuOptions[index] = {label = 'Clear', icon = currentWeather == 'CLEAR' and 'circle-check', args = {'set_weather', 'CLEAR'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Neutral', args = {'set_weather', 'NEUTRAL'}, close = false}
+        menuOptions[index] = {label = 'Neutral', icon = currentWeather == 'NEUTRAL' and 'circle-check', args = {'set_weather', 'NEUTRAL'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Smog', args = {'set_weather', 'SMOG'}, close = false}
+        menuOptions[index] = {label = 'Smog', icon = currentWeather == 'SMOG' and 'circle-check', args = {'set_weather', 'SMOG'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Foggy', args = {'set_weather', 'FOGGY'}, close = false}
+        menuOptions[index] = {label = 'Foggy', icon = currentWeather == 'FOGGY' and 'circle-check', args = {'set_weather', 'FOGGY'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Cloudy', args = {'set_weather', 'CLOUDS'}, close = false}
+        menuOptions[index] = {label = 'Cloudy', icon = currentWeather == 'CLOUDS' and 'circle-check', args = {'set_weather', 'CLOUDS'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Overcast', args = {'set_weather', 'OVERCAST'}, close = false}
+        menuOptions[index] = {label = 'Overcast', icon = currentWeather == 'OVERCAST' and 'circle-check', args = {'set_weather', 'OVERCAST'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Clearing', args = {'set_weather', 'CLEARING'}, close = false}
+        menuOptions[index] = {label = 'Clearing', icon = currentWeather == 'CLEARING' and 'circle-check', args = {'set_weather', 'CLEARING'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Rainy', args = {'set_weather', 'RAIN'}, close = false}
+        menuOptions[index] = {label = 'Rainy', icon = currentWeather == 'RAIN' and 'circle-check', args = {'set_weather', 'RAIN'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Thunder', args = {'set_weather', 'THUNDER'}, close = false}
+        menuOptions[index] = {label = 'Thunder', icon = currentWeather == 'THUNDER' and 'circle-check', args = {'set_weather', 'THUNDER'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Blizzard', args = {'set_weather', 'BLIZZARD'}, close = false}
+        menuOptions[index] = {label = 'Blizzard', icon = currentWeather == 'BLIZZARD' and 'circle-check', args = {'set_weather', 'BLIZZARD'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Snow', args = {'set_weather', 'SNOW'}, close = false}
+        menuOptions[index] = {label = 'Snow', icon = currentWeather == 'SNOW' and 'circle-check', args = {'set_weather', 'SNOW'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Light Snow', args = {'set_weather', 'SNOWLIGHT'}, close = false}
+        menuOptions[index] = {label = 'Light Snow', icon = currentWeather == 'SNOWLIGHT' and 'circle-check', args = {'set_weather', 'SNOWLIGHT'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'X-MAS Snow', args = {'set_weather', 'XMAS'}, close = false}
+        menuOptions[index] = {label = 'X-MAS Snow', icon = currentWeather == 'XMAS' and 'circle-check', args = {'set_weather', 'XMAS'}, close = false}
         index += 1
 
-        menuOptions[index] = {label = 'Halloween', args = {'set_weather', 'HALLOWEEN'}, close = false}
+        menuOptions[index] = {label = 'Halloween', icon = currentWeather == 'HALLOWEEN' and 'circle-check', args = {'set_weather', 'HALLOWEEN'}, close = false}
         index += 1
     end
 
@@ -376,23 +376,24 @@ end)
 CreateThread(function()
     local changedThings = false
     while true do
+        local openMenu = lib.getOpenMenu()
         blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
         snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
         dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
 
-        if checkedBlackout ~= blackout then
+        if checkedBlackout ~= blackout and openMenu == 'bMenu_weather_options' then
             lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}, 2)
             checkedBlackout = blackout
             changedThings = true
         end
 
-        if checkedSnowEffects ~= snowEffects then
+        if checkedSnowEffects ~= snowEffects and openMenu == 'bMenu_weather_options' then
             lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = snowEffects, close = false}, 3)
             checkedSnowEffects = snowEffects
             changedThings = true
         end
 
-        if checkedDynamicWeather ~= dynamicWeather then
+        if checkedDynamicWeather ~= dynamicWeather and openMenu == 'bMenu_weather_options' then
             lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = dynamicWeather, close = false}, 1)
             checkedDynamicWeather = dynamicWeather
             changedThings = true
@@ -414,7 +415,7 @@ CreateThread(function()
         currentWeather = GetConvar('bMenu.Current_Weather', 'EXTRASUNNY'):upper()
         currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
 
-        if currentChecked ~= currentWeather then
+        if currentChecked ~= currentWeather and openMenu == 'bMenu_weather_options' then
             local oldData = weatherIndexes[currentChecked]
             local newData = weatherIndexes[currentWeather]
             lib.setMenuOptions('bMenu_weather_options', {label = oldData[2], args = {'set_weather', currentChecked}, close = false}, oldData[1])
@@ -423,7 +424,7 @@ CreateThread(function()
             changedThings = true
         end
 
-        if changedThings and lib.getOpenMenu() == 'bMenu_weather_options' then
+        if changedThings and openMenu == 'bMenu_weather_options' then
             lib.hideMenu(false)
             Wait(100)
             lib.showMenu('bMenu_weather_options', MenuIndexes['bMenu_weather_options'])
