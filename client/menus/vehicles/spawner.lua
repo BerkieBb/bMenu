@@ -50,7 +50,6 @@ local function spawnVehicleOnPlayer(model)
 
     local otherCoords = spawnInVehicle and GetEntityCoords(cache.ped, true) or GetOffsetFromEntityInWorldCoords(cache.ped, 0.0, 8.0, 0.0)
     local coords = vec4(otherCoords.x, otherCoords.y, otherCoords.z + 1, GetEntityHeading(cache.ped) + (spawnInVehicle and 0 or 90))
-
     local previousVehicle = GetVehiclePedIsIn(cache.ped, true)
 
     if previousVehicle ~= 0 then
@@ -93,6 +92,7 @@ local function spawnVehicleOnPlayer(model)
     while netVeh == 0 or not DoesEntityExist(NetToVeh(netVeh)) do
         Wait(0)
     end
+
     local vehicle = NetToVeh(netVeh)
     if vehicle == 0 then
         lib.notify({
@@ -101,6 +101,7 @@ local function spawnVehicleOnPlayer(model)
         })
         return
     end
+
     SetVehicleNeedsToBeHotwired(vehicle, false)
     SetVehicleHasBeenOwnedByPlayer(vehicle, true)
     SetEntityAsMissionEntity(vehicle, true, false)
@@ -159,98 +160,111 @@ end
 
 function CreateVehicleSpawnerMenu()
     local id = 'bMenu_vehicle_spawner'
-    local i = 4
     local sorted = {}
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'VehicleRelated', 'Spawner'}, {'Spawn_By_Name', 'Spawn_In_Vehicle', 'Replace_Previous', 'Spawn_By_Category'})
+    local menuOptions = {
+        {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_vehicle_related_options'}}
+    }
+    local index = 1
 
-    for _, v in pairs(vehicleClassNames) do
-        sorted[#sorted+1] = v
+    if perms.Spawn_By_Name then
+        menuOptions[index] = {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = {'spawn_by_model'}}
+        index += 1
     end
 
-    table.sort(sorted, function(a, b)
-        return a < b
-    end)
+    if perms.Spawn_In_Vehicle then
+        menuOptions[index] = {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = spawnInVehicle, close = false}
+        index += 1
+    end
 
-    for i2 = 1, #sorted do
-        local v = sorted[i2]
-        local formattedId = ('%s_%s'):format(id, v)
-        local vehs = getVehiclesFromClassName(v)
+    if perms.Replace_Previous then
+        menuOptions[index] = {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = replacePreviousVehicle, close = false}
+        index += 1
+    end
 
-        if table.type(vehs) == 'empty' then goto skipLoop end
+    if perms.Spawn_By_Category then
+        for _, v in pairs(vehicleClassNames) do
+            sorted[#sorted+1] = v
+        end
 
-        lib.registerMenu({
-            id = formattedId,
-            title = v,
-            position = MenuPosition,
-            onClose = function(keyPressed)
-                CloseMenu(false, keyPressed, id)
-            end,
-            onSelected = function(selected)
-                MenuIndexes[formattedId] = selected
-            end,
-            options = {}
-        }, function(_, _, args)
-            spawnVehicleOnPlayer(args[1])
+        table.sort(sorted, function(a, b)
+            return a < b
         end)
 
-        lib.setMenuOptions(id, {label = v, args = {formattedId}}, i)
+        for i2 = 1, #sorted do
+            local v = sorted[i2]
+            local formattedId = ('%s_%s'):format(id, v)
+            local vehs = getVehiclesFromClassName(v)
 
-        createVehiclesForSpawner(vehs, formattedId)
-        i += 1
+            if table.type(vehs) == 'empty' then goto skipLoop end
 
-        :: skipLoop ::
+            lib.registerMenu({
+                id = formattedId,
+                title = v,
+                position = MenuPosition,
+                onClose = function(keyPressed)
+                    CloseMenu(false, keyPressed, id)
+                end,
+                onSelected = function(selected)
+                    MenuIndexes[formattedId] = selected
+                end,
+                options = {}
+            }, function(_, _, args)
+                spawnVehicleOnPlayer(args[1])
+            end)
+
+            menuOptions[index] = {label = v, args = {formattedId}}
+            createVehiclesForSpawner(vehs, formattedId)
+
+            index += 1
+
+            :: skipLoop ::
+        end
     end
+
+    lib.registerMenu({
+        id = id,
+        title = 'Vehicle Spawner',
+        position = MenuPosition,
+        onClose = function(keyPressed)
+            CloseMenu(false, keyPressed, 'bMenu_vehicle_related_options')
+        end,
+        onSelected = function(selected)
+            MenuIndexes[id] = selected
+        end,
+        onCheck = function(selected, checked, args)
+            if args[1] == 'inside_vehicle' then
+                spawnInVehicle = checked
+                lib.setMenuOptions(id, {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, selected)
+            elseif args[1] == 'replace_vehicle' then
+                replacePreviousVehicle = checked
+                lib.setMenuOptions(id, {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, selected)
+            end
+        end,
+        options = menuOptions
+    }, function(_, _, args)
+        if args[1] == 'spawn_by_model' then
+            local vehicle = lib.inputDialog('Spawn Vehicle', {'Vehicle Model Name'})
+            if vehicle and table.type(vehicle) ~= 'empty' then
+                local model = joaat(vehicle[1])
+                if IsModelInCdimage(model) then
+                    spawnVehicleOnPlayer(model)
+                else
+                    lib.notify({
+                        description = ('Vehicle model %s doesn\'t exist in the game'):format(vehicle[1]),
+                        type = 'error'
+                    })
+                end
+            end
+            Wait(200)
+            lib.showMenu(id, MenuIndexes[id])
+        elseif args[1] ~= 'inside_vehicle' and args[1] ~= 'replace_vehicle' then
+            lib.showMenu(args[1], MenuIndexes[args[1]])
+        end
+    end)
 end
 
 --#endregion Functions
-
---#region Menu Registration
-
-lib.registerMenu({
-    id = 'bMenu_vehicle_spawner',
-    title = 'Vehicle Spawner',
-    position = MenuPosition,
-    onClose = function(keyPressed)
-        CloseMenu(false, keyPressed, 'bMenu_vehicle_related_options')
-    end,
-    onSelected = function(selected)
-        MenuIndexes['bMenu_vehicle_spawner'] = selected
-    end,
-    onCheck = function(selected, checked, args)
-        if args[1] == 'inside_vehicle' then
-            spawnInVehicle = checked
-            lib.setMenuOptions('bMenu_vehicle_spawner', {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = checked, close = false}, selected)
-        elseif args[1] == 'replace_vehicle' then
-            replacePreviousVehicle = checked
-            lib.setMenuOptions('bMenu_vehicle_spawner', {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = checked, close = false}, selected)
-        end
-    end,
-    options = {
-        {label = 'Spawn Vehicle By Model Name', description = 'Enter the name of the vehicle you want to spawn', args = {'spawn_by_model'}},
-        {label = 'Spawn Inside Vehicle', description = 'This will teleport you into the vehicle when it spawns', args = {'inside_vehicle'}, checked = spawnInVehicle, close = false},
-        {label = 'Replace Previous Vehicle', description = 'This will delete the vehicle you were previously in when spawning a new vehicle', args = {'replace_vehicle'}, checked = replacePreviousVehicle, close = false}
-    }
-}, function(_, _, args)
-    if args[1] == 'spawn_by_model' then
-        local vehicle = lib.inputDialog('Spawn Vehicle', {'Vehicle Model Name'})
-        if vehicle and table.type(vehicle) ~= 'empty' then
-            local model = joaat(vehicle[1])
-            if IsModelInCdimage(model) then
-                spawnVehicleOnPlayer(model)
-            else
-                lib.notify({
-                    description = ('Vehicle model %s doesn\'t exist in the game'):format(vehicle[1]),
-                    type = 'error'
-                })
-            end
-        end
-        Wait(200)
-        lib.showMenu('bMenu_vehicle_spawner', MenuIndexes['bMenu_vehicle_spawner'])
-    elseif args[1] ~= 'inside_vehicle' and args[1] ~= 'replace_vehicle' then
-        lib.showMenu(args[1], MenuIndexes[args[1]])
-    end
-end)
-
---#endregion Menu Registration
 
 --#region Threads
 

@@ -20,7 +20,7 @@ function IsInVehicle(checkDriver)
 end
 
 function CreateVehicleOptionsMenu()
-    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'VehicleRelated', {'Options', 'Spawner', 'PersonalVehicle'})
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, 'VehicleRelated', {'Options', 'PersonalVehicle', 'Spawner'})
     local menuOptions = {
         {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_main'}}
     }
@@ -31,13 +31,13 @@ function CreateVehicleOptionsMenu()
         index += 1
     end
 
-    if perms.Spawner then
-        menuOptions[index] = {label = 'Spawner', icon = 'car', description = 'Spawn any vehicle that is registered in the game, including addon vehicles', args = {'bMenu_vehicle_spawner'}}
+    if perms.PersonalVehicle then
+        menuOptions[index] = {label = 'Personal Vehicle', icon = 'user-gear', description = 'Control your personal vehicle or change it', args = {'bMenu_vehicle_personal'}}
         index += 1
     end
 
-    if perms.PersonalVehicle then
-        menuOptions[index] = {label = 'Personal Vehicle', icon = 'user-gear', description = 'Control your personal vehicle or change it', args = {'bMenu_vehicle_personal'}}
+    if perms.Spawner then
+        menuOptions[index] = {label = 'Spawner', icon = 'car', description = 'Spawn any vehicle that is registered in the game, including addon vehicles', args = {'bMenu_vehicle_spawner'}}
         index += 1
     end
 
