@@ -20,6 +20,7 @@ local vehicleDoors = {
 
 local function pressKeyFob()
     if not cache.playerId or cache.playerId == 0 or currentVehicle == 0 or IsPlayerDead(cache.playerId) or IsPedInAnyVehicle(cache.ped, false) then return end
+
     local keyFobHash = `p_car_keys_01`
     lib.requestModel(keyFobHash)
 
@@ -125,7 +126,7 @@ local function createDoorMenu()
     end)
 end
 
-function CreateVehiclePersonalMenu()
+function SetupVehiclePersonalMenu()
     local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'VehicleRelated', 'PersonalVehicle'}, {'Toggle_Engine', 'Set_Lights', 'Manage_Doors', 'Toggle_Alarm', 'Toggle_Blip', 'Exclusive_Driver'})
     local menuOptions = {
         {label = 'Set Vehicle', description = 'Sets your current vehicle as your personal vehicle. If you already have a personal vehicle set then this will override your selection', args = {'set_vehicle'}},

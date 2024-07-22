@@ -53,10 +53,12 @@ function CreateVehicleOptionsMenu()
         end,
         options = menuOptions
     }, function(_, _, args)
-        if args[1] == 'bMenu_vehicle_personal' then
-            CreateVehiclePersonalMenu()
+        if args[1] == 'bMenu_vehicle_options' then
+            SetupVehicleOptionsMenu()
+        elseif args[1] == 'bMenu_vehicle_personal' then
+            SetupVehiclePersonalMenu()
         elseif args[1] == 'bMenu_vehicle_spawner' then
-            CreateVehicleSpawnerMenu()
+            SetupVehicleSpawnerMenu()
         end
 
         lib.showMenu(args[1], MenuIndexes[args[1]])

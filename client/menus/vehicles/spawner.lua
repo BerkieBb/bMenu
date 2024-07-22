@@ -158,7 +158,7 @@ local function createVehiclesForSpawner(vehs, id)
     end
 end
 
-function CreateVehicleSpawnerMenu()
+function SetupVehicleSpawnerMenu()
     local id = 'bMenu_vehicle_spawner'
     local sorted = {}
     local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'VehicleRelated', 'Spawner'}, {'Spawn_By_Name', 'Spawn_In_Vehicle', 'Replace_Previous', 'Spawn_By_Category'})
