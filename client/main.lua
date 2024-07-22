@@ -187,8 +187,6 @@ end)
 --[[
     Things I have to do before the 1.0.0 release
 
-        Add permissions for every option
-
         Finish Misc menu
 
         Extend private message functionality (under online players)
