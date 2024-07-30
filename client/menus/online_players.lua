@@ -138,7 +138,7 @@ function CreatePlayerMenu()
             ---@diagnostic disable-next-line: need-check-nil
             local success, reason, extraArg1 = lib.callback.await('bMenu:server:playerListAction', false, args[1], data.source, canActOnSelf, message and message[1] or nil)
 
-            if args[1] == teleportVehicleArg then
+            if args[1] == teleportVehicleArg and success then
                 local veh = NetToVeh(extraArg1)
                 if not AreAnyVehicleSeatsFree(veh) then
                     success = false
@@ -159,9 +159,9 @@ function CreatePlayerMenu()
                     success = false
                     reason = 'There are no seats available'
                 end
-            elseif args[1] == waypointArg then
+            elseif args[1] == waypointArg and success then
                 SetNewWaypoint(extraArg1.x, extraArg1.y)
-            elseif args[1] == blipArg then
+            elseif args[1] == blipArg and success then
                 if playerBlips[data.source] then
                     if DoesBlipExist(playerBlips[data.source]) then
                         RemoveBlip(playerBlips[data.source])
@@ -177,9 +177,9 @@ function CreatePlayerMenu()
                     ShowHeadingIndicatorOnBlip(playerBlips[data.source], true)
                     ShowHeightOnBlip(playerBlips[data.source], true)
                 end
-            elseif args[1] == killArg then
+            elseif args[1] == killArg and success then
                 SetEntityHealth(NetToEnt(extraArg1), 0)
-            elseif args[1] == spectateArg then
+            elseif args[1] == spectateArg and success then
                 local player = GetPlayerFromServerId(data.source)
                 local playerPed = GetPlayerPed(player)
 
