@@ -193,7 +193,7 @@ CreateThread(function()
             local zOff = 0.0
             local currentHeading = GetEntityHeading(noclipEntity)
 
-            if IsInputDisabled(2) and UpdateOnscreenKeyboard() ~= 0 and not IsPauseMenuActive() then
+            if IsUsingKeyboard(2) and UpdateOnscreenKeyboard() ~= 0 and not IsPauseMenuActive() then
                 if IsControlJustPressed(0, 21) then
                     movingSpeed += 1
                     if movingSpeed == 8 then
@@ -246,6 +246,7 @@ CreateThread(function()
 
             SetLocalPlayerVisibleLocally(true)
         end
+
         Wait(0)
     end
 end)

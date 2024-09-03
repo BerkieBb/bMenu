@@ -343,7 +343,7 @@ RegisterNetEvent('bMenu:client:setClouds', function(opacity, cloudType)
         return
     end
 
-    SetCloudHatOpacity(opacity)
+    SetCloudsAlpha(opacity)
     LoadCloudHat(cloudType, 4)
 end)
 
