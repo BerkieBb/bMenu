@@ -154,9 +154,9 @@ end
 
 --#region Commands
 
-RegisterCommand('toggle_noclip', toggleNoClip, true)
+RegisterCommand('bMenu_toggleNoClip', toggleNoClip, true)
 
-RegisterKeyMapping('toggle_noclip', 'Toggle NoClip from bMenu', 'KEYBOARD', GetConvar('bMenu.NoClip_Keybind', 'F2'))
+RegisterKeyMapping('bMenu_toggleNoClip', 'Toggle NoClip', 'KEYBOARD', 'F2')
 
 --#endregion Commands
 

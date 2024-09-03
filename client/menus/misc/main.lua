@@ -220,11 +220,11 @@ CreateThread(function()
 
         if cache.vehicle then
             if speedKmh then
-                DrawTextOnScreen(('%s KM/h'):format(math.round(GetEntitySpeed(cache.vehicle) * 3.6, 1)), 0.995, 0.955, 0.7, 2, 4)
+                DrawTextOnScreen(('%s KM/h'):format(lib.math.round(GetEntitySpeed(cache.vehicle) * 3.6)), 0.995, 0.955, 0.7, 2, 4)
             end
 
             if speedMph then
-                DrawTextOnScreen(('%s MPH'):format(math.round(GetEntitySpeed(cache.vehicle) * 2.23694, 1)), 0.995, speedKmh and 0.925 or 0.955, 0.7, 2, 4)
+                DrawTextOnScreen(('%s MPH'):format(lib.math.round(GetEntitySpeed(cache.vehicle) * 2.23694)), 0.995, speedKmh and 0.925 or 0.955, 0.7, 2, 4)
                 if speedKmh then
                     HideHudComponentThisFrame(9)
                 end

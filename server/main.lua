@@ -23,6 +23,7 @@ end)
 
 lib.callback.register('bMenu:server:hasConvarPermission', function(source, category, convar)
     if not convar then return end
+
     if type(convar) == 'table' then
         local allowed = {}
 
@@ -30,6 +31,7 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
             for i = 1, #convar do
                 allowed[convar[i]] = true
             end
+
             return allowed
         end
 
@@ -55,6 +57,7 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
             local c = convar[i]
             allowed[c] = hasAllPermission or IsPlayerAceAllowed(source, string.format('bMenu.%s%s', categoryText or '', c))
         end
+
         return allowed
     end
 
@@ -72,8 +75,9 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
     elseif categoryType == 'string' then
         local length = #categoryText
         local endStr = categoryText:sub(length, length)
-        categoryText = endStr == '.' and categoryText or categoryText..'.'
+        categoryText = endStr == '.' and categoryText or (categoryText .. '.')
     end
+
     return GetConvar('bMenu.Use_Permissions', 'false') == 'false' or IsPlayerAceAllowed(source, string.format('%sAll', categoryText)) or IsPlayerAceAllowed(source, string.format('bMenu.%s%s', categoryText or '', convar))
 end)
 

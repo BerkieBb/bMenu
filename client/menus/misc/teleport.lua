@@ -16,112 +16,6 @@ local function refreshLocations()
     end
 end
 
-local function teleportToCoords(pos)
-    local vehicleRestoreVisibility = IsInVehicle(true) and IsEntityVisible(cache.vehicle)
-    local pedRestoreVisibility = IsEntityVisible(cache.ped)
-
-    if IsInVehicle(true) then
-        FreezeEntityPosition(cache.vehicle, true)
-        if IsEntityVisible(cache.vehicle) then
-            NetworkFadeOutEntity(cache.vehicle, true, false)
-        end
-    else
-        ClearPedTasksImmediately(cache.ped)
-        FreezeEntityPosition(cache.ped, true)
-        if IsEntityVisible(cache.ped) then
-            NetworkFadeOutEntity(cache.ped, true, false)
-        end
-    end
-
-    DoScreenFadeOut(500)
-    while not IsScreenFadedOut() do
-        Wait(0)
-    end
-
-    local groundZ = 850
-    local found = false
-    for zz = 950, 0, -25 do
-        local z = zz
-        if zz % 2 ~= 0 then
-            z = 950 - zz
-        end
-
-        RequestCollisionAtCoord(pos.x, pos.y, z)
-
-        NewLoadSceneStart(pos.x, pos.y, z, pos.x, pos.y, z, 50, 0)
-
-        local tempTimer = GetGameTimer()
-
-        while IsNetworkLoadingScene() do
-            if GetGameTimer() - tempTimer > 1000 then
-                break
-            end
-            Wait(0)
-        end
-
-        SetEntityCoords(IsInVehicle(true) and cache.vehicle or cache.ped, pos.x, pos.y, z, false, false, false, true)
-
-        tempTimer = GetGameTimer()
-
-        while not HasCollisionLoadedAroundEntity(cache.ped) do
-            if GetGameTimer() - tempTimer > 1000 then
-                return
-            end
-            Wait(0)
-        end
-
-        found, groundZ = GetGroundZFor_3dCoord(pos.x, pos.y, z, false)
-
-        if found then
-            if IsInVehicle(true) then
-                SetEntityCoords(cache.vehicle, pos.x, pos.y, groundZ, false, false, false, true)
-                FreezeEntityPosition(cache.vehicle, false)
-                SetVehicleOnGroundProperly(cache.vehicle)
-                FreezeEntityPosition(cache.vehicle, true)
-            else
-                SetEntityCoords(cache.ped, pos.x, pos.y, groundZ, false, false, false, true)
-            end
-            break
-        end
-
-        Wait(10)
-    end
-
-    if not found then
-        local result, safePos = GetNthClosestVehicleNode(pos.x, pos.y, pos.z, 0, 0, 0, 0)
-        if not result or not safePos then
-            safePos = pos
-        end
-
-        if IsInVehicle(true) then
-            SetEntityCoords(cache.vehicle, safePos.x, safePos.y, safePos.z, false, false, false, true)
-            FreezeEntityPosition(cache.vehicle, false)
-            SetVehicleOnGroundProperly(cache.vehicle)
-            FreezeEntityPosition(cache.vehicle, true)
-        else
-            SetEntityCoords(cache.ped, safePos.x, safePos.y, safePos.z, false, false, false, true)
-        end
-    end
-
-    if IsInVehicle(true) then
-        if vehicleRestoreVisibility then
-            NetworkFadeInEntity(cache.vehicle, true)
-            if not pedRestoreVisibility then
-                SetEntityVisible(cache.ped, false, false)
-            end
-        end
-        FreezeEntityPosition(cache.vehicle, false)
-    else
-        if pedRestoreVisibility then
-            NetworkFadeInEntity(cache.ped, true)
-        end
-        FreezeEntityPosition(cache.ped, false)
-    end
-
-    DoScreenFadeIn(500)
-    SetGameplayCamRelativePitch(0.0, 1.0)
-end
-
 local function createLocationsMenu()
     local menuOptions = {}
     for i = 1, #locations do
@@ -194,8 +88,7 @@ function SetupTeleportOptions()
         end
 
         if args[1] == 'teleport_waypoint' then
-            local blipMarker = GetFirstBlipInfoId(8)
-            if not DoesBlipExist(blipMarker) then
+            if not IsWaypointActive() then
                 lib.notify({
                     description = 'No waypoint set',
                     type = 'error'
@@ -203,15 +96,7 @@ function SetupTeleportOptions()
                 return
             end
 
-            local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
-            local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
-            RequestCollisionAtCoord(waypointBlipPos.x, waypointBlipPos.y, 1000)
-            local result, z = GetGroundZFor_3dCoord(waypointBlipPos.x, waypointBlipPos.y, 1000, false)
-            if not result then
-                z = 0
-            end
-            waypointBlipPos = vec3(waypointBlipPos.x, waypointBlipPos.y, z)
-            teleportToCoords(waypointBlipPos)
+            TeleportToWaypoint()
         elseif args[1] == 'teleport_coords' then
             local dialog = lib.inputDialog('Teleport To Coords', {'Coords'})
 
@@ -276,6 +161,29 @@ function SetupTeleportOptions()
 end
 
 --#endregion Functions
+
+--#region Commands
+
+RegisterCommand('bMenu_tpToWaypoint', function()
+    if not IsScreenFadedIn() or IsPlayerSwitchInProgress() or not IsUsingKeyboard(2) then return end
+
+    if not IsWaypointActive() then
+        return lib.notify({
+            description = 'There is no waypoint active',
+            type = 'error'
+        })
+    end
+
+    TeleportToWaypoint()
+    lib.notify({
+        description = 'Teleported to waypoint',
+        type = 'success'
+    })
+end, true)
+
+RegisterKeyMapping('bMenu_tpToWaypoint', 'Teleport to waypoint', 'KEYBOARD', 'F7')
+
+--#endregion Commands
 
 --#region Threads
 

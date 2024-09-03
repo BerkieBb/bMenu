@@ -1633,11 +1633,11 @@ function SetupVehicleOptionsMenu()
                 SetEntityMaxSpeed(cache.vehicle, curSpeed)
                 if ShouldUseMetricMeasurements() then
                     lib.notify({
-                        description = ('Vehicle speed is now limited to %s KPH'):format(math.round(curSpeed * 3.6, 0.1))
+                        description = ('Vehicle speed is now limited to %s KPH'):format(lib.math.round(curSpeed * 3.6, 1))
                     })
                 else
                     lib.notify({
-                        description = ('Vehicle speed is now limited to %s MPH'):format(math.round(curSpeed * 2.23693629, 0.1))
+                        description = ('Vehicle speed is now limited to %s MPH'):format(lib.math.round(curSpeed * 2.23693629, 1))
                     })
                 end
             elseif scrollIndex == 2 then
@@ -1662,11 +1662,11 @@ function SetupVehicleOptionsMenu()
 
                 if ShouldUseMetricMeasurements() then
                     lib.notify({
-                        description = ('Vehicle speed is now limited to %s KPH'):format(math.round(input[1] * 3.6, 0.1))
+                        description = ('Vehicle speed is now limited to %s KPH'):format(lib.math.round(input[1] * 3.6, 1))
                     })
                 else
                     lib.notify({
-                        description = ('Vehicle speed is now limited to %s MPH'):format(math.round(input[1] * 2.23693629, 0.1))
+                        description = ('Vehicle speed is now limited to %s MPH'):format(lib.math.round(input[1] * 2.23693629, 1))
                     })
                 end
 
@@ -2527,7 +2527,7 @@ CreateThread(function()
             end
 
             if vehicleShowHealth then
-                DrawTextOnScreen(('~n~Engine health: %s~n~Body health: %s~n~Tank health: %s'):format(getHealthString(math.round(GetVehicleEngineHealth(veh), 0.001)), getHealthString(math.round(GetVehicleBodyHealth(veh), 0.001)), getHealthString(math.round(GetVehiclePetrolTankHealth(veh), 0.001))), 0.5, 0.0)
+                DrawTextOnScreen(('~n~Engine health: %s~n~Body health: %s~n~Tank health: %s'):format(getHealthString(lib.math.round(GetVehicleEngineHealth(veh), 3)), getHealthString(lib.math.round(GetVehicleBodyHealth(veh), 3)), getHealthString(lib.math.round(GetVehiclePetrolTankHealth(veh), 3))), 0.5, 0.0)
             end
 
             if vehicleHighbeamsOnHonk then
