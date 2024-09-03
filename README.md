@@ -15,7 +15,7 @@ If you've got any ideas that you'd like implemented or things you'd want changed
 Without any of the following requirements, this resource won't start
 
 * [ox_lib](https://github.com/overextended/ox_lib/releases)
-* OneSync infinity enabled (now called just OneSync as it is the default option)
+* OneSync Infinity enabled
 * [FXServer](https://runtime.fivem.net/artifacts/fivem/) 5904 or above
 
 ## Credits
@@ -24,7 +24,7 @@ Without any of the following requirements, this resource won't start
 
 ## Contact
 
-If you want to contact me, you can do that in either the issues or on Discord by adding me as a friend by my user tag `BerkieB#5038` or by joining my [discord](https://discord.gg/ZpqEZWSvZU)
+If you want to contact me, you can do that in either the issues or on Discord by adding me as a friend by my username `berkieb` or by joining my [discord](https://discord.gg/ZpqEZWSvZU)
 
 ## License
 
