@@ -11,6 +11,7 @@ local deathNotifs = false
 local nightVision = false
 local thermalVision = false
 local playerNames = false
+local driftMode = false
 local playerNamesDistance = 500
 local safeZoneSizeX = (1 / GetSafeZoneSize() / 3) - 0.358
 local gamerTags = {}
@@ -212,7 +213,31 @@ end)
 
 --#endregion Callbacks
 
+--#region Commands
+
+RegisterCommand('bMenu_toggleDriftMode', function()
+    driftMode = not driftMode
+
+    if not cache.vehicle then return end
+
+    SetVehicleReduceGrip(cache.vehicle, driftMode)
+end, true)
+
+RegisterKeyMapping('bMenu_toggleDriftMode', 'Toggle drift mode for bMenu', 'KEYBOARD', 'LSHIFT')
+
+--#endregion Commands
+
 --#region Threads
+
+lib.onCache('vehicle', function(value, oldValue)
+    if oldValue then
+        SetVehicleReduceGrip(oldValue, false)
+    end
+
+    if not value then return end
+
+    SetVehicleReduceGrip(value, driftMode)
+end)
 
 CreateThread(function()
     while true do
