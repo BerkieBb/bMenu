@@ -230,13 +230,8 @@ RegisterKeyMapping('bMenu_toggleDriftMode', 'Toggle drift mode for bMenu', 'KEYB
 --#region Threads
 
 lib.onCache('vehicle', function(value, oldValue)
-    if oldValue then
-        SetVehicleReduceGrip(oldValue, false)
-    end
-
-    if not value then return end
-
-    SetVehicleReduceGrip(value, driftMode)
+    if oldValue then SetVehicleReduceGrip(oldValue, false) end
+    if value then SetVehicleReduceGrip(value, false) end
 end)
 
 CreateThread(function()
