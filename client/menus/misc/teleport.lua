@@ -34,8 +34,14 @@ local function createLocationsMenu()
         end,
         options = menuOptions
     }, function(_, _, args)
-        SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
-        SetEntityHeading(cache.ped, args.heading)
+        if IsInVehicle(true) then
+            SetEntityCoords(cache.vehicle, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
+            SetEntityHeading(currentVeh, args.heading)
+        else
+            SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
+            SetEntityHeading(cache.ped, args.heading)
+        end
+
         lib.notify({
             description = ('Successfully teleport to %s'):format(args.name),
             type = 'success'
@@ -128,7 +134,11 @@ function SetupTeleportOptions()
                 actualValues[i] = nil
             end
 
-            SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
+            if IsInVehicle(true) then
+                SetEntityCoords(cache.vehicle, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
+            else
+                SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
+            end
 
             Wait(200)
             lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
