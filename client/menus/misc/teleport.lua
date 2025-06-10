@@ -34,9 +34,8 @@ local function createLocationsMenu()
         end,
         options = menuOptions
     }, function(_, _, args)
-        local currentVeh = cache.vehicle
         if IsInVehicle(true) then
-            SetEntityCoords(currentVeh, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
+            SetEntityCoords(cache.vehicle, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
             SetEntityHeading(currentVeh, args.heading)
         else
             SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
@@ -135,9 +134,8 @@ function SetupTeleportOptions()
                 actualValues[i] = nil
             end
 
-            local currentVeh = cache.vehicle
             if IsInVehicle(true) then
-                SetEntityCoords(currentVeh, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
+                SetEntityCoords(cache.vehicle, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
             else
                 SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
             end
