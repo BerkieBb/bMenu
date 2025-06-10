@@ -34,14 +34,14 @@ local function createLocationsMenu()
         end,
         options = menuOptions
     }, function(_, _, args)
-        local currentVeh = GetVehiclePedIsIn(cache.ped, false)
-            if currentVeh ~= 0 then
-                SetEntityCoords(currentVeh, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
-                SetEntityHeading(currentVeh, args.heading)
-            else
-                SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
-                SetEntityHeading(cache.ped, args.heading)
-            end
+        local currentVeh = cache.vehicle
+        if IsInVehicle(true) then
+            SetEntityCoords(currentVeh, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
+            SetEntityHeading(currentVeh, args.heading)
+        else
+            SetEntityCoords(cache.ped, args.coords.x, args.coords.y, args.coords.z, true, false, false, false)
+            SetEntityHeading(cache.ped, args.heading)
+        end
 
         lib.notify({
             description = ('Successfully teleport to %s'):format(args.name),
@@ -135,9 +135,8 @@ function SetupTeleportOptions()
                 actualValues[i] = nil
             end
 
-            -- This seems to fix vehicle support for teleporting with coords.
-            local currentVeh = GetVehiclePedIsIn(cache.ped, false)
-            if currentVeh ~= 0 then
+            local currentVeh = cache.vehicle
+            if IsInVehicle(true) then
                 SetEntityCoords(currentVeh, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
             else
                 SetEntityCoords(cache.ped, actualValues[1], actualValues[2], actualValues[3], true, false, false, false)
