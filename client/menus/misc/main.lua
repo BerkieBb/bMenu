@@ -193,8 +193,10 @@ end
 
 AddEventHandler('gameEventTriggered', function(name, args)
 	if name ~= 'CEventNetworkEntityDamage' or not deathNotifs then return end
+
 	local victim, victimDied = args[1], args[4]
 	if not victimDied or not IsPedAPlayer(victim) or (not IsPedDeadOrDying(victim, true) and not IsPedFatallyInjured(victim)) then return end
+
     local player = NetworkGetPlayerIndexFromPed(victim)
     local killerPed = GetPedSourceOfDeath(victim)
     local killerPlayer = NetworkGetPlayerIndexFromPed(killerPed)
@@ -255,9 +257,11 @@ CreateThread(function()
             local currentPos = GetEntityCoords(cache.ped, true)
             local _, nodePos = GetNthClosestVehicleNode(currentPos.x, currentPos.y, currentPos.z, 0, 0, 0, 0)
             nodePos = nodePos or currentPos
+
             local heading = GetEntityHeading(cache.ped)
             local safeZoneSize = GetSafeZoneSize()
             safeZoneSizeX = (1 / safeZoneSize / 3) - 0.358
+
             local _, crossing = GetStreetNameAtCoord(currentPos.x, currentPos.y, currentPos.z) or 1, 1
             local crossingName = GetStreetNameFromHashKey(crossing)
             local suffix = (crossingName and crossingName ~= '' and crossingName ~= 'NULL') and ('~t~ / %s'):format(crossingName) or ''
@@ -324,6 +328,7 @@ CreateThread(function()
                 for _, v in pairs(gamerTags) do
                     RemoveMpGamerTag(v)
                 end
+
                 table.wipe(gamerTags)
             end
         end

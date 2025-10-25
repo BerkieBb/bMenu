@@ -8,7 +8,6 @@ local locations = {}
 
 local function refreshLocations()
     local newLocations = lib.callback.await('bMenu:server:getConfig', false, 'locations')
-
     if newLocations and type(newLocations) == 'table' then
         for i = 1, #newLocations do
             locations[i] = newLocations[i]
@@ -147,7 +146,6 @@ function SetupTeleportOptions()
             lib.showMenu(args[1], MenuIndexes[args[1]])
         elseif args[1] == 'save_location' then
             local dialog = lib.inputDialog('Save Location', {'Location Name'})
-
             if not dialog or not dialog[1] or dialog[1] == '' then
                 Wait(200)
                 lib.showMenu('bMenu_misc_options_teleport_options', MenuIndexes['bMenu_misc_options_teleport_options'])
@@ -155,7 +153,6 @@ function SetupTeleportOptions()
             end
 
             local result, notification = lib.callback.await('bMenu:server:saveTeleportLocation', false, dialog[1])
-
             lib.notify({
                 description = notification,
                 type = result and 'success' or 'error'

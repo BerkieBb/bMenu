@@ -52,6 +52,10 @@ local lastWeatherChange = 0
 
 --#region Events
 
+---@param newWeather string
+---@param newBlackoutState boolean
+---@param newDynamicState boolean
+---@param newSnowState boolean
 RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutState, newDynamicState, newSnowState)
     if not weatherTypes[newWeather] then return end
 
@@ -70,6 +74,7 @@ RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutS
     end
 end)
 
+---@param removeClouds boolean?
 RegisterNetEvent('bMenu:server:setClouds', function(removeClouds)
     if removeClouds then
         TriggerClientEvent('bMenu:client:setClouds', -1, 0, 'removed')

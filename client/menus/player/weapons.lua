@@ -808,6 +808,7 @@ function SetupWeaponsMenu()
                 lib.setMenuOptions('bMenu_player_weapon_options', {label = 'Unlimited Ammo', args = {'unlimited_ammo'}, checked = checked, close = false}, selected)
                 local hasWeapon, currentWeapon = GetCurrentPedWeapon(cache.ped, true)
                 if not hasWeapon then return end
+
                 SetPedInfiniteAmmo(cache.ped, unlimitedAmmo, currentWeapon)
             elseif args[1] == 'no_reload' then
                 unlimitedClip = checked
@@ -874,7 +875,6 @@ function SetupWeaponsMenu()
             end
 
             local data = weapons[joaat(dialog[1])]
-
             if not data then
                 lib.notify({
                     description = ('Weapon %s doesn\'t exist, if this is an existing weapon, add it to the weapons.lua file in the config folder. If this weapon is a weapon from the game, make an issue on github about it and it will be added very soon.'):format(dialog[1]),

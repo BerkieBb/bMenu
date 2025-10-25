@@ -1,5 +1,6 @@
 --#region Callbacks
 
+---@return { source: integer, name: string }[]
 lib.callback.register('bMenu:server:getOnlinePlayers', function()
     local players = GetPlayers()
     local data = {}
@@ -10,9 +11,18 @@ lib.callback.register('bMenu:server:getOnlinePlayers', function()
             name = GetPlayerName(src)
         }
     end
+
     return data
 end)
 
+---@param source integer
+---@param action string
+---@param playerSource integer
+---@param canActOnSelf boolean
+---@param message string
+---@return boolean
+---@return string
+---@return any
 lib.callback.register('bMenu:server:playerListAction', function(source, action, playerSource, canActOnSelf, message)
     if source == playerSource and not canActOnSelf then return false, 'You can\'t act on yourself' end
 

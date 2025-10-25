@@ -2949,37 +2949,11 @@ local rotateSpeed = 20
 
 --#region Functions
 
-local function DrawTextOnScreen(text, x, y, size, position --[[ 0: center | 1: left | 2: right ]], font, disableTextOutline)
-    if
-    not IsHudPreferenceSwitchedOn()
-    or IsHudHidden()
-    or IsPlayerSwitchInProgress()
-    or IsScreenFadedOut()
-    or IsPauseMenuActive()
-    or IsFrontendFading()
-    or IsPauseMenuRestarting()
-    then
-        return
-    end
-
-    size = size or 0.48
-    position = position or 1
-    font = font or 6
-
-    SetTextFont(font)
-    SetTextScale(1.0, size)
-    if position == 2 then
-        SetTextWrap(0, x)
-    end
-    SetTextJustification(position)
-    if not disableTextOutline then
-        SetTextOutline()
-    end
-    BeginTextCommandDisplayText('STRING')
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandDisplayText(x, y)
-end
-
+---@param entity number
+---@param r integer
+---@param g integer
+---@param b integer
+---@param alpha integer
 local function drawEntityBoundingBox(entity, r, g, b, alpha)
     local pad = 0.001
     local min, max = GetModelDimensions(GetEntityModel(entity))
@@ -3262,6 +3236,7 @@ end
 RegisterNetEvent('bMenu:client:clearArea', function(pos)
     -- Make sure this is only triggered from the server
     if GetInvokingResource() then return end
+
     ClearAreaLeaveVehicleHealth(pos.x, pos.y, pos.z, 100, false, false, false, false)
 end)
 
@@ -3277,6 +3252,7 @@ CreateThread(function()
             coords = not coords and GetEntityCoords(cache.ped) or coords
             SetScriptGfxAlign(0, 84)
             SetScriptGfxAlignParams(0, 0, 0, 0)
+
             local screenWidth = GetActiveScreenResolution()
             DrawTextOnScreen(('~r~X~s~ \t\t%s\n~r~Y~s~ \t\t%s\n~r~Z~s~ \t\t%s\n~r~Heading~s~ \t%s'):format(coords.x, coords.y, coords.z, GetEntityHeading(cache.ped)), 0.5 - (30 / screenWidth), 0, 0.5, 1, 6, false)
             ResetScriptGfxAlign()

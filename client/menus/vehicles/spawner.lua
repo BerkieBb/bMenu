@@ -34,6 +34,7 @@ local replacePreviousVehicle = true -- Replace the previous vehicle you were in 
 
 --#region Functions
 
+---@param model number
 local function spawnVehicleOnPlayer(model)
     if not IsModelAVehicle(model) then return end
 
@@ -133,16 +134,21 @@ local function spawnVehicleOnPlayer(model)
     SetModelAsNoLongerNeeded(model)
 end
 
+---@param className string
+---@return integer[]
 local function getVehiclesFromClassName(className)
     local result = {}
     for _, v in pairs(Vehicles) do
         if v.className == className then
-            result[#result+1] = v
+            result[#result + 1] = v
         end
     end
+
     return result
 end
 
+---@param vehs table
+---@param id string
 local function createVehiclesForSpawner(vehs, id)
     table.sort(vehs, function(a, b)
         return a.name < b.name

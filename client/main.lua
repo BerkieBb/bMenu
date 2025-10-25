@@ -84,13 +84,17 @@ function DrawTextOnScreen(text, x, y, size, position, font, disableTextOutline)
 
     SetTextFont(font)
     SetTextScale(1.0, size)
+
     if position == 2 then
         SetTextWrap(0, x)
     end
+
     SetTextJustification(position)
+
     if not disableTextOutline then
         SetTextOutline()
     end
+
     BeginTextCommandDisplayText('STRING')
     AddTextComponentSubstringPlayerName(text)
     EndTextCommandDisplayText(x, y)
@@ -217,6 +221,7 @@ function TeleportToWaypoint()
     local waypointBlipInfo = GetFirstBlipInfoId(GetWaypointBlipEnumId())
     local waypointBlipPos = waypointBlipInfo ~= 0 and GetBlipInfoIdType(waypointBlipInfo) == 4 and GetBlipInfoIdCoord(waypointBlipInfo) or vec2(0, 0)
     RequestCollisionAtCoord(waypointBlipPos.x, waypointBlipPos.y, 1000)
+
     local result, z = GetGroundZFor_3dCoord(waypointBlipPos.x, waypointBlipPos.y, 1000, false)
     if not result then
         z = 0

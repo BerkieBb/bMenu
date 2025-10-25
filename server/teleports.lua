@@ -1,5 +1,9 @@
 --#region Callbacks
 
+---@param source integer
+---@param teleportName string
+---@return boolean
+---@return string
 lib.callback.register('bMenu:server:saveTeleportLocation', function(source, teleportName)
     local file = {string.strtrim(LoadResourceFile('bMenu', 'config/locations.lua'))}
 
@@ -29,6 +33,8 @@ lib.callback.register('bMenu:server:saveTeleportLocation', function(source, tele
     return false, 'Something went wrong with loading the locations file'
 end)
 
+---@param fileName string
+---@return any
 lib.callback.register('bMenu:server:getConfig', function(_, fileName)
     local file = LoadResourceFile('bMenu', ('config/%s.lua'):format(fileName))
     if not file then return end

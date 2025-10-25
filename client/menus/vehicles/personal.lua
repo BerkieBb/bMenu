@@ -182,7 +182,6 @@ function SetupVehiclePersonalMenu()
         end,
         onCheck = function(selected, checked, args)
             local curVeh = NetToVeh(currentVehicle)
-
             if not NetworkHasControlOfEntity(curVeh) then
                 if not NetworkRequestControlOfEntity(curVeh) then
                     lib.notify({
@@ -221,7 +220,6 @@ function SetupVehiclePersonalMenu()
         end,
         onSideScroll = function(selected, scrollIndex, args)
             local curVeh = NetToVeh(currentVehicle)
-
             if not NetworkHasControlOfEntity(curVeh) then
                 if not NetworkRequestControlOfEntity(curVeh) then
                     lib.notify({
@@ -254,11 +252,14 @@ function SetupVehiclePersonalMenu()
                     if entityState.state.bMenu_blip and DoesBlipExist(entityState.state.bMenu_blip) then
                         RemoveBlip(entityState.state.bMenu_blip)
                     end
+
                     entityState.state:set('bMenu_blip', nil)
                 end
+
                 curVeh = GetVehiclePedIsIn(cache.ped, false)
                 SetVehicleHasBeenOwnedByPlayer(curVeh, true)
                 SetEntityAsMissionEntity(curVeh, true, false)
+
                 if enableVehicleBlip then
                     local entityState = Entity(curVeh)
                     if not entityState.state.bMenu_blip or not DoesBlipExist(entityState.state.bMenu_blip) then
@@ -270,12 +271,14 @@ function SetupVehiclePersonalMenu()
                         entityState.state:set('bMenu_blip', blip)
                     end
                 end
+
                 local name = GetDisplayNameFromVehicleModel(GetEntityModel(curVeh))
                 local labelText = GetLabelText(name)
                 local vehicleName = labelText and labelText ~= '' and labelText ~= 'NULL' and ToProperCase(labelText) or ToProperCase(name)
                 lib.setMenuOptions('bMenu_vehicle_personal', {label = ('Current Vehicle: %s'):format(vehicleName)}, selected)
                 currentVehicle = VehToNet(curVeh)
             end
+
             lib.showMenu('bMenu_vehicle_personal', MenuIndexes['bMenu_vehicle_personal'])
         elseif DoesEntityExist(NetToVeh(currentVehicle)) then
             if args[1] == 'kick_passengers' then
@@ -327,11 +330,12 @@ function SetupVehiclePersonalMenu()
                         Wait(50)
                     end
 
+                    SetVehicleDoorsLockedForAllPlayers(curVeh, lock)
+
                     lib.notify({
                         description = ('Vehicle doors are now %s'):format(lock and 'locked' or 'unlocked'),
                         type = 'inform'
                     })
-                    SetVehicleDoorsLockedForAllPlayers(curVeh, lock)
                 elseif args[1] == 'alarm_sound' then
                     pressKeyFob()
                     if IsVehicleAlarmActivated(curVeh) then

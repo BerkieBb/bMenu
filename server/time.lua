@@ -11,6 +11,10 @@ currentMinute = currentMinute < 0 and 0 or currentMinute > 59 and 59 or currentM
 
 --#region Events
 
+---@param newHour integer
+---@param newMinute integer
+---@param newFreezeState boolean
+---@param newSyncState boolean
 RegisterNetEvent('bMenu:server:updateTime', function(newHour, newMinute, newFreezeState, newSyncState)
     newHour = newHour < 0 and 0 or newHour > 23 and 23 or newHour
     newMinute = newMinute < 0 and 0 or newMinute > 23 and 23 or newMinute

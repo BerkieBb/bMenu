@@ -531,6 +531,8 @@ local vehicleHighbeamsOnHonk = false
 
 --#region Functions
 
+---@param health number
+---@return string
 local function getHealthString(health)
     local color = ''
     if health <= 0 then
@@ -551,6 +553,7 @@ local function getHealthString(health)
     return ('%s%s~w~'):format(color, health)
 end
 
+---@return table<integer, integer>
 local function getAllPossibleMods()
     local result = {}
     for k in pairs(vehicleModTypes) do
@@ -563,6 +566,8 @@ local function getAllPossibleMods()
     return result
 end
 
+---@param mod integer
+---@return string?
 local function getModLocalizedType(mod)
     local alt
     local alt2
@@ -616,16 +621,17 @@ local function getModLocalizedType(mod)
     end
 
     local name = alt or vehicleModTypes[mod]?[1] or GetModSlotName(cache.vehicle, mod)
-
     return DoesTextLabelExist(name) and GetLabelText(name) or alt2 or vehicleModTypes[mod]?[2]
 end
 
+---@param modType integer
+---@param mod integer
+---@return string?
 local function getModLocalizedName(modType, mod)
     local modCount = GetNumVehicleMods(cache.vehicle, modType)
     if mod < -1 or mod >= modCount then return end
 
     local vehModel = GetEntityModel(cache.vehicle)
-
     if modType == 14 then
         local horn = vehicleHornNames[mod]
         if horn then
@@ -1242,12 +1248,11 @@ local function setupGodModeMenu()
             if args[1] == 'invincible' then
                 vehicleInvincible = val
 
-                local memoryAddress = Citizen.InvokeNative(`GET_ENTITY_ADDRESS`, cache.vehicle)
+                local memoryAddress = GetEntityAddress(cache.vehicle)
                 if memoryAddress then
                     memoryAddress += 392
 
                     local setter = vehicleInvincible and SetBit or ClearBit
-
                     setter(memoryAddress, 4) -- IsBulletProof
                     setter(memoryAddress, 5) -- IsFireProof
                     setter(memoryAddress, 6) -- IsCollisionProof
@@ -2457,12 +2462,11 @@ lib.onCache('vehicle', function(value)
     SetVehicleWheelsCanBreak(value, not vehicleStrongWheels)
     SetVehicleHasStrongAxles(value, vehicleStrongWheels)
 
-    local memoryAddress = Citizen.InvokeNative(`GET_ENTITY_ADDRESS`, value)
+    local memoryAddress = GetEntityAddress(value)
     if memoryAddress then
         memoryAddress += 392
 
         local setter = vehicleInvincible and SetBit or ClearBit
-
         setter(memoryAddress, 4) -- IsBulletProof
         setter(memoryAddress, 5) -- IsFireProof
         setter(memoryAddress, 6) -- IsCollisionProof

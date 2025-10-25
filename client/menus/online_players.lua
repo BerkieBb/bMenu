@@ -29,6 +29,7 @@ lib.registerMenu({
         lib.hideMenu(true)
         return
     end
+
     lib.showMenu(args[1], MenuIndexes[args[1]])
 end)
 
@@ -39,6 +40,7 @@ end)
 function CreatePlayerMenu()
     local id = 'bMenu_online_players'
     lib.setMenuOptions(id, {{label = 'No Players Online', icon = 'face-sad-tear', args = {'none'}}})
+
     local onlinePlayers = lib.callback.await('bMenu:server:getOnlinePlayers', false)
     local messageArg = 'message'
     local teleportArg = 'teleport'
@@ -128,7 +130,6 @@ function CreatePlayerMenu()
             end
 
             local message = args[1] == messageArg and lib.hideMenu(true) and lib.inputDialog(('Send a message to %s'):format(data.name), {'Message'})
-
             if args[1] == messageArg and (not message or not message[1] or message[1] == '') then
                 Wait(500)
                 lib.showMenu(formattedId, MenuIndexes[formattedId])
@@ -146,7 +147,6 @@ function CreatePlayerMenu()
                 end
 
                 local found = false
-
                 for i2 = -1, GetVehicleModelNumberOfSeats(GetEntityModel(veh)) do
                     if IsVehicleSeatFree(veh, i2) then
                         found = true
@@ -182,7 +182,6 @@ function CreatePlayerMenu()
             elseif args[1] == spectateArg and success then
                 local player = GetPlayerFromServerId(data.source)
                 local playerPed = GetPlayerPed(player)
-
                 if NetworkIsInSpectatorMode() then
                     if currentlySpectating ~= player and playerPed ~= 0 then
                         DoScreenFadeOut(500)
