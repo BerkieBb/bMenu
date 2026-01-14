@@ -50,6 +50,16 @@ local lastWeatherChange = 0
 
 --#endregion Variables
 
+--#region Functions
+
+---@param weather string
+---@return boolean
+local function isSnowWeather(weather)
+    return weather == 'XMAS' or weather == 'SNOWLIGHT' or weather == 'SNOW' or weather == 'BLIZZARD'
+end
+
+--#endregion Functions
+
 --#region Events
 
 ---@param newWeather string
@@ -62,16 +72,18 @@ RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutS
     SetConvarReplicated('bMenu.Current_Weather', newWeather)
     SetConvarReplicated('bMenu.Enable_Blackout', tostring(newBlackoutState))
     SetConvarReplicated('bMenu.Dynamic_Weather', tostring(newDynamicState))
+
+    if isSnowWeather(newWeather) then
+        newSnowState = true
+    elseif GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true' and isSnowWeather(currentWeather) then
+        newSnowState = false
+    end
+
     SetConvarReplicated('bMenu.Enable_Snow_Effects', tostring(newSnowState))
+
     currentWeather = newWeather
     dynamicWeather = newDynamicState
     lastWeatherChange = GetGameTimer()
-
-    if newWeather == 'XMAS' or newWeather == 'SNOWLIGHT' or newWeather == 'SNOW' or newWeather == 'BLIZZARD' then
-        SetConvarReplicated('bMenu.Enable_Snow_Effects', 'true')
-    elseif GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true' and not newSnowState then
-        SetConvarReplicated('bMenu.Enable_Snow_Effects', 'false')
-    end
 end)
 
 ---@param removeClouds boolean?
