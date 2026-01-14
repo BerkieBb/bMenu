@@ -69,7 +69,7 @@ RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutS
 
     if newWeather == 'XMAS' or newWeather == 'SNOWLIGHT' or newWeather == 'SNOW' or newWeather == 'BLIZZARD' then
         SetConvarReplicated('bMenu.Enable_Snow_Effects', 'true')
-    elseif GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true' then
+    elseif GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true' and not newSnowState then
         SetConvarReplicated('bMenu.Enable_Snow_Effects', 'false')
     end
 end)
