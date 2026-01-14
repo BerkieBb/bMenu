@@ -232,6 +232,15 @@ function TeleportToWaypoint()
     TeleportToCoords(waypointBlipPos)
 end
 
+---@param id string
+---@param openDelay number? defaults to 100
+function RefreshMenu(id, openDelay)
+    openDelay = openDelay and (openDelay < 0 and 100 or openDelay) or 100
+    lib.hideMenu(false)
+    Wait(openDelay)
+    lib.showMenu(id, MenuIndexes[id])
+end
+
 --#endregion Functions
 
 --#region Commands

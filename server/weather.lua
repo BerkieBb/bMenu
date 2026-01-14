@@ -84,6 +84,8 @@ RegisterNetEvent('bMenu:server:updateWeather', function(newWeather, newBlackoutS
     currentWeather = newWeather
     dynamicWeather = newDynamicState
     lastWeatherChange = GetGameTimer()
+
+    TriggerClientEvent('bMenu:client:updateWeather', -1, newWeather, newBlackoutState, newDynamicState, newSnowState)
 end)
 
 ---@param removeClouds boolean?

@@ -18,8 +18,8 @@ local weatherIndexes = {
     HALLOWEEN = {18, 'Halloween'}
 }
 
+local timeEnabled = GetConvar('bMenu.Enable_Time', 'true') == 'true'
 local timeSyncedWithMachine = GetConvar('bMenu.Sync_Time_To_Machine_Time', 'false') == 'true'
-local timeFrozen = GetConvar('bMenu.Freeze_Time', 'false') == 'true'
 local currentHour = tonumber(GetConvar('bMenu.Current_Hour', '7')) --[[@as number]]
 local currentMinute = tonumber(GetConvar('bMenu.Current_Minute', '0')) --[[@as number]]
 currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
@@ -28,12 +28,9 @@ local showTimeOnScreen = false
 local dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
 local blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
 local snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
-local checkedDynamicWeather = dynamicWeather
-local checkedBlackout = blackout
-local checkedSnowEffects = snowEffects
 local currentWeather = GetConvar('bMenu.Current_Weather', 'EXTRASUNNY'):upper()
 currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
-local currentChecked = 'EXTRASUNNY' -- Leave this so the checkmark can move itself accordingly in the loop
+local currentCheckedWeather = 'EXTRASUNNY' -- Leave this so the checkmark can move itself accordingly in the loop
 local weatherChangeTime = tonumber(GetConvar('bMenu.Weather_Change_Time', '5')) --[[@as number]]
 weatherChangeTime = weatherChangeTime < 0 and 0 or weatherChangeTime
 local changingWeather = false
@@ -43,14 +40,14 @@ local changingWeather = false
 --#region Functions
 
 local function createTimeOptions()
-    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'WorldRelated', 'TimeOptions'}, {'Freeze_Unfreeze_Time', 'Sync_Time', 'Show_Time', 'Presets', 'Set_Hour', 'Set_Minute'})
+    local perms = lib.callback.await('bMenu:server:hasConvarPermission', false, {'WorldRelated', 'TimeOptions'}, {'Toggle_Time', 'Sync_Time', 'Show_Time', 'Presets', 'Set_Hour', 'Set_Minute'})
     local menuOptions = {
         {label = 'No access', description = 'You don\'t have access to any options, press enter to return', args = {'bMenu_world_related_options'}}
     }
     local index = 1
 
-    if perms.Freeze_Unfreeze_Time then
-        menuOptions[index] = {label = 'Freeze/Unfreeze Time', args = {'freeze_time'}, close = false}
+    if perms.Toggle_Time then
+        menuOptions[index] = {label = 'Toggle Time System', description = 'Toggle the time system. Unchecked = disabled', args = {'toggle_time'}, checked = timeEnabled, close = false}
         index += 1
     end
 
@@ -111,7 +108,9 @@ local function createTimeOptions()
             MenuIndexes['bMenu_time_options'] = selected
         end,
         onCheck = function(selected, checked, args)
-            if args[1] == 'show_time' then
+            if args[1] == 'toggle_time' then
+                TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, timeSyncedWithMachine, checked)
+            elseif args[1] == 'show_time' then
                 showTimeOnScreen = checked
                 lib.setMenuOptions('bMenu_time_options', {label = 'Show Time On Screen', args = {'show_time'}, checked = showTimeOnScreen, close = false}, selected)
             end
@@ -126,7 +125,7 @@ local function createTimeOptions()
         timeSyncedWithMachine = GetConvar('bMenu.Sync_Time_To_Machine_Time', 'false') == 'true'
 
         if args[1] == 'sync_to_server' then
-            TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, timeFrozen, not timeSyncedWithMachine)
+            TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, not timeSyncedWithMachine, timeEnabled)
         end
 
         if timeSyncedWithMachine and args[1] ~= 'sync_to_server' then
@@ -137,18 +136,15 @@ local function createTimeOptions()
             return
         end
 
-        timeFrozen = GetConvar('bMenu.Freeze_Time', 'false') == 'true'
-        if args[1] == 'freeze_time' then
-            TriggerServerEvent('bMenu:server:updateTime', currentHour, currentMinute, not timeFrozen, timeSyncedWithMachine)
-        elseif args[1] == 'set_time_preset' then
-            TriggerServerEvent('bMenu:server:updateTime', args[2], 0, timeFrozen, timeSyncedWithMachine)
+        if args[1] == 'set_time_preset' then
+            TriggerServerEvent('bMenu:server:updateTime', args[2], 0, timeSyncedWithMachine, timeEnabled)
         elseif args[1] == 'set_time_custom' then
             if args[2] == 'hours' then
                 local hour = scrollIndex - 1
-                TriggerServerEvent('bMenu:server:updateTime', hour, currentMinute, timeFrozen, timeSyncedWithMachine)
+                TriggerServerEvent('bMenu:server:updateTime', hour, currentMinute, timeSyncedWithMachine, timeEnabled)
             elseif args[2] == 'minutes' then
                 local minute = scrollIndex - 1
-                TriggerServerEvent('bMenu:server:updateTime', currentHour, minute, timeFrozen, timeSyncedWithMachine)
+                TriggerServerEvent('bMenu:server:updateTime', currentHour, minute, timeSyncedWithMachine, timeEnabled)
             end
         end
     end)
@@ -162,17 +158,17 @@ local function createWeatherOptions()
     local index = 1
 
     if perms.Toggle_Dynamic_Weather then
-        menuOptions[index] = {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checkedDynamicWeather, close = false}
+        menuOptions[index] = {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = dynamicWeather, close = false}
         index += 1
     end
 
     if perms.Toggle_Blackout then
-        menuOptions[index] = {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checkedBlackout, close = false}
+        menuOptions[index] = {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}
         index += 1
     end
 
     if perms.Toggle_Snow_Effects then
-        menuOptions[index] = {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checkedSnowEffects, close = false}
+        menuOptions[index] = {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = snowEffects, close = false}
         index += 1
     end
 
@@ -241,23 +237,16 @@ local function createWeatherOptions()
         onSelected = function(selected)
             MenuIndexes['bMenu_weather_options'] = selected
         end,
-        onCheck = function(selected, checked, args)
+        onCheck = function(_, checked, args)
             blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
             snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
             dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
-
             if args[1] == 'dynamic_weather' then
-                checkedDynamicWeather = checked
                 TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, checked, snowEffects)
-                lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = checked, close = false}, selected)
             elseif args[1] == 'blackout' then
-                checkedBlackout = checked
                 TriggerServerEvent('bMenu:server:updateWeather', currentWeather, checked, dynamicWeather, snowEffects)
-                lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = checked, close = false}, selected)
             elseif args[1] == 'snow_effects' then
-                checkedSnowEffects = checked
                 TriggerServerEvent('bMenu:server:updateWeather', currentWeather, blackout, dynamicWeather, checked)
-                lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = checked, close = false}, selected)
             end
         end,
         options = menuOptions
@@ -278,9 +267,10 @@ local function createWeatherOptions()
 
             lib.notify({
                 description = ('Changing weather to %s'):format(weatherIndexes[args[2]][2]),
-                type = 'inform',
+                type = 'info',
                 duration = weatherChangeTime * 1000 + 2000
             })
+
             changingWeather = true
             blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
             snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
@@ -337,6 +327,70 @@ end
 
 --#region Events
 
+RegisterNetEvent('bMenu:client:updateWeather', function(newWeather, newBlackoutState, newDynamicState, newSnowState)
+    if GetInvokingResource() then return end
+
+    local openMenu = lib.getOpenMenu()
+    local oldWeather = currentWeather
+    blackout = newBlackoutState
+    snowEffects = newSnowState
+    dynamicWeather = newDynamicState
+    currentWeather = newWeather
+    currentCheckedWeather = currentWeather
+
+    if openMenu == 'bMenu_weather_options' then
+        lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}, 2)
+        lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = snowEffects, close = false}, 3)
+        lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = dynamicWeather, close = false}, 1)
+
+        local oldData = weatherIndexes[oldWeather]
+        local newData = weatherIndexes[currentWeather]
+        lib.setMenuOptions('bMenu_weather_options', {label = oldData[2], args = {'set_weather', currentCheckedWeather}, close = false}, oldData[1])
+        lib.setMenuOptions('bMenu_weather_options', {label = newData[2], icon = 'circle-check', args = {'set_weather', currentWeather}, close = false}, newData[1])
+
+        RefreshMenu(openMenu)
+    end
+
+    SetArtificialLightsState(blackout)
+
+    if snowEffects then
+        lib.requestNamedPtfxAsset('core_snow')
+        UseParticleFxAsset('core_snow')
+    else
+        RemoveNamedPtfxAsset('core_snow')
+    end
+
+    ForceSnowPass(snowEffects)
+    SetForceVehicleTrails(snowEffects)
+    SetForcePedFootstepsTracks(snowEffects)
+
+    if not dynamicWeather then
+        ClearOverrideWeather()
+    end
+end)
+
+RegisterNetEvent('bMenu:client:updateTime', function(newHour, newMinute, newSyncState, newTimeEnabled, updateMenu)
+    if GetInvokingResource() then return end
+
+    local openMenu = lib.getOpenMenu()
+    currentHour = newHour
+    currentMinute = newMinute
+    timeSyncedWithMachine = newSyncState
+    timeEnabled = newTimeEnabled
+
+    if openMenu == 'bMenu_time_options' and updateMenu then
+        lib.setMenuOptions('bMenu_time_options', {label = 'Toggle Time System', description = 'Toggle the time system. Unchecked = disabled', args = {'toggle_time'}, checked = timeEnabled, close = false}, 1)
+
+        RefreshMenu(openMenu)
+    end
+
+    if timeEnabled then
+        NetworkOverrideClockTime(currentHour, currentMinute, 0)
+    else
+        NetworkClearClockTimeOverride()
+    end
+end)
+
 RegisterNetEvent('bMenu:client:setClouds', function(opacity, cloudType)
     if opacity == 0 and cloudType == 'removed' then
         ClearCloudHat()
@@ -356,95 +410,58 @@ CreateThread(function()
     while true do
         if showTimeOnScreen then
             sleep = 0
-            DrawTextOnScreen(('Current Time: %s:%s'):format(currentHour < 10 and '0'..currentHour or currentHour, currentMinute < 10 and '0'..currentMinute or currentMinute), 0.5, 0.0)
+            DrawTextOnScreen(('Current Time: %s:%s'):format(currentHour < 10 and ('0' .. currentHour) or currentHour, currentMinute < 10 and ('0' .. currentMinute) or currentMinute), 0.5, 0.0)
+        else
+            sleep = 100
         end
+
         Wait(sleep)
     end
 end)
 
 CreateThread(function()
-    while true do
-        currentHour = tonumber(GetConvar('bMenu.Current_Hour', '7')) --[[@as number]]
-        currentMinute = tonumber(GetConvar('bMenu.Current_Minute', '0')) --[[@as number]]
-        currentHour = currentHour < 0 and 0 or currentHour > 23 and 23 or currentHour
-        currentMinute = currentMinute < 0 and 0 or currentMinute > 59 and 59 or currentMinute
+    if timeEnabled then
         NetworkOverrideClockTime(currentHour, currentMinute, 0)
-        Wait(1000)
+    else
+        NetworkClearClockTimeOverride()
     end
-end)
 
-CreateThread(function()
-    local changedThings = false
+    if snowEffects then
+        lib.requestNamedPtfxAsset('core_snow')
+        UseParticleFxAsset('core_snow')
+    else
+        RemoveNamedPtfxAsset('core_snow')
+    end
+
+    ForceSnowPass(snowEffects)
+    SetForceVehicleTrails(snowEffects)
+    SetForcePedFootstepsTracks(snowEffects)
+
+    SetArtificialLightsState(blackout)
+
+    if not dynamicWeather then
+        ClearOverrideWeather()
+    end
+
     while true do
-        local openMenu = lib.getOpenMenu()
-        blackout = GetConvar('bMenu.Enable_Blackout', 'false') == 'true'
-        snowEffects = GetConvar('bMenu.Enable_Snow_Effects', 'false') == 'true'
-        dynamicWeather = GetConvar('bMenu.Dynamic_Weather', 'true') == 'true'
-
-        if checkedBlackout ~= blackout and openMenu == 'bMenu_weather_options' then
-            lib.setMenuOptions('bMenu_weather_options', {label = 'Blackout', description = 'If turned on, disables all light sources', args = {'blackout'}, checked = blackout, close = false}, 2)
-            checkedBlackout = blackout
-            changedThings = true
-        end
-
-        if checkedSnowEffects ~= snowEffects and openMenu == 'bMenu_weather_options' then
-            lib.setMenuOptions('bMenu_weather_options', {label = 'Snow Effects', description = 'This will force snow to appear on the ground and enable snow particles for peds and vehicles. Combine with X-MAS or Light Snow for the best results', args = {'snow_effects'}, checked = snowEffects, close = false}, 3)
-            checkedSnowEffects = snowEffects
-            changedThings = true
-        end
-
-        if checkedDynamicWeather ~= dynamicWeather and openMenu == 'bMenu_weather_options' then
-            lib.setMenuOptions('bMenu_weather_options', {label = 'Dynamic Weather', description = 'Whether to randomize the state of the weather or not', args = {'dynamic_weather'}, checked = dynamicWeather, close = false}, 1)
-            checkedDynamicWeather = dynamicWeather
-            changedThings = true
-        end
-
-        ForceSnowPass(snowEffects)
-        SetForceVehicleTrails(snowEffects)
-        SetForcePedFootstepsTracks(snowEffects)
-
-        if snowEffects then
-            lib.requestNamedPtfxAsset('core_snow')
-            UseParticleFxAsset('core_snow')
-        else
-            RemoveNamedPtfxAsset('core_snow')
-        end
-
-        SetArtificialLightsState(blackout)
-
         currentWeather = GetConvar('bMenu.Current_Weather', 'EXTRASUNNY'):upper()
         currentWeather = not weatherIndexes[currentWeather] and 'EXTRASUNNY' or currentWeather
 
-        if currentChecked ~= currentWeather and openMenu == 'bMenu_weather_options' then
-            local oldData = weatherIndexes[currentChecked]
-            local newData = weatherIndexes[currentWeather]
-            lib.setMenuOptions('bMenu_weather_options', {label = oldData[2], args = {'set_weather', currentChecked}, close = false}, oldData[1])
-            lib.setMenuOptions('bMenu_weather_options', {label = newData[2], icon = 'circle-check', args = {'set_weather', currentWeather}, close = false}, newData[1])
-            currentChecked = currentWeather
-            changedThings = true
-        end
-
-        if changedThings and openMenu == 'bMenu_weather_options' then
-            lib.hideMenu(false)
-            Wait(100)
-            lib.showMenu('bMenu_weather_options', MenuIndexes['bMenu_weather_options'])
-            changedThings = false
-        elseif changedThings then
-            changedThings = false
-        end
-
-        if GetNextWeatherTypeHashName() ~= joaat(currentWeather) then
+        if GetNextWeatherTypeHashName() ~= joaat(currentWeather) and dynamicWeather then
             SetWeatherTypeOvertimePersist(currentWeather, weatherChangeTime)
             Wait(weatherChangeTime * 1000 + 2000)
+
             if changingWeather then
                 lib.notify({
                     description = ('Changed weather to %s'):format(weatherIndexes[currentWeather][2]),
                     type = 'success'
                 })
             end
+
             changingWeather = false
             TriggerEvent('bMenu:client:weatherChangeComplete', currentWeather)
         end
+
         Wait(1000)
     end
 end)
