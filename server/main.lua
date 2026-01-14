@@ -2,11 +2,38 @@
 
 -- I don't want you renaming this because this uses kvp and that requires the resource name to be the same across servers to work correctly
 if GetCurrentResourceName() ~= 'bMenu' then
-    error('Please don\'t rename this resource, change the folder name (back) to \'bMenu\' (case sensitive) to make sure the saved data can be saved and fetched accordingly from the cache.')
+    error('Please don\'t rename this resource, change the folder name (back) to \'bMenu\' (case sensitive) to make sure the saved data can be saved and fetched accordingly from the cache for players.')
     return
 end
 
 --#endregion Startup
+
+--#region Functions
+
+---@param category string[]
+---@return string
+local function getArrayCategoryText(category)
+    local categoryText = ''
+    for i = 1, #category do
+        local text = category[i]
+        local length = #text
+        local endStr = text:sub(length, length)
+        text = endStr == '.' and text or (text .. '.')
+        categoryText = string.format('%s%s', categoryText, text)
+    end
+
+    return categoryText
+end
+
+---@param category string
+---@return string
+local function getStringCategoryText(category)
+    local length = #category
+    local endStr = category:sub(length, length)
+    return endStr == '.' and category or (category .. '.')
+end
+
+--#endregion Functions
 
 --#region Callbacks
 
@@ -33,16 +60,17 @@ lib.callback.register('bMenu:server:hasCommandPermission', function(source, comm
 end)
 
 ---@param source integer
----@param category string
----@param convar string
----@return (boolean | table<string, boolean>)?
+---@param category string | string[]
+---@param convar string | string[]
+---@return boolean | table<string, boolean>
 lib.callback.register('bMenu:server:hasConvarPermission', function(source, category, convar)
-    if not convar then return end
+    if not convar then return false end
 
+    local permissionsEnabled = GetConvar('bMenu.Use_Permissions', 'true') == 'true'
     if type(convar) == 'table' then
         local allowed = {}
 
-        if GetConvar('bMenu.Use_Permissions', 'true') == 'false' then
+        if not permissionsEnabled then
             for i = 1, #convar do
                 allowed[convar[i]] = true
             end
@@ -51,49 +79,19 @@ lib.callback.register('bMenu:server:hasConvarPermission', function(source, categ
         end
 
         local categoryType = type(category)
-        local categoryText = category
-        if categoryType == 'table' then
-            categoryText = ''
-            for i = 1, #category do
-                local text = category[i]
-                local length = #text
-                local endStr = text:sub(length, length)
-                text = endStr == '.' and text or text..'.'
-                categoryText = string.format('%s%s', categoryText, text)
-            end
-        elseif categoryType == 'string' then
-            local length = #categoryText
-            local endStr = categoryText:sub(length, length)
-            categoryText = endStr == '.' and categoryText or categoryText..'.'
-        end
-
+        local categoryText = categoryType == 'table' and getArrayCategoryText(category) or categoryType == 'string' and getStringCategoryText(category) or ''
         local hasAllPermission = IsPlayerAceAllowed(source --[[@as string]], string.format('%sAll', categoryText))
         for i = 1, #convar do
-            local c = convar[i]
-            allowed[c] = hasAllPermission or IsPlayerAceAllowed(source --[[@as string]], string.format('bMenu.%s%s', categoryText or '', c))
+            local val = convar[i]
+            allowed[val] = hasAllPermission or IsPlayerAceAllowed(source --[[@as string]], string.format('bMenu.%s%s', categoryText or '', val))
         end
 
         return allowed
     end
 
     local categoryType = type(category)
-    local categoryText = category
-    if categoryType == 'table' then
-        categoryText = ''
-        for i = 1, #category do
-            local text = category[i]
-            local length = #text
-            local endStr = text:sub(length, length)
-            text = endStr == '.' and text or text..'.'
-            categoryText = string.format('%s%s', categoryText, text)
-        end
-    elseif categoryType == 'string' then
-        local length = #categoryText
-        local endStr = categoryText:sub(length, length)
-        categoryText = endStr == '.' and categoryText or (categoryText .. '.')
-    end
-
-    return GetConvar('bMenu.Use_Permissions', 'false') == 'false' or IsPlayerAceAllowed(source --[[@as string]], string.format('%sAll', categoryText)) or IsPlayerAceAllowed(source --[[@as string]], string.format('bMenu.%s%s', categoryText or '', convar))
+    local categoryText = categoryType == 'table' and getArrayCategoryText(category) or categoryType == 'string' and getStringCategoryText(category) or ''
+    return not permissionsEnabled or IsPlayerAceAllowed(source --[[@as string]], string.format('%sAll', categoryText)) or IsPlayerAceAllowed(source --[[@as string]], string.format('bMenu.%s%s', categoryText or '', convar))
 end)
 
 --#endregion Callbacks
