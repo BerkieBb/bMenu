@@ -166,7 +166,7 @@ local function setupAutoPilotOptions()
 
                 lib.notify({
                     description = 'Your player ped is now driving the vehicle for you. You can cancel any time by pressing the Stop Driving button. The vehicle will stop when it has reached the destination',
-                    type = 'inform'
+                    type = 'info'
                 })
             elseif args[1] == 'around_randomly' then
                 ClearPedTasks(cache.ped)
@@ -178,7 +178,7 @@ local function setupAutoPilotOptions()
 
                 lib.notify({
                     description = 'Your player ped is now driving the vehicle for you. You can cancel any time by pressing the Stop Driving button',
-                    type = 'inform'
+                    type = 'info'
                 })
             elseif args[1] == 'stop_driving' then
                 local coords = GetEntityCoords(cache.ped)
@@ -188,7 +188,7 @@ local function setupAutoPilotOptions()
 
                 lib.notify({
                     description = 'The player ped will find a suitable place to park the car and will then stop driving. Please wait',
-                    type = 'inform'
+                    type = 'info'
                 })
                 ClearPedTasks(cache.ped)
                 TaskVehiclePark(cache.ped, cache.vehicle, closestNode.x, closestNode.y, closestNode.z, GetEntityHeading(cache.ped), 3, 60, true)
@@ -202,7 +202,7 @@ local function setupAutoPilotOptions()
 
                 lib.notify({
                     description = 'Your vehicle is now stopped',
-                    type = 'inform'
+                    type = 'info'
                 })
             elseif args[1] == 'force_stop_driving' then
                 ClearPedTasks(cache.ped)

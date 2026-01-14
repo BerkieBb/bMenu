@@ -286,7 +286,7 @@ function SetupVehiclePersonalMenu()
                 if IsPedInVehicle(cache.ped, curVeh, false) or (GetVehicleNumberOfPassengers(curVeh) == 0 and not IsVehicleSeatFree(curVeh, -1)) then
                     lib.notify({
                         description = 'No one to kick out of the vehicle',
-                        type = 'inform'
+                        type = 'info'
                     })
                     return
                 end
@@ -334,7 +334,7 @@ function SetupVehiclePersonalMenu()
 
                     lib.notify({
                         description = ('Vehicle doors are now %s'):format(lock and 'locked' or 'unlocked'),
-                        type = 'inform'
+                        type = 'info'
                     })
                 elseif args[1] == 'alarm_sound' then
                     pressKeyFob()

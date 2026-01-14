@@ -68,7 +68,7 @@ function SetupConnectionOptions()
         elseif args[1] == 'quit_game' then
             lib.notify({
                 description = 'The game will exit in 5 seconds',
-                type = 'inform'
+                type = 'info'
             })
             Wait(5000)
             RestartGame()

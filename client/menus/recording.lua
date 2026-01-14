@@ -82,7 +82,7 @@ function CreateRecordingMenu()
                 if quitSession then
                     lib.notify({
                         description = 'You have left your previous session before opening the Rockstar Editor. Restart the game to be able to rejoin the server\'s main session',
-                        type = 'inform'
+                        type = 'info'
                     })
                 end
             end)

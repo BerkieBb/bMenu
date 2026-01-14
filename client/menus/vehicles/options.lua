@@ -1649,7 +1649,7 @@ function SetupVehicleOptionsMenu()
                 SetEntityMaxSpeed(cache.vehicle, 500.01)
                 lib.notify({
                     description = 'Vehicle speed is now no longer limited',
-                    type = 'inform'
+                    type = 'info'
                 })
             elseif scrollIndex == 3 then
                 lib.hideMenu(false)

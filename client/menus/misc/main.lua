@@ -202,7 +202,7 @@ AddEventHandler('gameEventTriggered', function(name, args)
     local killerPlayer = NetworkGetPlayerIndexFromPed(killerPed)
     local deathCause = GetPedCauseOfDeath(victim)
     local description = killerPed ~= cache.ped and NetworkIsPlayerActive(killerPlayer) and ('%s was killed by %s with %s'):format(GetPlayerName(player), GetPlayerName(killerPlayer), deathCause) or ('%s was killed by %s'):format(GetPlayerName(player), deathCause)
-    lib.notify({title = 'Death Notification', description = description, type = 'inform'})
+    lib.notify({title = 'Death Notification', description = description, type = 'info'})
 end)
 
 --#endregion Events
