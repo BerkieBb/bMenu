@@ -24,7 +24,7 @@ Without any of the following requirements, this resource won't start
 
 ## Contact
 
-If you want to contact me, you can do that in either the issues or on Discord by adding me as a friend by my username `berkieb` or by joining my [discord](https://discord.gg/ZpqEZWSvZU)
+If you want to contact me, you can do that in either the issues or on Discord by adding me as a friend by my username `berkieb` or by joining my [discord](https://discord.gg/7h4Xx59DhD)
 
 ## License
 
